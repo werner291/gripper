@@ -13,12 +13,14 @@ use nphysics3d::{
     object::RigidBodyDesc
 };
 use crate::physics::PhysicsWorld;
+use std::prelude::v1::Vec;
+use std::clone::Clone;
 
 /// Spawns a new ball with a radius of 0.3 at (4.0, 1.0, 0.0).
 ///
 /// The ball is stuck to a vertical axis that it cannot leave:
 /// it can only be moved along the Y-axis.
-pub fn make_pinned_ball(window: &mut Window, physics: &mut PhysicsWorld, bp_to_sn: &mut Vec<(SceneNode, DefaultBodyPartHandle)>) -> (SceneNode, BodyPartHandle<DefaultBodyHandle>) {
+pub fn make_pinned_ball(window: &mut Window, physics: &mut PhysicsWorld, bp_to_sn: &mut Vec<(SceneNode, DefaultBodyPartHandle)>) -> (SceneNode, DefaultBodyPartHandle) {
     const RADIUS: f32 = 0.3;
 
     let rb = RigidBodyDesc::new()
