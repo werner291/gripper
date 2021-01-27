@@ -16,10 +16,14 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="99bfd17e-0b5a-4a4c-b788-1095db1046ef" name="Default Changelist" comment="Implemented automatic gradient-descent-based control.">
+    <list default="true" id="99bfd17e-0b5a-4a4c-b788-1095db1046ef" name="Default Changelist" comment="Gradient descent controller can now do gripper orientation as well, though overshoots the target occasionally.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/control_demos.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/control_demos.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/gradient_descent_control.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/gradient_descent_control.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/keyboard_control.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/keyboard_control.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/load_mesh.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/load_mesh.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/physics.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/physics.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/robot.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/robot.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/spawn_utilities.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/spawn_utilities.rs" afterDir="false" />
     </list>
@@ -94,7 +98,8 @@
     <MESSAGE value="Got a working robotic arm with gripper!" />
     <MESSAGE value="The robotic arm is now controllable, and the code is much cleaner. The robot has a collidable gripper, and a ball that can be picked up." />
     <MESSAGE value="Implemented automatic gradient-descent-based control." />
-    <option name="LAST_COMMIT_MESSAGE" value="Implemented automatic gradient-descent-based control." />
+    <MESSAGE value="Gradient descent controller can now do gripper orientation as well, though overshoots the target occasionally." />
+    <option name="LAST_COMMIT_MESSAGE" value="Gradient descent controller can now do gripper orientation as well, though overshoots the target occasionally." />
   </component>
   <component name="WindowStateProjectService">
     <state x="320" y="72" width="1017" height="719" key="#Plugins" timestamp="1611527829351">
@@ -105,30 +110,30 @@
       <screen x="0" y="0" width="1440" height="864" />
     </state>
     <state x="508" y="186" width="424" height="491" key="FileChooserDialogImpl/0.0.1440.864@0.0.1440.864" timestamp="1611604962454" />
-    <state width="1394" height="213" key="GridCell.Tab.0.bottom" timestamp="1611755888082">
+    <state width="1394" height="213" key="GridCell.Tab.0.bottom" timestamp="1611765104300">
       <screen x="0" y="0" width="1440" height="864" />
     </state>
-    <state width="1394" height="213" key="GridCell.Tab.0.bottom/0.0.1440.864@0.0.1440.864" timestamp="1611755888082" />
-    <state width="1394" height="213" key="GridCell.Tab.0.center" timestamp="1611755888081">
+    <state width="1394" height="213" key="GridCell.Tab.0.bottom/0.0.1440.864@0.0.1440.864" timestamp="1611765104300" />
+    <state width="1394" height="213" key="GridCell.Tab.0.center" timestamp="1611765104298">
       <screen x="0" y="0" width="1440" height="864" />
     </state>
-    <state width="1394" height="213" key="GridCell.Tab.0.center/0.0.1440.864@0.0.1440.864" timestamp="1611755888081" />
-    <state width="1394" height="213" key="GridCell.Tab.0.left" timestamp="1611755888081">
+    <state width="1394" height="213" key="GridCell.Tab.0.center/0.0.1440.864@0.0.1440.864" timestamp="1611765104298" />
+    <state width="1394" height="213" key="GridCell.Tab.0.left" timestamp="1611765104298">
       <screen x="0" y="0" width="1440" height="864" />
     </state>
-    <state width="1394" height="213" key="GridCell.Tab.0.left/0.0.1440.864@0.0.1440.864" timestamp="1611755888081" />
-    <state width="1394" height="213" key="GridCell.Tab.0.right" timestamp="1611755888082">
+    <state width="1394" height="213" key="GridCell.Tab.0.left/0.0.1440.864@0.0.1440.864" timestamp="1611765104298" />
+    <state width="1394" height="213" key="GridCell.Tab.0.right" timestamp="1611765104299">
       <screen x="0" y="0" width="1440" height="864" />
     </state>
-    <state width="1394" height="213" key="GridCell.Tab.0.right/0.0.1440.864@0.0.1440.864" timestamp="1611755888082" />
+    <state width="1394" height="213" key="GridCell.Tab.0.right/0.0.1440.864@0.0.1440.864" timestamp="1611765104299" />
     <state x="221" y="63" key="SettingsEditor" timestamp="1611511223289">
       <screen x="0" y="0" width="1440" height="864" />
     </state>
     <state x="221" y="63" key="SettingsEditor/0.0.1440.864@0.0.1440.864" timestamp="1611511223289" />
-    <state x="320" y="164" key="Vcs.Push.Dialog.v2" timestamp="1611606181750">
+    <state x="320" y="164" key="Vcs.Push.Dialog.v2" timestamp="1611756080188">
       <screen x="0" y="0" width="1440" height="864" />
     </state>
-    <state x="320" y="164" key="Vcs.Push.Dialog.v2/0.0.1440.864@0.0.1440.864" timestamp="1611606181750" />
+    <state x="320" y="164" key="Vcs.Push.Dialog.v2/0.0.1440.864@0.0.1440.864" timestamp="1611756080188" />
     <state x="424" y="171" width="592" height="580" key="find.popup" timestamp="1611344920372">
       <screen x="0" y="0" width="1440" height="864" />
     </state>

@@ -16,14 +16,25 @@ pub fn stl_to_trimesh(path: &str) -> TriMesh<f32> {
 
     let stl = stl_io::read_stl(&mut file).unwrap();
 
-    let vertices = stl.faces.iter().flat_map(|f: &IndexedTriangle| {
-        f.vertices.iter().map(|i| {
-            let v = stl.vertices[*i];
-            Point3::new(v[0],v[1], v[2])
-        }).collect::<Vec<_>>()
-    }).collect();
+    let vertices = stl
+        .faces
+        .iter()
+        .flat_map(|f: &IndexedTriangle| {
+            f.vertices
+                .iter()
+                .map(|i| {
+                    let v = stl.vertices[*i];
+                    Point3::new(v[0], v[1], v[2])
+                })
+                .collect::<Vec<_>>()
+        })
+        .collect();
 
     let mut mesh = TriMesh::new(vertices, None, None, None);
-    mesh.transform_by(&Isometry3::rotation(Vector3::new(-std::f32::consts::FRAC_PI_2,0.0,0.0)));
+    mesh.transform_by(&Isometry3::rotation(Vector3::new(
+        -std::f32::consts::FRAC_PI_2,
+        0.0,
+        0.0,
+    )));
     mesh
 }

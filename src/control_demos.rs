@@ -3,15 +3,19 @@ use std::iter::Iterator;
 use nphysics3d::joint::RevoluteJoint;
 
 use crate::physics::PhysicsWorld;
-use crate::robot::{GripperDirection, RobotBodypartIndex, set_gripper_direction};
 use crate::robot;
+use crate::robot::{set_gripper_direction, GripperDirection, RobotBodypartIndex};
 
 pub fn control_gripper_demo(mut physics: &mut PhysicsWorld, robot: &RobotBodypartIndex, t: f32) {
-    set_gripper_direction(&mut physics, &robot, if (t / 5.0) as i64 % 2 == 0 {
-        GripperDirection::Open
-    } else {
-        GripperDirection::Closed
-    });
+    set_gripper_direction(
+        &mut physics,
+        &robot,
+        if (t / 5.0) as i64 % 2 == 0 {
+            GripperDirection::Open
+        } else {
+            GripperDirection::Closed
+        },
+    );
 }
 
 fn control_flailing_demo(mut physics: &mut PhysicsWorld, robot: &RobotBodypartIndex, t: f32) {

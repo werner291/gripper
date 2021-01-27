@@ -1,10 +1,9 @@
 use std::cell::RefCell;
 use std::clone::Clone;
-use std::convert::{From, Into};
 use std::f32::consts::{FRAC_PI_2, PI};
-use std::iter::{Iterator, IntoIterator};
-use std::option::Option::{None, Some};
+use std::iter::Iterator;
 use std::option::Option;
+use std::option::Option::{None, Some};
 use std::prelude::v1::Vec;
 use std::rc::Rc;
 use std::string::{String, ToString};
@@ -13,11 +12,13 @@ use kiss3d::ncollide3d::na::{Isometry3, Rotation3, Unit, Vector3};
 use kiss3d::ncollide3d::pipeline::CollisionGroups;
 use kiss3d::ncollide3d::procedural::TriMesh;
 use kiss3d::ncollide3d::shape::{ConvexHull, ShapeHandle};
-use kiss3d::ncollide3d::shape::TriMesh as sTriMesh;
 use kiss3d::resource::{MaterialManager, Mesh, TextureManager};
 use kiss3d::scene::{Object, SceneNode};
 use nphysics3d::joint::{FixedJoint, Joint, RevoluteJoint};
-use nphysics3d::object::{Body, BodyPartHandle, ColliderDesc, DefaultBodyHandle, DefaultBodyPartHandle, DefaultColliderHandle, Multibody, MultibodyDesc, MultibodyLink};
+use nphysics3d::object::{
+    Body, BodyPartHandle, ColliderDesc, DefaultBodyHandle, DefaultBodyPartHandle, Multibody,
+    MultibodyDesc, MultibodyLink,
+};
 
 use crate::load_mesh;
 use crate::physics::PhysicsWorld;
@@ -46,7 +47,8 @@ impl RobotBodypartIndex {
     ///
     /// Also provides a canonical mapping for motors to numerical channels.
     pub fn motor_parts(&self) -> [DefaultBodyPartHandle; 10] {
-        [   self.swivel,
+        [
+            self.swivel,
             self.link1,
             self.link2,
             self.gripper,
@@ -55,7 +57,7 @@ impl RobotBodypartIndex {
             self.finger_2,
             self.finger_0_2,
             self.finger_1_2,
-            self.finger_0_2
+            self.finger_0_2,
         ]
     }
 
@@ -63,67 +65,99 @@ impl RobotBodypartIndex {
     ///
     /// Setting a positive speed on these opens the gripper, a negative speed closes them.
     pub fn finger_parts(&self) -> [DefaultBodyPartHandle; 6] {
-        [   self.finger_0,
+        [
+            self.finger_0,
             self.finger_1,
             self.finger_2,
             self.finger_0_2,
             self.finger_1_2,
-            self.finger_2_2
+            self.finger_2_2,
         ]
     }
 }
 
 /// Build a physical and visible robot.
-pub fn make_robot(physics: &mut PhysicsWorld, scene: &mut SceneNode, part_to_body: &mut Vec<(SceneNode, DefaultBodyPartHandle)>) -> RobotBodypartIndex {
-
+pub fn make_robot(
+    physics: &mut PhysicsWorld,
+    scene: &mut SceneNode,
+    part_to_body: &mut Vec<(SceneNode, DefaultBodyPartHandle)>,
+) -> RobotBodypartIndex {
     // Generates a Multibody of the robot, without any visible parts.
     let robot = make_multibody(physics);
 
     attach_colliders(physics, &robot);
 
     // Otherwise, the robot sometimes fails to respond to control signals if it goes to sleep.
-    physics.bodies.get_mut(robot.body).unwrap().set_deactivation_threshold(None);
+    physics
+        .bodies
+        .get_mut(robot.body)
+        .unwrap()
+        .set_deactivation_threshold(None);
 
     build_graphics(scene, part_to_body, &robot);
 
     robot
 }
 
-fn build_graphics(scene: &mut SceneNode, part_to_body: &mut Vec<(SceneNode, DefaultBodyPartHandle)>, robot: &RobotBodypartIndex) {
-// Allocate some scene nodes and load the appropriate meshes.
-    let base = scene.add_trimesh(load_mesh::stl_to_trimesh("scad/base.stl"), Vector3::new(1.0, 1.0, 1.0));
-    let swivel = scene.add_trimesh(load_mesh::stl_to_trimesh("scad/rotbase.stl"), Vector3::new(1.0, 1.0, 1.0));
-    let link1 = scene.add_trimesh(load_mesh::stl_to_trimesh("scad/armlink.stl"), Vector3::new(1.0, 1.0, 1.0));
-    let link2 = scene.add_trimesh(load_mesh::stl_to_trimesh("scad/armlink.stl"), Vector3::new(1.0, 1.0, 1.0));
-    let gripper = scene.add_trimesh(load_mesh::stl_to_trimesh("scad/gripper.stl"), Vector3::new(1.0, 1.0, 1.0));
+fn build_graphics(
+    scene: &mut SceneNode,
+    part_to_body: &mut Vec<(SceneNode, DefaultBodyPartHandle)>,
+    robot: &RobotBodypartIndex,
+) {
+    // Allocate some scene nodes and load the appropriate meshes.
+    let base = scene.add_trimesh(
+        load_mesh::stl_to_trimesh("scad/base.stl"),
+        Vector3::new(1.0, 1.0, 1.0),
+    );
+    let swivel = scene.add_trimesh(
+        load_mesh::stl_to_trimesh("scad/rotbase.stl"),
+        Vector3::new(1.0, 1.0, 1.0),
+    );
+    let link1 = scene.add_trimesh(
+        load_mesh::stl_to_trimesh("scad/armlink.stl"),
+        Vector3::new(1.0, 1.0, 1.0),
+    );
+    let link2 = scene.add_trimesh(
+        load_mesh::stl_to_trimesh("scad/armlink.stl"),
+        Vector3::new(1.0, 1.0, 1.0),
+    );
+    let gripper = scene.add_trimesh(
+        load_mesh::stl_to_trimesh("scad/gripper.stl"),
+        Vector3::new(1.0, 1.0, 1.0),
+    );
 
     // Fingers are special due to them being copies of each other and rotated.
-    let [finger_0, finger_1, finger_2, finger_0_2, finger_1_2, finger_2_2] = [0, 1, 2, 0, 1, 2].map(|i| {
-        let mesh = load_mesh::stl_to_trimesh("scad/phalanx.stl");
-        let transform = Isometry3::rotation(Vector3::new(0.0, std::f32::consts::FRAC_PI_2 + std::f32::consts::PI * i as f32 / 1.5, 0.0));
+    let [finger_0, finger_1, finger_2, finger_0_2, finger_1_2, finger_2_2] = [0, 1, 2, 0, 1, 2]
+        .map(|i| {
+            let mesh = load_mesh::stl_to_trimesh("scad/phalanx.stl");
+            let transform = Isometry3::rotation(Vector3::new(
+                0.0,
+                std::f32::consts::FRAC_PI_2 + std::f32::consts::PI * i as f32 / 1.5,
+                0.0,
+            ));
 
-        // Use the `wrap_transformed_trimesh` function since they need to be rotated,
-        // which cannot be represented in the Multibody structure.
-        let node = wrap_transformed_trimesh(mesh, transform);
-        scene.add_child(node.clone() /* Rc<RefCell<_>> construction. */);
-        node
-    });
+            // Use the `wrap_transformed_trimesh` function since they need to be rotated,
+            // which cannot be represented in the Multibody structure.
+            let node = wrap_transformed_trimesh(mesh, transform);
+            scene.add_child(node.clone() /* Rc<RefCell<_>> construction. */);
+            node
+        });
 
     // Update the part-to-body index, which will allow the simulator
     // to synchronize the body parts to their scene node counterparts.
-    part_to_body.extend_from_slice(
-        &[(base, robot.base.clone()),
-            (swivel, robot.swivel.clone()),
-            (link1, robot.link1.clone()),
-            (link2, robot.link2.clone()),
-            (gripper, robot.gripper.clone()),
-            (finger_0, robot.finger_0.clone()),
-            (finger_1, robot.finger_1.clone()),
-            (finger_2, robot.finger_2.clone()),
-            (finger_0_2, robot.finger_0_2.clone()),
-            (finger_1_2, robot.finger_1_2.clone()),
-            (finger_2_2, robot.finger_2_2.clone())]
-    );
+    part_to_body.extend_from_slice(&[
+        (base, robot.base.clone()),
+        (swivel, robot.swivel.clone()),
+        (link1, robot.link1.clone()),
+        (link2, robot.link2.clone()),
+        (gripper, robot.gripper.clone()),
+        (finger_0, robot.finger_0.clone()),
+        (finger_1, robot.finger_1.clone()),
+        (finger_2, robot.finger_2.clone()),
+        (finger_0_2, robot.finger_0_2.clone()),
+        (finger_1_2, robot.finger_1_2.clone()),
+        (finger_2_2, robot.finger_2_2.clone()),
+    ]);
 }
 
 fn attach_colliders(physics: &mut PhysicsWorld, robot: &RobotBodypartIndex) {
@@ -134,7 +168,12 @@ fn attach_colliders(physics: &mut PhysicsWorld, robot: &RobotBodypartIndex) {
     for (i, n) in robot.finger_parts().iter().enumerate() {
         let mesh = load_mesh::stl_to_trimesh("scad/phalanx.stl");
 
-        attach_collider_with_mesh(physics, *n, mesh, Vector3::new(0.0, FRAC_PI_2 + PI * i as f32 / 1.5, 0.0));
+        attach_collider_with_mesh(
+            physics,
+            *n,
+            mesh,
+            Vector3::new(0.0, FRAC_PI_2 + PI * i as f32 / 1.5, 0.0),
+        );
     }
 }
 
@@ -153,18 +192,54 @@ fn make_multibody(physics: &mut PhysicsWorld) -> RobotBodypartIndex {
         joint.enable_angular_motor();
         joint.set_desired_angular_motor_velocity(1.0);
         joint.set_max_angular_motor_torque(1.0);
-        base.add_child(joint).set_name("swivel".to_string()).set_parent_shift(Vector3::new(0.0, SWIVEL_SHIFT, 0.0))
+        base.add_child(joint)
+            .set_name("swivel".to_string())
+            .set_parent_shift(Vector3::new(0.0, SWIVEL_SHIFT, 0.0))
     };
 
-
-    let mut link1 = make_link(&mut swivel, Vector3::new(0.0, LINK1_SHIFT, 0.0), -PI * 0.75, PI * 0.75, Vector3::x(), "link1".to_string());
-    let mut link2 = make_link(&mut link1, Vector3::new(0.0, LINK_LENGTH, 0.0), -PI * 0.75, PI * 0.75, Vector3::x(), "link2".to_string());
-    let mut gripper = make_link(&mut link2, Vector3::new(0.0, LINK_LENGTH, 0.0), -FRAC_PI_2, FRAC_PI_2, Vector3::x(), "gripper".to_string());
+    let mut link1 = make_link(
+        &mut swivel,
+        Vector3::new(0.0, LINK1_SHIFT, 0.0),
+        -PI * 0.75,
+        PI * 0.75,
+        Vector3::x(),
+        "link1".to_string(),
+    );
+    let mut link2 = make_link(
+        &mut link1,
+        Vector3::new(0.0, LINK_LENGTH, 0.0),
+        -PI * 0.75,
+        PI * 0.75,
+        Vector3::x(),
+        "link2".to_string(),
+    );
+    let mut gripper = make_link(
+        &mut link2,
+        Vector3::new(0.0, LINK_LENGTH, 0.0),
+        -FRAC_PI_2,
+        FRAC_PI_2,
+        Vector3::x(),
+        "gripper".to_string(),
+    );
 
     for i in 0..3 {
         let rot = Rotation3::new(Vector3::new(0.0, 2.0 * PI * (i as f32) / 3.0, 0.0));
-        let mut phalanx_1 = make_link(&mut gripper, &rot * Vector3::new(0.0, 0.5, 0.3), 0.0, FRAC_PI_2, &rot * Vector3::x(), format!("finger_{}", i), );
-        make_link(&mut phalanx_1, &rot * Vector3::new(0.0, 0.5, 0.0), -0.4, FRAC_PI_2, &rot * Vector3::x(), format!("finger_{}_2", i), );
+        let mut phalanx_1 = make_link(
+            &mut gripper,
+            &rot * Vector3::new(0.0, 0.5, 0.3),
+            0.0,
+            FRAC_PI_2,
+            &rot * Vector3::x(),
+            format!("finger_{}", i),
+        );
+        make_link(
+            &mut phalanx_1,
+            &rot * Vector3::new(0.0, 0.5, 0.0),
+            -0.4,
+            FRAC_PI_2,
+            &rot * Vector3::x(),
+            format!("finger_{}_2", i),
+        );
     }
 
     let mb = physics.bodies.insert(base.build());
@@ -187,10 +262,14 @@ fn make_multibody(physics: &mut PhysicsWorld) -> RobotBodypartIndex {
     }
 }
 
-
-fn attach_collider_with_mesh(physics: &mut PhysicsWorld, bph: DefaultBodyPartHandle, mesh: TriMesh<f32>, rotation_angleaxis: Vector3<f32>) {
-
-    let shape = ConvexHull::try_from_points(mesh.coords.as_slice()).expect("Cannot create convex hull.");
+fn attach_collider_with_mesh(
+    physics: &mut PhysicsWorld,
+    bph: DefaultBodyPartHandle,
+    mesh: TriMesh<f32>,
+    rotation_angleaxis: Vector3<f32>,
+) {
+    let shape =
+        ConvexHull::try_from_points(mesh.coords.as_slice()).expect("Cannot create convex hull.");
 
     let collider = ColliderDesc::new(ShapeHandle::new(shape))
         .density(1.0)
@@ -200,14 +279,23 @@ fn attach_collider_with_mesh(physics: &mut PhysicsWorld, bph: DefaultBodyPartHan
     physics.colliders.insert(collider);
 }
 
-
-fn make_link<'a>(swivel: &'a mut &mut MultibodyDesc<f32>, parent_shift: Vector3<f32>, min_angle: f32, max_angle: f32, rev_axis: Vector3<f32>, name: String) -> &'a mut MultibodyDesc<f32> {
+fn make_link<'a>(
+    swivel: &'a mut &mut MultibodyDesc<f32>,
+    parent_shift: Vector3<f32>,
+    min_angle: f32,
+    max_angle: f32,
+    rev_axis: Vector3<f32>,
+    name: String,
+) -> &'a mut MultibodyDesc<f32> {
     let mut joint = RevoluteJoint::new(Unit::new_normalize(rev_axis), 0.0);
     joint.enable_angular_motor();
     joint.set_max_angular_motor_torque(10.0);
     joint.enable_min_angle(min_angle);
     joint.enable_max_angle(max_angle);
-    swivel.add_child(joint).set_name(name).set_parent_shift(parent_shift)
+    swivel
+        .add_child(joint)
+        .set_name(name)
+        .set_parent_shift(parent_shift)
 }
 
 fn wrap_transformed_trimesh(trimesh: TriMesh<f32>, transform: Isometry3<f32>) -> SceneNode {
@@ -221,35 +309,55 @@ fn wrap_transformed_trimesh(trimesh: TriMesh<f32>, transform: Isometry3<f32>) ->
     sn
 }
 
-pub fn get_joint_mut<J: Joint<f32>>(physics: &mut PhysicsWorld, part_handle: DefaultBodyPartHandle) -> Option<&mut J> {
+pub fn get_joint_mut<J: Joint<f32>>(
+    physics: &mut PhysicsWorld,
+    part_handle: DefaultBodyPartHandle,
+) -> Option<&mut J> {
     let link = get_multibody_link_mut(physics, part_handle)?;
     link.joint_mut().downcast_mut()
 }
 
-pub fn get_multibody_link(physics: &PhysicsWorld, part_handle: DefaultBodyPartHandle) -> Option<&MultibodyLink<f32>> {
+pub fn get_multibody_link(
+    physics: &PhysicsWorld,
+    part_handle: DefaultBodyPartHandle,
+) -> Option<&MultibodyLink<f32>> {
     let mut mb: &Multibody<_> = physics.bodies.multibody(part_handle.0)?;
     mb.link(part_handle.1)
 }
 
-pub fn get_multibody_link_mut(physics: &mut PhysicsWorld, part_handle: DefaultBodyPartHandle) -> Option<&mut MultibodyLink<f32>> {
+pub fn get_multibody_link_mut(
+    physics: &mut PhysicsWorld,
+    part_handle: DefaultBodyPartHandle,
+) -> Option<&mut MultibodyLink<f32>> {
     let mut mb: &mut Multibody<_> = physics.bodies.multibody_mut(part_handle.0)?;
     mb.link_mut(part_handle.1)
 }
 
 pub fn set_motor_speed(physics: &mut PhysicsWorld, part_handle: DefaultBodyPartHandle, speed: f32) {
-    get_joint_mut::<RevoluteJoint<f32>>(physics, part_handle).unwrap().set_desired_angular_motor_velocity(speed);
+    get_joint_mut::<RevoluteJoint<f32>>(physics, part_handle)
+        .unwrap()
+        .set_desired_angular_motor_velocity(speed);
 }
 
 #[derive(Clone, Copy)]
 pub enum GripperDirection {
-    Open, Closed
+    Open,
+    Closed,
 }
 
-pub fn set_gripper_direction(physics: &mut PhysicsWorld, bdi: &RobotBodypartIndex, dir: GripperDirection) {
+pub fn set_gripper_direction(
+    physics: &mut PhysicsWorld,
+    bdi: &RobotBodypartIndex,
+    dir: GripperDirection,
+) {
     for bp in bdi.finger_parts().iter() {
-        set_motor_speed(physics, *bp, match dir {
-            GripperDirection::Open => 1.0,
-            GripperDirection::Closed => -1.0,
-        });
+        set_motor_speed(
+            physics,
+            *bp,
+            match dir {
+                GripperDirection::Open => 1.0,
+                GripperDirection::Closed => -1.0,
+            },
+        );
     }
 }

@@ -13,7 +13,11 @@ use crate::robot::RobotBodypartIndex;
 /// and the robot's motors will be directly controllable by pressing keys.
 ///
 /// See / modify this method's body to look up or change the key mapping if necessary.
-pub fn control_robot_by_keys(window: &Window, mut physics: &mut PhysicsWorld, robot: &RobotBodypartIndex) {
+pub fn control_robot_by_keys(
+    window: &Window,
+    mut physics: &mut PhysicsWorld,
+    robot: &RobotBodypartIndex,
+) {
     // FIXME store mapping in a datastructure instead.
     revjoint_control(&window, &mut physics, Key::Q, Key::A, robot.swivel);
     revjoint_control(&window, &mut physics, Key::W, Key::S, robot.link1);
@@ -28,10 +32,16 @@ pub fn control_robot_by_keys(window: &Window, mut physics: &mut PhysicsWorld, ro
 }
 
 /// Utility function that controls an individual motor with backwards/forwards keys.
-fn revjoint_control(window: &Window, mut physics: &mut PhysicsWorld, back: Key, forward: Key, bph: DefaultBodyPartHandle) {
-    robot::get_joint_mut::<RevoluteJoint<f32>>(&mut physics, bph).unwrap().set_desired_angular_motor_velocity(
-        key_forward_backward(&window, back, forward)
-    );
+fn revjoint_control(
+    window: &Window,
+    mut physics: &mut PhysicsWorld,
+    back: Key,
+    forward: Key,
+    bph: DefaultBodyPartHandle,
+) {
+    robot::get_joint_mut::<RevoluteJoint<f32>>(&mut physics, bph)
+        .unwrap()
+        .set_desired_angular_motor_velocity(key_forward_backward(&window, back, forward));
 }
 
 /// Small utility function that computes a value between -1 and 1
@@ -39,11 +49,11 @@ fn revjoint_control(window: &Window, mut physics: &mut PhysicsWorld, back: Key, 
 fn key_forward_backward(window: &Window, back: Key, forward: Key) -> f32 {
     let a = match window.get_key(back) {
         Action::Release => 0.0,
-        Action::Press => -1.0
+        Action::Press => -1.0,
     };
     let b = match window.get_key(forward) {
         Action::Release => 0.0,
-        Action::Press => 1.0
+        Action::Press => 1.0,
     };
-    a+b
+    a + b
 }

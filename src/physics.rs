@@ -1,10 +1,14 @@
+use nalgebra::Vector3;
 use nphysics3d::force_generator::DefaultForceGeneratorSet;
 use nphysics3d::joint::DefaultJointConstraintSet;
-use nalgebra::Vector3;
-use nphysics3d::object::{DefaultBodySet, DefaultColliderSet, BodySet, ColliderSet, ColliderAnchor};
-use nphysics3d::world::{DefaultGeometricalWorld, DefaultMechanicalWorld, BroadPhasePairFilterSets};
-use nphysics3d::ncollide3d::broad_phase::BroadPhasePairFilter;
 use nphysics3d::nalgebra::RealField;
+use nphysics3d::ncollide3d::broad_phase::BroadPhasePairFilter;
+use nphysics3d::object::{
+    BodySet, ColliderAnchor, ColliderSet, DefaultBodySet, DefaultColliderSet,
+};
+use nphysics3d::world::{
+    BroadPhasePairFilterSets, DefaultGeometricalWorld, DefaultMechanicalWorld,
+};
 use std::option::Option::Some;
 
 /// A contact filter that ensures that the robot cannot collide with itself,
@@ -15,12 +19,13 @@ use std::option::Option::Some;
 /// Stolen from https://github.com/dimforge/nphysics/blob/master/examples3d/broad_phase_filter3.rs
 struct NoMultibodySelfContactFilter;
 
-impl<N, Bodies, Colliders> BroadPhasePairFilter<N, BroadPhasePairFilterSets<'_, N, Bodies, Colliders>>
-for NoMultibodySelfContactFilter
-    where
-        N: RealField,
-        Bodies: BodySet<N>,
-        Colliders: ColliderSet<N, Bodies::Handle>,
+impl<N, Bodies, Colliders>
+    BroadPhasePairFilter<N, BroadPhasePairFilterSets<'_, N, Bodies, Colliders>>
+    for NoMultibodySelfContactFilter
+where
+    N: RealField,
+    Bodies: BodySet<N>,
+    Colliders: ColliderSet<N, Bodies::Handle>,
 {
     fn is_pair_valid(
         &self,
@@ -34,11 +39,11 @@ for NoMultibodySelfContactFilter
         match (a1, a2) {
             (
                 Some(ColliderAnchor::OnBodyPart {
-                         body_part: part1, ..
-                     }),
+                    body_part: part1, ..
+                }),
                 Some(ColliderAnchor::OnBodyPart {
-                         body_part: part2, ..
-                     }),
+                    body_part: part2, ..
+                }),
             ) => part1.0 != part2.0, // Don't collide if the two parts belong to the same body.
             _ => true,
         }
@@ -86,4 +91,3 @@ impl PhysicsWorld {
         );
     }
 }
-
