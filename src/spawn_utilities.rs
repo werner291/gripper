@@ -24,7 +24,7 @@ pub fn make_pinned_ball(window: &mut Window, physics: &mut PhysicsWorld, bp_to_s
     const RADIUS: f32 = 0.3;
 
     let rb = RigidBodyDesc::new()
-        .translation(Vector3::new(4.0, 1.0, 0.0))
+        .translation(Vector3::new(3.0, 1.0, 0.0))
         .kinematic_translations(Vector3::new(true, false, true))
         .build();
 

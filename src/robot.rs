@@ -157,8 +157,8 @@ fn make_multibody(physics: &mut PhysicsWorld) -> RobotBodypartIndex {
     };
 
 
-    let mut link1 = make_link(&mut swivel, Vector3::new(0.0, LINK1_SHIFT, 0.0), -FRAC_PI_2, FRAC_PI_2, Vector3::x(), "link1".to_string());
-    let mut link2 = make_link(&mut link1, Vector3::new(0.0, LINK_LENGTH, 0.0), -FRAC_PI_2, FRAC_PI_2, Vector3::x(), "link2".to_string());
+    let mut link1 = make_link(&mut swivel, Vector3::new(0.0, LINK1_SHIFT, 0.0), -PI * 0.75, PI * 0.75, Vector3::x(), "link1".to_string());
+    let mut link2 = make_link(&mut link1, Vector3::new(0.0, LINK_LENGTH, 0.0), -PI * 0.75, PI * 0.75, Vector3::x(), "link2".to_string());
     let mut gripper = make_link(&mut link2, Vector3::new(0.0, LINK_LENGTH, 0.0), -FRAC_PI_2, FRAC_PI_2, Vector3::x(), "gripper".to_string());
 
     for i in 0..3 {

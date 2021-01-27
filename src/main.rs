@@ -82,7 +82,7 @@ fn main() {
         control_demos::control_gripper_demo(&mut physics, &robot, t);
 
 
-        gradient_descent_control::gradient_descent_control(&mut physics, &robot, &(target));
+        gradient_descent_control::gradient_descent_control(&mut physics, &robot, &(target), &Unit::new_unchecked(Vector3::new(0.0, -1.0, 0.0)));
         // control_flailing_demo(&mut physics, &robot, t)
         // control_robot_by_keys(&window,&mut physics,&robot);
     }
