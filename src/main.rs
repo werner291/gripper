@@ -14,6 +14,7 @@ use nphysics3d::object::{BodyPartHandle, DefaultBodyPartHandle};
 
 use crate::physics::PhysicsWorld;
 use crate::spawn_utilities::{make_ground, make_pinned_ball};
+use crate::tcp_controller::TcpController;
 
 mod control_demos;
 mod gradient_descent_control;
@@ -22,6 +23,7 @@ mod load_mesh;
 mod physics;
 mod robot;
 mod spawn_utilities;
+mod tcp_controller;
 
 extern crate kiss3d;
 extern crate nalgebra as na;
@@ -48,6 +50,8 @@ fn main() {
     let mut trace = Vec::new();
 
     let mut frame = 0;
+
+    let mut tctrl = TcpController::new_wait_until_connected(11235).expect("Cannot establish TCP socket.");
 
     while window.render() {
         let ball_pos = Point3::from(
@@ -80,16 +84,16 @@ fn main() {
             }
         }
 
+        // tctrl.send_joint_angles(&mut physics, &robot).expect("Connection failed")
+        tctrl.control_cycle_synchronous(&mut physics, &robot).expect("Connection failed");
+
         synchronize_physics_to_graphics(&mut physics, &mut bp_to_sn);
 
-        control_demos::control_gripper_demo(&mut physics, &robot, t);
+        // control_demos::control_gripper_demo(&mut physics, &robot, t);
 
-        gradient_descent_control::gradient_descent_control(
-            &mut physics,
-            &robot,
-            &(target),
-            &Unit::new_unchecked(Vector3::new(0.0, -1.0, 0.0)),
-        );
+        // gradient_descent_control::gradient_descent_control(
+        //     &mut physics, &robot, &(target), &Unit::new_unchecked(Vector3::new(0.0, -1.0, 0.0)),
+        // );
         // control_flailing_demo(&mut physics, &robot, t)
         // control_robot_by_keys(&window,&mut physics,&robot);
     }

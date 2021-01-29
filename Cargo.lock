@@ -696,6 +696,7 @@ dependencies = [
 name = "gripper_experiment"
 version = "0.1.0"
 dependencies = [
+ "byteorder",
  "k",
  "kiss3d",
  "nalgebra 0.24.1",

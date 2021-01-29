@@ -308,12 +308,18 @@ fn wrap_transformed_trimesh(trimesh: TriMesh<f32>, transform: Isometry3<f32>) ->
     sn
 }
 
+pub fn get_joint<J: Joint<f32>>(
+    physics: &PhysicsWorld,
+    part_handle: DefaultBodyPartHandle,
+) -> Option<&J> {
+    get_multibody_link(physics, part_handle)?.joint().downcast_ref()
+}
+
 pub fn get_joint_mut<J: Joint<f32>>(
     physics: &mut PhysicsWorld,
     part_handle: DefaultBodyPartHandle,
 ) -> Option<&mut J> {
-    let link = get_multibody_link_mut(physics, part_handle)?;
-    link.joint_mut().downcast_mut()
+    get_multibody_link_mut(physics, part_handle)?.joint_mut().downcast_mut()
 }
 
 pub fn get_multibody_link(
@@ -327,10 +333,7 @@ pub fn get_multibody_link_mut(
     physics: &mut PhysicsWorld,
     part_handle: DefaultBodyPartHandle,
 ) -> Option<&mut MultibodyLink<f32>> {
-    physics
-        .bodies
-        .multibody_mut(part_handle.0)?
-        .link_mut(part_handle.1)
+    physics.bodies.multibody_mut(part_handle.0)?.link_mut(part_handle.1)
 }
 
 pub fn set_motor_speed(physics: &mut PhysicsWorld, part_handle: DefaultBodyPartHandle, speed: f32) {
