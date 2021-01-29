@@ -26,7 +26,7 @@ use crate::physics::PhysicsWorld;
 /// A struct that contains the body handle and body part handle of the various parts of a robot.
 /// Note that each body part also has a name, should that be more convenient.
 #[derive(Debug)]
-pub struct RobotBodypartIndex {
+pub struct RobotBodyPartIndex {
     pub body: DefaultBodyHandle,
     pub base: DefaultBodyPartHandle,
     pub swivel: DefaultBodyPartHandle,
@@ -41,7 +41,7 @@ pub struct RobotBodypartIndex {
     pub finger_2_2: DefaultBodyPartHandle,
 }
 
-impl RobotBodypartIndex {
+impl RobotBodyPartIndex {
     /// Provides an array of body part handles that correspond to parts
     /// that have a motorized revolute joint.
     ///
@@ -81,7 +81,7 @@ pub fn make_robot(
     physics: &mut PhysicsWorld,
     scene: &mut SceneNode,
     part_to_body: &mut Vec<(SceneNode, DefaultBodyPartHandle)>,
-) -> RobotBodypartIndex {
+) -> RobotBodyPartIndex {
     // Generates a Multibody of the robot, without any visible parts.
     let robot = make_multibody(physics);
 
@@ -102,7 +102,7 @@ pub fn make_robot(
 fn build_graphics(
     scene: &mut SceneNode,
     part_to_body: &mut Vec<(SceneNode, DefaultBodyPartHandle)>,
-    robot: &RobotBodypartIndex,
+    robot: &RobotBodyPartIndex,
 ) {
     // Allocate some scene nodes and load the appropriate meshes.
     let base = scene.add_trimesh(
@@ -159,7 +159,7 @@ fn build_graphics(
     }
 }
 
-fn attach_colliders(physics: &mut PhysicsWorld, robot: &RobotBodypartIndex) {
+fn attach_colliders(physics: &mut PhysicsWorld, robot: &RobotBodyPartIndex) {
     let gripper = load_mesh::trimesh_from_stl_sr(load_mesh::GRIPPER_STL);
 
     attach_collider_with_mesh(physics, robot.gripper, gripper, Vector3::new(0.0, 0.0, 0.0));
@@ -181,7 +181,7 @@ const LINK1_SHIFT: f32 = 1.25;
 const LINK_LENGTH: f32 = 2.5;
 
 /// Generates a Multibody of the robot, without colliders.
-fn make_multibody(physics: &mut PhysicsWorld) -> RobotBodypartIndex {
+fn make_multibody(physics: &mut PhysicsWorld) -> RobotBodyPartIndex {
     let joint = FixedJoint::new(Isometry3::identity());
 
     let mut base = MultibodyDesc::new(joint).name("base".to_string()).mass(1.0);
@@ -245,7 +245,7 @@ fn make_multibody(physics: &mut PhysicsWorld) -> RobotBodypartIndex {
 
     let robot = physics.bodies.multibody_mut(mb).unwrap();
 
-    RobotBodypartIndex {
+    RobotBodyPartIndex {
         body: mb,
         base: BodyPartHandle(mb, robot.links_with_name("base").next().unwrap().0),
         swivel: BodyPartHandle(mb, robot.links_with_name("swivel").next().unwrap().0),
@@ -347,7 +347,7 @@ pub enum GripperDirection {
 
 pub fn set_gripper_direction(
     physics: &mut PhysicsWorld,
-    bdi: &RobotBodypartIndex,
+    bdi: &RobotBodyPartIndex,
     dir: GripperDirection,
 ) {
     for bp in bdi.finger_parts().iter() {

@@ -16,11 +16,11 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="99bfd17e-0b5a-4a4c-b788-1095db1046ef" name="Default Changelist" comment="Including Cargo.lock">
+    <list default="true" id="99bfd17e-0b5a-4a4c-b788-1095db1046ef" name="Default Changelist" comment="Minor renaming.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/control_demos.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/control_demos.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/gradient_descent_control.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/gradient_descent_control.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/load_mesh.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/load_mesh.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/keyboard_control.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/keyboard_control.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/robot.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/robot.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -38,8 +38,8 @@
   <component name="Git.Settings">
     <option name="PUSH_TAGS">
       <GitPushTagMode>
-        <option name="argument" value="--follow-tags" />
-        <option name="title" value="Current Branch" />
+        <option name="argument" value="--tags" />
+        <option name="title" value="All" />
       </GitPushTagMode>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -129,7 +129,9 @@
     <MESSAGE value="Fixed asset name for Windows." />
     <MESSAGE value="Removed dependency on external files, all models includeddirectly in executable." />
     <MESSAGE value="Including Cargo.lock" />
-    <option name="LAST_COMMIT_MESSAGE" value="Including Cargo.lock" />
+    <MESSAGE value="Ran cargo fix and fmt." />
+    <MESSAGE value="Minor renaming." />
+    <option name="LAST_COMMIT_MESSAGE" value="Minor renaming." />
   </component>
   <component name="WindowStateProjectService">
     <state x="320" y="72" width="1017" height="719" key="#Plugins" timestamp="1611925219950">
@@ -152,30 +154,30 @@
       <screen x="0" y="0" width="1440" height="864" />
     </state>
     <state x="0" y="0" key="FileDocumentManager.FileCacheConflict/0.0.1440.864@0.0.1440.864" timestamp="1611932380535" />
-    <state width="1394" height="213" key="GridCell.Tab.0.bottom" timestamp="1611932986060">
+    <state width="1394" height="213" key="GridCell.Tab.0.bottom" timestamp="1611933337371">
       <screen x="0" y="0" width="1440" height="864" />
     </state>
-    <state width="1394" height="213" key="GridCell.Tab.0.bottom/0.0.1440.864@0.0.1440.864" timestamp="1611932986060" />
-    <state width="1394" height="213" key="GridCell.Tab.0.center" timestamp="1611932986059">
+    <state width="1394" height="213" key="GridCell.Tab.0.bottom/0.0.1440.864@0.0.1440.864" timestamp="1611933337371" />
+    <state width="1394" height="213" key="GridCell.Tab.0.center" timestamp="1611933337370">
       <screen x="0" y="0" width="1440" height="864" />
     </state>
-    <state width="1394" height="213" key="GridCell.Tab.0.center/0.0.1440.864@0.0.1440.864" timestamp="1611932986059" />
-    <state width="1394" height="213" key="GridCell.Tab.0.left" timestamp="1611932986059">
+    <state width="1394" height="213" key="GridCell.Tab.0.center/0.0.1440.864@0.0.1440.864" timestamp="1611933337370" />
+    <state width="1394" height="213" key="GridCell.Tab.0.left" timestamp="1611933337370">
       <screen x="0" y="0" width="1440" height="864" />
     </state>
-    <state width="1394" height="213" key="GridCell.Tab.0.left/0.0.1440.864@0.0.1440.864" timestamp="1611932986059" />
-    <state width="1394" height="213" key="GridCell.Tab.0.right" timestamp="1611932986059">
+    <state width="1394" height="213" key="GridCell.Tab.0.left/0.0.1440.864@0.0.1440.864" timestamp="1611933337370" />
+    <state width="1394" height="213" key="GridCell.Tab.0.right" timestamp="1611933337370">
       <screen x="0" y="0" width="1440" height="864" />
     </state>
-    <state width="1394" height="213" key="GridCell.Tab.0.right/0.0.1440.864@0.0.1440.864" timestamp="1611932986059" />
+    <state width="1394" height="213" key="GridCell.Tab.0.right/0.0.1440.864@0.0.1440.864" timestamp="1611933337370" />
     <state x="221" y="63" key="SettingsEditor" timestamp="1611511223289">
       <screen x="0" y="0" width="1440" height="864" />
     </state>
     <state x="221" y="63" key="SettingsEditor/0.0.1440.864@0.0.1440.864" timestamp="1611511223289" />
-    <state x="320" y="164" key="Vcs.Push.Dialog.v2" timestamp="1611932762568">
+    <state x="320" y="164" key="Vcs.Push.Dialog.v2" timestamp="1611933135872">
       <screen x="0" y="0" width="1440" height="864" />
     </state>
-    <state x="320" y="164" key="Vcs.Push.Dialog.v2/0.0.1440.864@0.0.1440.864" timestamp="1611932762568" />
+    <state x="320" y="164" key="Vcs.Push.Dialog.v2/0.0.1440.864@0.0.1440.864" timestamp="1611933135872" />
     <state x="424" y="171" width="592" height="580" key="find.popup" timestamp="1611344920372">
       <screen x="0" y="0" width="1440" height="864" />
     </state>
@@ -184,13 +186,13 @@
       <screen x="0" y="0" width="1440" height="864" />
     </state>
     <state x="459" y="329" key="git4idea.remote.GitConfigureRemotesDialog/0.0.1440.864@0.0.1440.864" timestamp="1611922821198" />
-    <state x="486" y="273" width="478" height="317" key="git4idea.ui.GitTagDialog" timestamp="1611931351580">
+    <state x="486" y="273" width="478" height="317" key="git4idea.ui.GitTagDialog" timestamp="1611933076360">
       <screen x="0" y="0" width="1440" height="864" />
     </state>
-    <state x="486" y="273" width="478" height="317" key="git4idea.ui.GitTagDialog/0.0.1440.864@0.0.1440.864" timestamp="1611931351580" />
-    <state x="383" y="184" width="672" height="678" key="search.everywhere.popup" timestamp="1611932174533">
+    <state x="486" y="273" width="478" height="317" key="git4idea.ui.GitTagDialog/0.0.1440.864@0.0.1440.864" timestamp="1611933076360" />
+    <state x="383" y="184" width="672" height="678" key="search.everywhere.popup" timestamp="1611933083442">
       <screen x="0" y="0" width="1440" height="864" />
     </state>
-    <state x="383" y="184" width="672" height="678" key="search.everywhere.popup/0.0.1440.864@0.0.1440.864" timestamp="1611932174533" />
+    <state x="383" y="184" width="672" height="678" key="search.everywhere.popup/0.0.1440.864@0.0.1440.864" timestamp="1611933083442" />
   </component>
 </project>

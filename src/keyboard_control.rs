@@ -5,7 +5,7 @@ use nphysics3d::object::DefaultBodyPartHandle;
 
 use crate::physics::PhysicsWorld;
 use crate::robot;
-use crate::robot::RobotBodypartIndex;
+use crate::robot::RobotBodyPartIndex;
 
 /// Allows for basic keyboard-based control of the robot.
 ///
@@ -16,7 +16,7 @@ use crate::robot::RobotBodypartIndex;
 pub fn control_robot_by_keys(
     window: &Window,
     mut physics: &mut PhysicsWorld,
-    robot: &RobotBodypartIndex,
+    robot: &RobotBodyPartIndex,
 ) {
     // FIXME store mapping in a datastructure instead.
     revjoint_control(&window, &mut physics, Key::Q, Key::A, robot.swivel);

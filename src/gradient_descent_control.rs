@@ -7,17 +7,18 @@ use rand::Rng;
 
 use crate::physics::PhysicsWorld;
 use crate::robot;
-use crate::robot::{get_multibody_link, GripperDirection, RobotBodypartIndex};
+use crate::robot::{get_multibody_link, GripperDirection, RobotBodyPartIndex};
 use nalgebra::Matrix3;
 use std::convert::From;
 use std::option::Option::Some;
 use std::process::exit;
+use std::prelude::Vec;
 
 /// Controls the robot using a gradient-descent-based inverse kinematic controller.
 /// Sets target motor speeds based on gradients of the distance of a point in front of the gripper.
 pub fn gradient_descent_control(
     mut physics: &mut PhysicsWorld,
-    robot: &RobotBodypartIndex,
+    robot: &RobotBodyPartIndex,
     target_pos: &Point3<f32>,
     _target_heading: &Unit<Vector3<f32>>,
 ) -> f32 {
@@ -115,7 +116,7 @@ pub fn gradient_descent_control(
     remaining_distance
 }
 
-pub fn point_inside_gripper(physics: &PhysicsWorld, robot: &RobotBodypartIndex) -> Point3<f32> {
+pub fn point_inside_gripper(physics: &PhysicsWorld, robot: &RobotBodyPartIndex) -> Point3<f32> {
     // Get the position and orientation of the "gripper", i.e. the base of the end-effector.
     let gripper = get_multibody_link(&physics, robot.gripper).unwrap();
 

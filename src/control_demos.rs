@@ -4,9 +4,9 @@ use nphysics3d::joint::RevoluteJoint;
 
 use crate::physics::PhysicsWorld;
 use crate::robot;
-use crate::robot::{set_gripper_direction, GripperDirection, RobotBodypartIndex};
+use crate::robot::{set_gripper_direction, GripperDirection, RobotBodyPartIndex};
 
-pub fn control_gripper_demo(mut physics: &mut PhysicsWorld, robot: &RobotBodypartIndex, t: f32) {
+pub fn control_gripper_demo(mut physics: &mut PhysicsWorld, robot: &RobotBodyPartIndex, t: f32) {
     set_gripper_direction(
         &mut physics,
         &robot,
@@ -18,7 +18,7 @@ pub fn control_gripper_demo(mut physics: &mut PhysicsWorld, robot: &RobotBodypar
     );
 }
 
-fn control_flailing_demo(mut physics: &mut PhysicsWorld, robot: &RobotBodypartIndex, t: f32) {
+fn control_flailing_demo(mut physics: &mut PhysicsWorld, robot: &RobotBodyPartIndex, t: f32) {
     for (i, bph) in robot.motor_parts().iter().enumerate() {
         let v = (t + i as f32).sin();
         let revjoint = robot::get_joint_mut::<RevoluteJoint<f32>>(&mut physics, *bph).unwrap();
