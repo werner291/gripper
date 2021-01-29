@@ -12,7 +12,7 @@ use nalgebra::Matrix3;
 use std::convert::From;
 use std::option::Option::Some;
 use std::process::exit;
-use std::prelude::Vec;
+use std::vec::Vec;
 
 /// Controls the robot using a gradient-descent-based inverse kinematic controller.
 /// Sets target motor speeds based on gradients of the distance of a point in front of the gripper.
