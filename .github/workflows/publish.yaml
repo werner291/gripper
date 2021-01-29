@@ -20,15 +20,15 @@ jobs:
         include:
           - name: linux
             os: ubuntu-latest
-            artifact_name: target/release/gripper_experiment
+            artifact_name: gripper_experiment
             asset_name: gripper_experiment-linux
           - name: windows
             os: windows-latest
-            artifact_name: target/release/gripper_experiment.exe
+            artifact_name: gripper_experiment.exe
             asset_name: gripper_experiment-windows
           - name: macos
             os: macos-latest
-            artifact_name: target/release/gripper_experiment
+            artifact_name: gripper_experiment
             asset_name: gripper_experiment-macos
 
     steps:
