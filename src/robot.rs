@@ -16,7 +16,7 @@ use kiss3d::resource::{MaterialManager, Mesh, TextureManager};
 use kiss3d::scene::{Object, SceneNode};
 use nphysics3d::joint::{FixedJoint, Joint, RevoluteJoint};
 use nphysics3d::object::{
-    Body, BodyPartHandle, ColliderDesc, DefaultBodyHandle, DefaultBodyPartHandle, Multibody,
+    BodyPartHandle, ColliderDesc, DefaultBodyHandle, DefaultBodyPartHandle, Multibody,
     MultibodyDesc, MultibodyLink,
 };
 
@@ -106,23 +106,23 @@ fn build_graphics(
 ) {
     // Allocate some scene nodes and load the appropriate meshes.
     let base = scene.add_trimesh(
-        load_mesh::stl_to_trimesh("scad/base.stl"),
+        load_mesh::trimesh_from_stl_sr(load_mesh::BASE_STL),
         Vector3::new(1.0, 1.0, 1.0),
     );
     let swivel = scene.add_trimesh(
-        load_mesh::stl_to_trimesh("scad/rotbase.stl"),
+        load_mesh::trimesh_from_stl_sr(load_mesh::SWIVEL_STL),
         Vector3::new(1.0, 1.0, 1.0),
     );
     let link1 = scene.add_trimesh(
-        load_mesh::stl_to_trimesh("scad/armlink.stl"),
+        load_mesh::trimesh_from_stl_sr(load_mesh::ARMLINK_STL),
         Vector3::new(1.0, 1.0, 1.0),
     );
     let link2 = scene.add_trimesh(
-        load_mesh::stl_to_trimesh("scad/armlink.stl"),
+        load_mesh::trimesh_from_stl_sr(load_mesh::ARMLINK_STL),
         Vector3::new(1.0, 1.0, 1.0),
     );
     let gripper = scene.add_trimesh(
-        load_mesh::stl_to_trimesh("scad/gripper.stl"),
+        load_mesh::trimesh_from_stl_sr(load_mesh::GRIPPER_STL),
         Vector3::new(1.0, 1.0, 1.0),
     );
 
@@ -131,6 +131,7 @@ fn build_graphics(
         (swivel, robot.swivel.clone()),
         (link1, robot.link1.clone()),
         (link2, robot.link2.clone()),
+        (gripper, robot.gripper.clone())
         ]);
 
     // Fingers are special due to them being copies of each other and rotated.
@@ -140,7 +141,7 @@ fn build_graphics(
         (robot.finger_0_2, 0),
         (robot.finger_1_2, 1),
         (robot.finger_2_2, 2)] {
-        let mesh = load_mesh::stl_to_trimesh("scad/phalanx.stl");
+        let mesh = load_mesh::trimesh_from_stl_sr(load_mesh::PHALANX_STL);
         let transform = Isometry3::rotation(Vector3::new(
             0.0,
             std::f32::consts::FRAC_PI_2 + std::f32::consts::PI * (*rot_i) as f32 / 1.5,
@@ -157,12 +158,12 @@ fn build_graphics(
 }
 
 fn attach_colliders(physics: &mut PhysicsWorld, robot: &RobotBodypartIndex) {
-    let gripper = load_mesh::stl_to_trimesh("scad/gripper.stl");
+    let gripper = load_mesh::trimesh_from_stl_sr(load_mesh::GRIPPER_STL);
 
     attach_collider_with_mesh(physics, robot.gripper, gripper, Vector3::new(0.0, 0.0, 0.0));
 
     for (i, n) in robot.finger_parts().iter().enumerate() {
-        let mesh = load_mesh::stl_to_trimesh("scad/phalanx.stl");
+        let mesh = load_mesh::trimesh_from_stl_sr(load_mesh::PHALANX_STL);
 
         attach_collider_with_mesh(
             physics,
@@ -179,7 +180,7 @@ const LINK_LENGTH: f32 = 2.5;
 
 /// Generates a Multibody of the robot, without colliders.
 fn make_multibody(physics: &mut PhysicsWorld) -> RobotBodypartIndex {
-    let mut joint = FixedJoint::new(Isometry3::identity());
+    let joint = FixedJoint::new(Isometry3::identity());
 
     let mut base = MultibodyDesc::new(joint).name("base".to_string()).mass(1.0);
 
@@ -240,7 +241,7 @@ fn make_multibody(physics: &mut PhysicsWorld) -> RobotBodypartIndex {
 
     let mb = physics.bodies.insert(base.build());
 
-    let mut robot = physics.bodies.multibody_mut(mb).unwrap();
+    let robot = physics.bodies.multibody_mut(mb).unwrap();
 
     RobotBodypartIndex {
         body: mb,
@@ -317,16 +318,14 @@ pub fn get_multibody_link(
     physics: &PhysicsWorld,
     part_handle: DefaultBodyPartHandle,
 ) -> Option<&MultibodyLink<f32>> {
-    let mut mb: &Multibody<_> = physics.bodies.multibody(part_handle.0)?;
-    mb.link(part_handle.1)
+    physics.bodies.multibody(part_handle.0)?.link(part_handle.1)
 }
 
 pub fn get_multibody_link_mut(
     physics: &mut PhysicsWorld,
     part_handle: DefaultBodyPartHandle,
 ) -> Option<&mut MultibodyLink<f32>> {
-    let mut mb: &mut Multibody<_> = physics.bodies.multibody_mut(part_handle.0)?;
-    mb.link_mut(part_handle.1)
+    physics.bodies.multibody_mut(part_handle.0)?.link_mut(part_handle.1)
 }
 
 pub fn set_motor_speed(physics: &mut PhysicsWorld, part_handle: DefaultBodyPartHandle, speed: f32) {

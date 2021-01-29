@@ -1,7 +1,6 @@
 #![allow(dead_code)]
 
 use std::convert::From;
-use std::iter::Iterator;
 use std::option::Option::Some;
 use std::prelude::v1::Vec;
 
@@ -11,7 +10,7 @@ use kiss3d::scene::{Object, SceneNode};
 use kiss3d::window::Window;
 use na::{Isometry3, Point3, Translation3, Unit, Vector3};
 use nphysics3d::object::{
-    BodyPart, BodyPartHandle, BodyStatus, ColliderDesc, DefaultBodyHandle, DefaultBodyPartHandle,
+    BodyPartHandle, BodyStatus, ColliderDesc, DefaultBodyHandle, DefaultBodyPartHandle,
     Multibody, MultibodyDesc, MultibodyLink, RigidBodyDesc,
 };
 use rand::Rng;
@@ -33,7 +32,7 @@ extern crate kiss3d;
 extern crate nalgebra as na;
 
 fn main() {
-    let mut window = Window::new("Kiss3d: cube");
+    let mut window = Window::new("Robotic Gripper");
 
     window.set_framerate_limit(Some(60));
     let mut physics = physics::PhysicsWorld::new();

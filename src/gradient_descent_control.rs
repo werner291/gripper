@@ -106,7 +106,7 @@ pub fn gradient_descent_control(
             robot::set_motor_speed(&mut physics, *bph, *g);
         }
     } else {
-        for (bph, g) in motors.iter().zip(motor_speeds.iter()) {
+        for (bph, _g) in motors.iter().zip(motor_speeds.iter()) {
             robot::set_motor_speed(&mut physics, *bph, rng.gen_range(-0.1..0.1));
         }
     }

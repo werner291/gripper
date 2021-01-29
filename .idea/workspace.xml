@@ -16,16 +16,15 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="99bfd17e-0b5a-4a4c-b788-1095db1046ef" name="Default Changelist" comment="Gradient descent controller can now do gripper orientation as well, though overshoots the target occasionally.">
+    <list default="true" id="99bfd17e-0b5a-4a4c-b788-1095db1046ef" name="Default Changelist" comment="Fixed asset name for Windows.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/control_demos.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/control_demos.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Cargo.lock" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/crosswin-shell.nix" beforeDir="false" afterPath="$PROJECT_DIR$/crosswin-shell.nix" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shell.nix" beforeDir="false" afterPath="$PROJECT_DIR$/shell.nix" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/gradient_descent_control.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/gradient_descent_control.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/keyboard_control.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/keyboard_control.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/load_mesh.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/load_mesh.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/physics.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/physics.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/robot.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/robot.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/spawn_utilities.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/spawn_utilities.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -40,6 +39,12 @@
     </option>
   </component>
   <component name="Git.Settings">
+    <option name="PUSH_TAGS">
+      <GitPushTagMode>
+        <option name="argument" value="--follow-tags" />
+        <option name="title" value="Current Branch" />
+      </GitPushTagMode>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="MacroExpansionManager">
@@ -56,7 +61,21 @@
     <property name="org.rust.cargo.project.model.PROJECT_DISCOVERY" value="true" />
     <property name="settings.editor.selected.configurable" value="project.propCompiler" />
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Cargo.run">
+    <configuration name="build" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
+      <option name="command" value="build" />
+      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
+      <option name="channel" value="DEFAULT" />
+      <option name="allFeatures" value="false" />
+      <option name="emulateTerminal" value="false" />
+      <option name="backtrace" value="SHORT" />
+      <envs />
+      <option name="isRedirectInput" value="false" />
+      <option name="redirectInputPath" value="" />
+      <method v="2">
+        <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="run" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
       <option name="command" value="run --package gripper_experiment --bin gripper_experiment" />
       <option name="workingDirectory" value="file://$PROJECT_DIR$" />
@@ -71,9 +90,14 @@
         <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
       </method>
     </configuration>
+    <list>
+      <item itemvalue="Cargo.build" />
+      <item itemvalue="Cargo.run" />
+    </list>
     <recent_temporary>
       <list>
         <item itemvalue="Cargo.run" />
+        <item itemvalue="Cargo.build" />
       </list>
     </recent_temporary>
   </component>
@@ -99,48 +123,75 @@
     <MESSAGE value="The robotic arm is now controllable, and the code is much cleaner. The robot has a collidable gripper, and a ball that can be picked up." />
     <MESSAGE value="Implemented automatic gradient-descent-based control." />
     <MESSAGE value="Gradient descent controller can now do gripper orientation as well, though overshoots the target occasionally." />
-    <option name="LAST_COMMIT_MESSAGE" value="Gradient descent controller can now do gripper orientation as well, though overshoots the target occasionally." />
+    <MESSAGE value="Now with a proper, straight approach path!" />
+    <MESSAGE value="Removed unstable feature usage." />
+    <MESSAGE value="Added workflow." />
+    <MESSAGE value="Fixed asset name." />
+    <MESSAGE value="Fixed release action." />
+    <MESSAGE value="Fixed release action (again)" />
+    <MESSAGE value="Fixed asset name for Windows." />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed asset name for Windows." />
   </component>
   <component name="WindowStateProjectService">
-    <state x="320" y="72" width="1017" height="719" key="#Plugins" timestamp="1611527829351">
+    <state x="320" y="72" width="1017" height="719" key="#Plugins" timestamp="1611925219950">
       <screen x="0" y="0" width="1440" height="864" />
     </state>
-    <state x="320" y="72" width="1017" height="719" key="#Plugins/0.0.1440.864@0.0.1440.864" timestamp="1611527829351" />
+    <state x="320" y="72" width="1017" height="719" key="#Plugins/0.0.1440.864@0.0.1440.864" timestamp="1611925219950" />
+    <state x="178" y="90" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1611920620911">
+      <screen x="0" y="0" width="1440" height="864" />
+    </state>
+    <state x="178" y="90" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1440.864@0.0.1440.864" timestamp="1611920620911" />
+    <state x="458" y="177" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1611931515043">
+      <screen x="0" y="0" width="1440" height="864" />
+    </state>
+    <state x="458" y="177" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1440.864@0.0.1440.864" timestamp="1611931515043" />
     <state x="508" y="186" width="424" height="491" key="FileChooserDialogImpl" timestamp="1611604962454">
       <screen x="0" y="0" width="1440" height="864" />
     </state>
     <state x="508" y="186" width="424" height="491" key="FileChooserDialogImpl/0.0.1440.864@0.0.1440.864" timestamp="1611604962454" />
-    <state width="1394" height="213" key="GridCell.Tab.0.bottom" timestamp="1611765104300">
+    <state x="0" y="0" key="FileDocumentManager.FileCacheConflict" timestamp="1611932380535">
       <screen x="0" y="0" width="1440" height="864" />
     </state>
-    <state width="1394" height="213" key="GridCell.Tab.0.bottom/0.0.1440.864@0.0.1440.864" timestamp="1611765104300" />
-    <state width="1394" height="213" key="GridCell.Tab.0.center" timestamp="1611765104298">
+    <state x="0" y="0" key="FileDocumentManager.FileCacheConflict/0.0.1440.864@0.0.1440.864" timestamp="1611932380535" />
+    <state width="1394" height="213" key="GridCell.Tab.0.bottom" timestamp="1611932422865">
       <screen x="0" y="0" width="1440" height="864" />
     </state>
-    <state width="1394" height="213" key="GridCell.Tab.0.center/0.0.1440.864@0.0.1440.864" timestamp="1611765104298" />
-    <state width="1394" height="213" key="GridCell.Tab.0.left" timestamp="1611765104298">
+    <state width="1394" height="213" key="GridCell.Tab.0.bottom/0.0.1440.864@0.0.1440.864" timestamp="1611932422865" />
+    <state width="1394" height="213" key="GridCell.Tab.0.center" timestamp="1611932422864">
       <screen x="0" y="0" width="1440" height="864" />
     </state>
-    <state width="1394" height="213" key="GridCell.Tab.0.left/0.0.1440.864@0.0.1440.864" timestamp="1611765104298" />
-    <state width="1394" height="213" key="GridCell.Tab.0.right" timestamp="1611765104299">
+    <state width="1394" height="213" key="GridCell.Tab.0.center/0.0.1440.864@0.0.1440.864" timestamp="1611932422864" />
+    <state width="1394" height="213" key="GridCell.Tab.0.left" timestamp="1611932422864">
       <screen x="0" y="0" width="1440" height="864" />
     </state>
-    <state width="1394" height="213" key="GridCell.Tab.0.right/0.0.1440.864@0.0.1440.864" timestamp="1611765104299" />
+    <state width="1394" height="213" key="GridCell.Tab.0.left/0.0.1440.864@0.0.1440.864" timestamp="1611932422864" />
+    <state width="1394" height="213" key="GridCell.Tab.0.right" timestamp="1611932422864">
+      <screen x="0" y="0" width="1440" height="864" />
+    </state>
+    <state width="1394" height="213" key="GridCell.Tab.0.right/0.0.1440.864@0.0.1440.864" timestamp="1611932422864" />
     <state x="221" y="63" key="SettingsEditor" timestamp="1611511223289">
       <screen x="0" y="0" width="1440" height="864" />
     </state>
     <state x="221" y="63" key="SettingsEditor/0.0.1440.864@0.0.1440.864" timestamp="1611511223289" />
-    <state x="320" y="164" key="Vcs.Push.Dialog.v2" timestamp="1611756080188">
+    <state x="320" y="164" key="Vcs.Push.Dialog.v2" timestamp="1611930269154">
       <screen x="0" y="0" width="1440" height="864" />
     </state>
-    <state x="320" y="164" key="Vcs.Push.Dialog.v2/0.0.1440.864@0.0.1440.864" timestamp="1611756080188" />
+    <state x="320" y="164" key="Vcs.Push.Dialog.v2/0.0.1440.864@0.0.1440.864" timestamp="1611930269154" />
     <state x="424" y="171" width="592" height="580" key="find.popup" timestamp="1611344920372">
       <screen x="0" y="0" width="1440" height="864" />
     </state>
     <state x="424" y="171" width="592" height="580" key="find.popup/0.0.1440.864@0.0.1440.864" timestamp="1611344920372" />
-    <state x="383" y="184" width="672" height="678" key="search.everywhere.popup" timestamp="1611752697151">
+    <state x="459" y="329" key="git4idea.remote.GitConfigureRemotesDialog" timestamp="1611922821198">
       <screen x="0" y="0" width="1440" height="864" />
     </state>
-    <state x="383" y="184" width="672" height="678" key="search.everywhere.popup/0.0.1440.864@0.0.1440.864" timestamp="1611752697151" />
+    <state x="459" y="329" key="git4idea.remote.GitConfigureRemotesDialog/0.0.1440.864@0.0.1440.864" timestamp="1611922821198" />
+    <state x="486" y="273" width="478" height="317" key="git4idea.ui.GitTagDialog" timestamp="1611931351580">
+      <screen x="0" y="0" width="1440" height="864" />
+    </state>
+    <state x="486" y="273" width="478" height="317" key="git4idea.ui.GitTagDialog/0.0.1440.864@0.0.1440.864" timestamp="1611931351580" />
+    <state x="383" y="184" width="672" height="678" key="search.everywhere.popup" timestamp="1611932174533">
+      <screen x="0" y="0" width="1440" height="864" />
+    </state>
+    <state x="383" y="184" width="672" height="678" key="search.everywhere.popup/0.0.1440.864@0.0.1440.864" timestamp="1611932174533" />
   </component>
 </project>
