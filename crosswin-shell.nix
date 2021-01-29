@@ -19,7 +19,11 @@ let
     ];
   };
   
+  pkgs-mingw = import <nixpkgs> { crossSystem = {config = "x86_64-w64-mingw32"; }; };
+
 in 
-    pkgs.mkShell { 
+    pkgs-mingw.mkShell { 
         nativeBuildInputs = [ rchan ];
+        buildInputs = [ rchan pkgs-mingw.windows.pthreads pkgs-mingw.windows.mingw_w64_pthreads ]; 
+        
     }
