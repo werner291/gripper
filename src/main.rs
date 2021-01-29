@@ -4,12 +4,8 @@ use std::convert::From;
 use std::option::Option::Some;
 use std::prelude::v1::Vec;
 
-use kiss3d::{
-    light::Light,
-    scene::SceneNode,
-    window::Window
-};
-use na::{Isometry3, Point3, Translation3, Unit, Vector3};
+use kiss3d::{light::Light, scene::SceneNode, window::Window};
+use na::{Isometry3, Point3, Translation3, Vector3};
 use nphysics3d::object::{BodyPartHandle, DefaultBodyPartHandle};
 
 use crate::physics::PhysicsWorld;
@@ -51,7 +47,8 @@ fn main() {
 
     let mut frame = 0;
 
-    let mut tctrl = TcpController::new_wait_until_connected(11235).expect("Cannot establish TCP socket.");
+    let mut tctrl =
+        TcpController::new_wait_until_connected(11235).expect("Cannot establish TCP socket.");
 
     while window.render() {
         let ball_pos = Point3::from(
@@ -85,7 +82,9 @@ fn main() {
         }
 
         // tctrl.send_joint_angles(&mut physics, &robot).expect("Connection failed")
-        tctrl.control_cycle_synchronous(&mut physics, &robot).expect("Connection failed");
+        tctrl
+            .control_cycle_synchronous(&mut physics, &robot)
+            .expect("Connection failed");
 
         synchronize_physics_to_graphics(&mut physics, &mut bp_to_sn);
 
