@@ -16,11 +16,8 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="99bfd17e-0b5a-4a4c-b788-1095db1046ef" name="Default Changelist" comment="Fixed asset name for Windows.">
+    <list default="true" id="99bfd17e-0b5a-4a4c-b788-1095db1046ef" name="Default Changelist" comment="Including Cargo.lock">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Cargo.lock" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/crosswin-shell.nix" beforeDir="false" afterPath="$PROJECT_DIR$/crosswin-shell.nix" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shell.nix" beforeDir="false" afterPath="$PROJECT_DIR$/shell.nix" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/gradient_descent_control.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/gradient_descent_control.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/load_mesh.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/load_mesh.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.rs" afterDir="false" />
@@ -130,7 +127,9 @@
     <MESSAGE value="Fixed release action." />
     <MESSAGE value="Fixed release action (again)" />
     <MESSAGE value="Fixed asset name for Windows." />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed asset name for Windows." />
+    <MESSAGE value="Removed dependency on external files, all models includeddirectly in executable." />
+    <MESSAGE value="Including Cargo.lock" />
+    <option name="LAST_COMMIT_MESSAGE" value="Including Cargo.lock" />
   </component>
   <component name="WindowStateProjectService">
     <state x="320" y="72" width="1017" height="719" key="#Plugins" timestamp="1611925219950">
@@ -153,30 +152,30 @@
       <screen x="0" y="0" width="1440" height="864" />
     </state>
     <state x="0" y="0" key="FileDocumentManager.FileCacheConflict/0.0.1440.864@0.0.1440.864" timestamp="1611932380535" />
-    <state width="1394" height="213" key="GridCell.Tab.0.bottom" timestamp="1611932422865">
+    <state width="1394" height="213" key="GridCell.Tab.0.bottom" timestamp="1611932986060">
       <screen x="0" y="0" width="1440" height="864" />
     </state>
-    <state width="1394" height="213" key="GridCell.Tab.0.bottom/0.0.1440.864@0.0.1440.864" timestamp="1611932422865" />
-    <state width="1394" height="213" key="GridCell.Tab.0.center" timestamp="1611932422864">
+    <state width="1394" height="213" key="GridCell.Tab.0.bottom/0.0.1440.864@0.0.1440.864" timestamp="1611932986060" />
+    <state width="1394" height="213" key="GridCell.Tab.0.center" timestamp="1611932986059">
       <screen x="0" y="0" width="1440" height="864" />
     </state>
-    <state width="1394" height="213" key="GridCell.Tab.0.center/0.0.1440.864@0.0.1440.864" timestamp="1611932422864" />
-    <state width="1394" height="213" key="GridCell.Tab.0.left" timestamp="1611932422864">
+    <state width="1394" height="213" key="GridCell.Tab.0.center/0.0.1440.864@0.0.1440.864" timestamp="1611932986059" />
+    <state width="1394" height="213" key="GridCell.Tab.0.left" timestamp="1611932986059">
       <screen x="0" y="0" width="1440" height="864" />
     </state>
-    <state width="1394" height="213" key="GridCell.Tab.0.left/0.0.1440.864@0.0.1440.864" timestamp="1611932422864" />
-    <state width="1394" height="213" key="GridCell.Tab.0.right" timestamp="1611932422864">
+    <state width="1394" height="213" key="GridCell.Tab.0.left/0.0.1440.864@0.0.1440.864" timestamp="1611932986059" />
+    <state width="1394" height="213" key="GridCell.Tab.0.right" timestamp="1611932986059">
       <screen x="0" y="0" width="1440" height="864" />
     </state>
-    <state width="1394" height="213" key="GridCell.Tab.0.right/0.0.1440.864@0.0.1440.864" timestamp="1611932422864" />
+    <state width="1394" height="213" key="GridCell.Tab.0.right/0.0.1440.864@0.0.1440.864" timestamp="1611932986059" />
     <state x="221" y="63" key="SettingsEditor" timestamp="1611511223289">
       <screen x="0" y="0" width="1440" height="864" />
     </state>
     <state x="221" y="63" key="SettingsEditor/0.0.1440.864@0.0.1440.864" timestamp="1611511223289" />
-    <state x="320" y="164" key="Vcs.Push.Dialog.v2" timestamp="1611930269154">
+    <state x="320" y="164" key="Vcs.Push.Dialog.v2" timestamp="1611932762568">
       <screen x="0" y="0" width="1440" height="864" />
     </state>
-    <state x="320" y="164" key="Vcs.Push.Dialog.v2/0.0.1440.864@0.0.1440.864" timestamp="1611930269154" />
+    <state x="320" y="164" key="Vcs.Push.Dialog.v2/0.0.1440.864@0.0.1440.864" timestamp="1611932762568" />
     <state x="424" y="171" width="592" height="580" key="find.popup" timestamp="1611344920372">
       <screen x="0" y="0" width="1440" height="864" />
     </state>

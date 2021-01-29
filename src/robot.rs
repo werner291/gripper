@@ -9,15 +9,15 @@ use std::rc::Rc;
 use std::string::{String, ToString};
 
 use kiss3d::ncollide3d::na::{Isometry3, Rotation3, Unit, Vector3};
-use kiss3d::ncollide3d::pipeline::CollisionGroups;
+
 use kiss3d::ncollide3d::procedural::TriMesh;
 use kiss3d::ncollide3d::shape::{ConvexHull, ShapeHandle};
 use kiss3d::resource::{MaterialManager, Mesh, TextureManager};
 use kiss3d::scene::{Object, SceneNode};
 use nphysics3d::joint::{FixedJoint, Joint, RevoluteJoint};
 use nphysics3d::object::{
-    BodyPartHandle, ColliderDesc, DefaultBodyHandle, DefaultBodyPartHandle, Multibody,
-    MultibodyDesc, MultibodyLink,
+    BodyPartHandle, ColliderDesc, DefaultBodyHandle, DefaultBodyPartHandle, MultibodyDesc,
+    MultibodyLink,
 };
 
 use crate::load_mesh;
@@ -131,16 +131,18 @@ fn build_graphics(
         (swivel, robot.swivel.clone()),
         (link1, robot.link1.clone()),
         (link2, robot.link2.clone()),
-        (gripper, robot.gripper.clone())
-        ]);
+        (gripper, robot.gripper.clone()),
+    ]);
 
     // Fingers are special due to them being copies of each other and rotated.
-    for (bph, rot_i) in &[(robot.finger_0, 0),
+    for (bph, rot_i) in &[
+        (robot.finger_0, 0),
         (robot.finger_1, 1),
         (robot.finger_2, 2),
         (robot.finger_0_2, 0),
         (robot.finger_1_2, 1),
-        (robot.finger_2_2, 2)] {
+        (robot.finger_2_2, 2),
+    ] {
         let mesh = load_mesh::trimesh_from_stl_sr(load_mesh::PHALANX_STL);
         let transform = Isometry3::rotation(Vector3::new(
             0.0,
@@ -325,7 +327,10 @@ pub fn get_multibody_link_mut(
     physics: &mut PhysicsWorld,
     part_handle: DefaultBodyPartHandle,
 ) -> Option<&mut MultibodyLink<f32>> {
-    physics.bodies.multibody_mut(part_handle.0)?.link_mut(part_handle.1)
+    physics
+        .bodies
+        .multibody_mut(part_handle.0)?
+        .link_mut(part_handle.1)
 }
 
 pub fn set_motor_speed(physics: &mut PhysicsWorld, part_handle: DefaultBodyPartHandle, speed: f32) {

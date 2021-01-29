@@ -4,19 +4,14 @@ use std::convert::From;
 use std::option::Option::Some;
 use std::prelude::v1::Vec;
 
-use kiss3d::light::Light;
-use kiss3d::resource::{MaterialManager, Mesh, TextureManager};
-use kiss3d::scene::{Object, SceneNode};
-use kiss3d::window::Window;
-use na::{Isometry3, Point3, Translation3, Unit, Vector3};
-use nphysics3d::object::{
-    BodyPartHandle, BodyStatus, ColliderDesc, DefaultBodyHandle, DefaultBodyPartHandle,
-    Multibody, MultibodyDesc, MultibodyLink, RigidBodyDesc,
+use kiss3d::{
+    light::Light,
+    scene::SceneNode,
+    window::Window
 };
-use rand::Rng;
-use stl_io::{IndexedTriangle, Triangle, Vertex};
+use na::{Isometry3, Point3, Translation3, Unit, Vector3};
+use nphysics3d::object::{BodyPartHandle, DefaultBodyPartHandle};
 
-use crate::keyboard_control::control_robot_by_keys;
 use crate::physics::PhysicsWorld;
 use crate::spawn_utilities::{make_ground, make_pinned_ball};
 

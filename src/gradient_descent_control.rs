@@ -19,7 +19,7 @@ pub fn gradient_descent_control(
     mut physics: &mut PhysicsWorld,
     robot: &RobotBodypartIndex,
     target_pos: &Point3<f32>,
-    target_heading: &Unit<Vector3<f32>>,
+    _target_heading: &Unit<Vector3<f32>>,
 ) -> f32 {
     robot::set_gripper_direction(&mut physics, &robot, GripperDirection::Open);
 
@@ -29,7 +29,7 @@ pub fn gradient_descent_control(
     let remaining_distance = distance_squared(&target_pos, &gripper_pos);
 
     // Gradient of square distance is simply the difference in positions.
-    let distance_gradient = (target_pos - gripper_pos);
+    let distance_gradient = target_pos - gripper_pos;
 
     // let gripper_forward : Vector3<f32> = gripper_position * Vector3::new(0.0, 1.0, 0.0);
 
@@ -37,46 +37,48 @@ pub fn gradient_descent_control(
 
     let motors = [robot.swivel, robot.link1, robot.link2];
 
-    let motor_gradients = motors.iter().map(|bph| {
+    let motor_gradients = motors
+        .iter()
+        .map(|bph| {
+            // Retrieve the position and rotation of the body link being considered.
+            let link = physics
+                .bodies
+                .multibody(robot.body)
+                .unwrap()
+                .link(bph.1)
+                .unwrap();
 
-        // Retrieve the position and rotation of the body link being considered.
-        let link = physics
-            .bodies
-            .multibody(robot.body)
-            .unwrap()
-            .link(bph.1)
-            .unwrap();
+            let link_position = Point3::from(link.position().translation.vector);
 
-        let link_position = Point3::from(link.position().translation.vector);
+            // A vector from the center of the joint to the point inside the gripper.
+            let toward_gripper = &gripper_pos - &link_position;
 
-        // A vector from the center of the joint to the point inside the gripper.
-        let toward_gripper = &gripper_pos - &link_position;
+            // Extract the rotation axis of this joint.
+            let rot_axis_local: &Unit<Vector3<f32>> = &link
+                .joint()
+                .downcast_ref::<RevoluteJoint<f32>>()
+                .unwrap()
+                .axis();
 
-        // Extract the rotation axis of this joint.
-        let rot_axis_local: &Unit<Vector3<f32>> = &link
-            .joint()
-            .downcast_ref::<RevoluteJoint<f32>>()
-            .unwrap()
-            .axis();
+            let rot_axis_global: Unit<Vector3<f32>> = link.position().rotation * rot_axis_local;
 
-        let rot_axis_global: Unit<Vector3<f32>> = link.position().rotation * rot_axis_local;
+            // Velocity of the gripper if the current joint was rotating at unit velocity,
+            // all others immobile.
+            -toward_gripper.cross(&rot_axis_global)
 
-        // Velocity of the gripper if the current joint was rotating at unit velocity,
-        // all others immobile.
-        -toward_gripper.cross(&rot_axis_global)
+            // let gradient_at_joint = induced_velocity.dot(&distance_gradient);
 
-        // let gradient_at_joint = induced_velocity.dot(&distance_gradient);
+            // let ideal_rotation = toward_gripper.cross(&toward_ball) / toward_ball.norm();
+            //
+            //
+            // let translational_gradient = ideal_rotation.dot(&rot_axis_global) / 1.5;
+            //
+            // let rotational_gradient = -rot_axis_global.dot(&gripper_preferred_rotation_axis);
 
-        // let ideal_rotation = toward_gripper.cross(&toward_ball) / toward_ball.norm();
-        //
-        //
-        // let translational_gradient = ideal_rotation.dot(&rot_axis_global) / 1.5;
-        //
-        // let rotational_gradient = -rot_axis_global.dot(&gripper_preferred_rotation_axis);
-
-        // rotational_gradient +
-        // -gradient_at_joint
-    }).collect::<Vec<_>>();
+            // rotational_gradient +
+            // -gradient_at_joint
+        })
+        .collect::<Vec<_>>();
 
     let mut rng = rand::thread_rng();
 
@@ -91,7 +93,6 @@ pub fn gradient_descent_control(
     // dbg!(&motor_speeds);
 
     if let Some(speeds) = motor_speeds {
-
         let safe_speeds = if speeds.norm() > 1.0 {
             speeds.normalize()
         } else {
