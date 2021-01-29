@@ -37,7 +37,7 @@ pub fn gradient_descent_control(
 
     let motors = [robot.swivel, robot.link1, robot.link2];
 
-    let motor_gradients = motors.map(|bph| {
+    let motor_gradients = motors.iter().map(|bph| {
 
         // Retrieve the position and rotation of the body link being considered.
         let link = physics
@@ -76,7 +76,7 @@ pub fn gradient_descent_control(
 
         // rotational_gradient +
         // -gradient_at_joint
-    });
+    }).collect::<Vec<_>>();
 
     let mut rng = rand::thread_rng();
 

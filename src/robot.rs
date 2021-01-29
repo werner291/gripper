@@ -126,38 +126,34 @@ fn build_graphics(
         Vector3::new(1.0, 1.0, 1.0),
     );
 
-    // Fingers are special due to them being copies of each other and rotated.
-    let [finger_0, finger_1, finger_2, finger_0_2, finger_1_2, finger_2_2] = [0, 1, 2, 0, 1, 2]
-        .map(|i| {
-            let mesh = load_mesh::stl_to_trimesh("scad/phalanx.stl");
-            let transform = Isometry3::rotation(Vector3::new(
-                0.0,
-                std::f32::consts::FRAC_PI_2 + std::f32::consts::PI * i as f32 / 1.5,
-                0.0,
-            ));
-
-            // Use the `wrap_transformed_trimesh` function since they need to be rotated,
-            // which cannot be represented in the Multibody structure.
-            let node = wrap_transformed_trimesh(mesh, transform);
-            scene.add_child(node.clone() /* Rc<RefCell<_>> construction. */);
-            node
-        });
-
-    // Update the part-to-body index, which will allow the simulator
-    // to synchronize the body parts to their scene node counterparts.
     part_to_body.extend_from_slice(&[
         (base, robot.base.clone()),
         (swivel, robot.swivel.clone()),
         (link1, robot.link1.clone()),
         (link2, robot.link2.clone()),
-        (gripper, robot.gripper.clone()),
-        (finger_0, robot.finger_0.clone()),
-        (finger_1, robot.finger_1.clone()),
-        (finger_2, robot.finger_2.clone()),
-        (finger_0_2, robot.finger_0_2.clone()),
-        (finger_1_2, robot.finger_1_2.clone()),
-        (finger_2_2, robot.finger_2_2.clone()),
-    ]);
+        ]);
+
+    // Fingers are special due to them being copies of each other and rotated.
+    for (bph, rot_i) in &[(robot.finger_0, 0),
+        (robot.finger_1, 1),
+        (robot.finger_2, 2),
+        (robot.finger_0_2, 0),
+        (robot.finger_1_2, 1),
+        (robot.finger_2_2, 2)] {
+        let mesh = load_mesh::stl_to_trimesh("scad/phalanx.stl");
+        let transform = Isometry3::rotation(Vector3::new(
+            0.0,
+            std::f32::consts::FRAC_PI_2 + std::f32::consts::PI * (*rot_i) as f32 / 1.5,
+            0.0,
+        ));
+
+        // Use the `wrap_transformed_trimesh` function since they need to be rotated,
+        // which cannot be represented in the Multibody structure.
+        let node = wrap_transformed_trimesh(mesh, transform);
+        scene.add_child(node.clone() /* Rc<RefCell<_>> construction. */);
+
+        part_to_body.push((node, *bph));
+    }
 }
 
 fn attach_colliders(physics: &mut PhysicsWorld, robot: &RobotBodypartIndex) {

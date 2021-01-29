@@ -1,4 +1,3 @@
-#![feature(array_map)]
 #![allow(dead_code)]
 
 use std::convert::From;
