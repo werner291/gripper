@@ -1,23 +1,29 @@
-let
-  moz_overlay = import (builtins.fetchTarball https://github.com/mozilla/nixpkgs-mozilla/archive/master.tar.gz);
-  nixpkgs = import <nixpkgs> { overlays = [ moz_overlay ]; };
-  rust = (nixpkgs.rustChannelOf { date = "2020-08-18"; channel = "nightly"; }).rust.override {
-    extensions = [ "rust-src" "rust-analysis" "rls-preview" ];
-    };
-in
-  with nixpkgs;
-  stdenv.mkDerivation {
-    name = "rust";
-    
-    nativeBuildInputs = [
-        pkgconfig
-        python3
+#{ sources ? import ./nix/sources.nix }:
+
+let 
+
+  pkgs = import <nixpkgs> {
+    overlays = [
+      (import (builtins.fetchTarball "https://github.com/oxalica/rust-overlay/archive/master.tar.gz"))
     ];
+  };
 
-    buildInputs = [
-        rust glib gtk3 libGL cmake
+  rchan = (pkgs.rustChannelOf {
+    date = "2021-01-15";
+    channel = "nightly";
+  }).rust.override {
+    targets = [ "x86_64-pc-windows-gnu" ];
+    extensions = [
+      "rust-src"
+      "rustc-dev"
     ];
+  };
+  
+  pkgs-mingw = import <nixpkgs> { crossSystem = {config = "x86_64-w64-mingw32"; }; };
 
-    LD_LIBRARY_PATH = with pkgs.xlibs; "${pkgs.libGL}/lib";
-
-  }
+in 
+    pkgs-mingw.mkShell { 
+        nativeBuildInputs = [ rchan pkgs.wine ];
+        buildInputs = [ rchan pkgs-mingw.windows.pthreads pkgs-mingw.windows.mingw_w64_pthreads ]; 
+        
+    }
