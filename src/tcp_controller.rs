@@ -2,15 +2,15 @@ use crate::physics::PhysicsWorld;
 use crate::robot::{get_joint, set_motor_speed, RobotBodyPartIndex};
 use byteorder::{BigEndian, ByteOrder, ReadBytesExt, WriteBytesExt};
 use nphysics3d::joint::RevoluteJoint;
-use std::io::{Error, Result, Write};
+use std::io::{Result, Write};
 
+use std::iter::Iterator;
 use std::net::{TcpListener, TcpStream};
-use std::result::Result::{Ok, Err};
-use std::thread;
+use std::result::Result::{Err, Ok};
 use std::sync::mpsc;
 use std::sync::mpsc::{Receiver, Sender};
+use std::thread;
 use std::vec::Vec;
-use std::iter::Iterator;
 
 pub struct TcpController {
     tx: Sender<JointAngles>,
@@ -20,16 +20,15 @@ pub struct TcpController {
 
 struct JointAngles {
     frame: u64,
-    angles: Vec<f32>
+    angles: Vec<f32>,
 }
 
 struct JointVelocities {
-    velocities: Vec<f32>
+    velocities: Vec<f32>,
 }
 
 impl TcpController {
     pub fn new_on_port(port: u16) -> Result<TcpController> {
-
         let (send_ja, rcv_ja) = mpsc::channel::<JointAngles>();
         let (send_jv, rcv_jv) = mpsc::channel::<JointVelocities>();
 
@@ -42,7 +41,11 @@ impl TcpController {
         })
     }
 
-    fn run_tx_rx_thread(port: u16, rcv_ja: Receiver<JointAngles>, send_jv: Sender<JointVelocities>) {
+    fn run_tx_rx_thread(
+        port: u16,
+        rcv_ja: Receiver<JointAngles>,
+        send_jv: Sender<JointVelocities>,
+    ) {
         let listener = TcpListener::bind(("0.0.0.0", port)).expect("Cannot bind to port.");
 
         println!("Listening on port {}", port);
@@ -54,8 +57,14 @@ impl TcpController {
 
                     loop {
                         // FIXME too much .unwrap() for my taste...
-                        TcpController::write_joint_angles(&mut current_stream, rcv_ja.recv().unwrap()).unwrap();
-                        send_jv.send(TcpController::read_joint_angles(&mut current_stream).unwrap()).unwrap();
+                        TcpController::write_joint_angles(
+                            &mut current_stream,
+                            rcv_ja.recv().unwrap(),
+                        )
+                        .unwrap();
+                        send_jv
+                            .send(TcpController::read_joint_angles(&mut current_stream).unwrap())
+                            .unwrap();
                     }
                 }
                 Err(e) => {
@@ -66,7 +75,6 @@ impl TcpController {
     }
 
     fn read_joint_angles(current_stream: &mut TcpStream) -> Result<JointVelocities> {
-
         let mut velocities = Vec::new();
 
         for _ in 0..10 {
@@ -77,13 +85,13 @@ impl TcpController {
     }
 
     fn write_joint_angles(current_stream: &mut TcpStream, ja: JointAngles) -> Result<()> {
-            current_stream.write_u64::<BigEndian>(ja.frame as u64)?;
+        current_stream.write_u64::<BigEndian>(ja.frame as u64)?;
 
-            for x in ja.angles.iter() {
-                current_stream.write_f32::<BigEndian>(*x)?;
-            }
+        for x in ja.angles.iter() {
+            current_stream.write_f32::<BigEndian>(*x)?;
+        }
 
-            current_stream.flush()
+        current_stream.flush()
     }
 
     pub fn control_cycle_synchronous(
@@ -102,25 +110,27 @@ impl TcpController {
     ) {
         let ja = self.rx.recv().unwrap();
 
-        for (x,v) in robot.motor_parts().iter().zip(ja.velocities.into_iter()) {
+        for (x, v) in robot.motor_parts().iter().zip(ja.velocities.into_iter()) {
             set_motor_speed(physics, *x, v);
         }
     }
 
-    pub fn send_joint_angles(
-        &mut self,
-        physics: &PhysicsWorld,
-        robot: &RobotBodyPartIndex,
-    ) {
-        let angles = robot.motor_parts().iter().map(|bph| {
-            let joint = get_joint::<RevoluteJoint<f32>>(physics, *bph).unwrap();
-            joint.angle()
-        }).collect();
+    pub fn send_joint_angles(&mut self, physics: &PhysicsWorld, robot: &RobotBodyPartIndex) {
+        let angles = robot
+            .motor_parts()
+            .iter()
+            .map(|bph| {
+                let joint = get_joint::<RevoluteJoint<f32>>(physics, *bph).unwrap();
+                joint.angle()
+            })
+            .collect();
 
-        self.tx.send(JointAngles {
-            frame: self.frame_counter,
-            angles
-        }).expect("Sending joint angles to network thread failed.");
+        self.tx
+            .send(JointAngles {
+                frame: self.frame_counter,
+                angles,
+            })
+            .expect("Sending joint angles to network thread failed.");
 
         self.frame_counter += 1;
     }

@@ -4,7 +4,7 @@ use std::f32::consts::{FRAC_PI_2, PI};
 use std::iter::Iterator;
 use std::option::Option;
 use std::option::Option::{None, Some};
-use std::prelude::v1::Vec;
+
 use std::rc::Rc;
 use std::string::{String, ToString};
 
@@ -20,9 +20,9 @@ use nphysics3d::object::{
     MultibodyLink,
 };
 
+use crate::graphics::Graphics;
 use crate::load_mesh;
 use crate::physics::PhysicsWorld;
-use crate::graphics::Graphics;
 
 /// A struct that contains the body handle and body part handle of the various parts of a robot.
 /// Note that each body part also has a name, should that be more convenient.
@@ -78,10 +78,7 @@ impl RobotBodyPartIndex {
 }
 
 /// Build a physical and visible robot.
-pub fn make_robot(
-    physics: &mut PhysicsWorld,
-    graphics: &mut Graphics,
-) -> RobotBodyPartIndex {
+pub fn make_robot(physics: &mut PhysicsWorld, graphics: &mut Graphics) -> RobotBodyPartIndex {
     // Generates a Multibody of the robot, without any visible parts.
     let robot = make_multibody(physics);
 
@@ -99,10 +96,7 @@ pub fn make_robot(
     robot
 }
 
-fn build_graphics(
-    robot: &RobotBodyPartIndex,
-    graphics: &mut Graphics
-) {
+fn build_graphics(robot: &RobotBodyPartIndex, graphics: &mut Graphics) {
     // Allocate some scene nodes and load the appropriate meshes.
     let base = graphics.window.add_trimesh(
         load_mesh::trimesh_from_stl_sr(load_mesh::BASE_STL),
@@ -152,7 +146,10 @@ fn build_graphics(
         // Use the `wrap_transformed_trimesh` function since they need to be rotated,
         // which cannot be represented in the Multibody structure.
         let node = wrap_transformed_trimesh(mesh, transform);
-        graphics.window.scene_mut().add_child(node.clone() /* Rc<RefCell<_>> construction. */);
+        graphics
+            .window
+            .scene_mut()
+            .add_child(node.clone() /* Rc<RefCell<_>> construction. */);
 
         graphics.bp_to_sn.push((node, *bph));
     }

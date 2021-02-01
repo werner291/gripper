@@ -1,6 +1,6 @@
 use crate::physics::PhysicsWorld;
 use kiss3d::scene::SceneNode;
-use kiss3d::window::Window;
+
 use nalgebra::{Point3, Unit, Vector3};
 use nphysics3d::ncollide3d::shape::{Ball, Plane, ShapeHandle};
 use nphysics3d::{
@@ -10,7 +10,7 @@ use nphysics3d::{
     object::{BodyPartHandle, DefaultBodyPartHandle},
 };
 use std::clone::Clone;
-use std::prelude::v1::Vec;
+
 use crate::graphics::Graphics;
 
 /// Spawns a new ball with a radius of 0.3 at (4.0, 1.0, 0.0).
@@ -35,7 +35,9 @@ pub fn make_pinned_ball(
             .build(BodyPartHandle(ball, 0)),
     );
     let ball_sn = graphics.window.add_sphere(RADIUS);
-    graphics.bp_to_sn.push((ball_sn.clone(), BodyPartHandle(ball, 0)));
+    graphics
+        .bp_to_sn
+        .push((ball_sn.clone(), BodyPartHandle(ball, 0)));
 
     (ball_sn, BodyPartHandle(ball, 0))
 }
@@ -43,10 +45,7 @@ pub fn make_pinned_ball(
 /// Spawns a ground plane.
 ///
 /// Note that while the visible geometry is finite, the physical actual plane extends to infinity.
-pub fn make_ground(
-    physics: &mut PhysicsWorld,
-    graphics: &mut Graphics,
-) {
+pub fn make_ground(physics: &mut PhysicsWorld, graphics: &mut Graphics) {
     let ground = physics
         .bodies
         .insert(RigidBodyDesc::new().status(BodyStatus::Static).build());
@@ -64,5 +63,7 @@ pub fn make_ground(
         2,
         2,
     );
-    graphics.bp_to_sn.push((ground_quad, BodyPartHandle(ground, 0)));
+    graphics
+        .bp_to_sn
+        .push((ground_quad, BodyPartHandle(ground, 0)));
 }
