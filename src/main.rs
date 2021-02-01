@@ -40,7 +40,7 @@ struct Opts {
         long,
         about = "If present, accepts remote control signal on specified port."
     )]
-    remote_control_port: Option<u16>,
+    remote_control_port: Option<u16>
 }
 
 fn main() {
@@ -62,11 +62,12 @@ fn main() {
 
     let mut tctrl = opts
         .remote_control_port
-        .map(|_port| TcpController::new_on_port(11235).expect("Cannot establish TCP socket."));
+        .map(|port| TcpController::new_wait_until_connected(port).expect("Connection failed."));
 
     let mut should_close = false;
 
     while !should_close {
+
         should_close |= !graphics.draw_frame(&physics);
 
         physics.step();
