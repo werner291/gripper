@@ -16,13 +16,15 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="99bfd17e-0b5a-4a4c-b788-1095db1046ef" name="Default Changelist" comment="Fixed wrong inclusion of Vec.">
-      <change afterPath="$PROJECT_DIR$/src/tcp_controller.rs" afterDir="false" />
+    <list default="true" id="99bfd17e-0b5a-4a4c-b788-1095db1046ef" name="Default Changelist" comment="Added documentation to example file.">
+      <change afterPath="$PROJECT_DIR$/src/graphics.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Cargo.lock" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.toml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/robot.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/robot.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/spawn_utilities.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/spawn_utilities.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tcp_controller.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/tcp_controller.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -54,9 +56,19 @@
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="NIXITCH_NIXPKGS_CONFIG" value="/etc/nix/nixpkgs-config.nix" />
+    <property name="NIXITCH_NIX_CONF_DIR" value="" />
+    <property name="NIXITCH_NIX_OTHER_STORES" value="" />
+    <property name="NIXITCH_NIX_PATH" value="nixpkgs=/nix/var/nix/profiles/per-user/root/channels/nixos:nixos-config=/etc/nixos/configuration.nix:/nix/var/nix/profiles/per-user/root/channels" />
+    <property name="NIXITCH_NIX_PROFILES" value="/run/current-system/sw /nix/var/nix/profiles/default /etc/profiles/per-user/werner /home/werner/.nix-profile" />
+    <property name="NIXITCH_NIX_REMOTE" value="" />
+    <property name="NIXITCH_NIX_USER_PROFILE_DIR" value="/nix/var/nix/profiles/per-user/werner" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/../synthetic-fruit-trees/grabber.rs" />
     <property name="org.rust.cargo.project.model.PROJECT_DISCOVERY" value="true" />
+    <property name="project.structure.last.edited" value="Project" />
+    <property name="project.structure.proportion" value="0.0" />
+    <property name="project.structure.side.proportion" value="0.0" />
     <property name="settings.editor.selected.configurable" value="project.propCompiler" />
   </component>
   <component name="RunManager" selected="Cargo.run">
@@ -134,13 +146,20 @@
     <MESSAGE value="Minor renaming." />
     <MESSAGE value="Added caching rule for dependencies." />
     <MESSAGE value="Fixed wrong inclusion of Vec." />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed wrong inclusion of Vec." />
+    <MESSAGE value="Implemented TCP controller and example script." />
+    <MESSAGE value="Ran format and fix." />
+    <MESSAGE value="Added documentation to example file." />
+    <option name="LAST_COMMIT_MESSAGE" value="Added documentation to example file." />
   </component>
   <component name="WindowStateProjectService">
     <state x="320" y="72" width="1017" height="719" key="#Plugins" timestamp="1611925219950">
       <screen x="0" y="0" width="1440" height="864" />
     </state>
     <state x="320" y="72" width="1017" height="719" key="#Plugins/0.0.1440.864@0.0.1440.864" timestamp="1611925219950" />
+    <state x="208" y="6" key="#Project_Structure" timestamp="1611948373334">
+      <screen x="0" y="0" width="1440" height="864" />
+    </state>
+    <state x="208" y="6" key="#Project_Structure/0.0.1440.864@0.0.1440.864" timestamp="1611948373334" />
     <state x="178" y="90" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1611920620911">
       <screen x="0" y="0" width="1440" height="864" />
     </state>
@@ -149,38 +168,46 @@
       <screen x="0" y="0" width="1440" height="864" />
     </state>
     <state x="458" y="177" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1440.864@0.0.1440.864" timestamp="1611931515043" />
-    <state x="508" y="186" width="424" height="491" key="FileChooserDialogImpl" timestamp="1611604962454">
+    <state x="508" y="186" width="424" height="491" key="FileChooserDialogImpl" timestamp="1612186121559">
       <screen x="0" y="0" width="1440" height="864" />
     </state>
-    <state x="508" y="186" width="424" height="491" key="FileChooserDialogImpl/0.0.1440.864@0.0.1440.864" timestamp="1611604962454" />
+    <state x="508" y="186" width="424" height="491" key="FileChooserDialogImpl/0.0.1440.864@0.0.1440.864" timestamp="1612186121559" />
     <state x="0" y="0" key="FileDocumentManager.FileCacheConflict" timestamp="1611932380535">
       <screen x="0" y="0" width="1440" height="864" />
     </state>
     <state x="0" y="0" key="FileDocumentManager.FileCacheConflict/0.0.1440.864@0.0.1440.864" timestamp="1611932380535" />
-    <state width="1394" height="213" key="GridCell.Tab.0.bottom" timestamp="1611947547572">
+    <state width="1394" height="213" key="GridCell.Tab.0.bottom" timestamp="1612197266616">
       <screen x="0" y="0" width="1440" height="864" />
     </state>
-    <state width="1394" height="213" key="GridCell.Tab.0.bottom/0.0.1440.864@0.0.1440.864" timestamp="1611947547572" />
-    <state width="1394" height="213" key="GridCell.Tab.0.center" timestamp="1611947547572">
+    <state width="1394" height="213" key="GridCell.Tab.0.bottom/0.0.1440.864@0.0.1440.864" timestamp="1612197266616" />
+    <state width="1394" height="213" key="GridCell.Tab.0.center" timestamp="1612197266616">
       <screen x="0" y="0" width="1440" height="864" />
     </state>
-    <state width="1394" height="213" key="GridCell.Tab.0.center/0.0.1440.864@0.0.1440.864" timestamp="1611947547572" />
-    <state width="1394" height="213" key="GridCell.Tab.0.left" timestamp="1611947547571">
+    <state width="1394" height="213" key="GridCell.Tab.0.center/0.0.1440.864@0.0.1440.864" timestamp="1612197266616" />
+    <state width="1394" height="213" key="GridCell.Tab.0.left" timestamp="1612197266615">
       <screen x="0" y="0" width="1440" height="864" />
     </state>
-    <state width="1394" height="213" key="GridCell.Tab.0.left/0.0.1440.864@0.0.1440.864" timestamp="1611947547571" />
-    <state width="1394" height="213" key="GridCell.Tab.0.right" timestamp="1611947547572">
+    <state width="1394" height="213" key="GridCell.Tab.0.left/0.0.1440.864@0.0.1440.864" timestamp="1612197266615" />
+    <state width="1394" height="213" key="GridCell.Tab.0.right" timestamp="1612197266616">
       <screen x="0" y="0" width="1440" height="864" />
     </state>
-    <state width="1394" height="213" key="GridCell.Tab.0.right/0.0.1440.864@0.0.1440.864" timestamp="1611947547572" />
+    <state width="1394" height="213" key="GridCell.Tab.0.right/0.0.1440.864@0.0.1440.864" timestamp="1612197266616" />
+    <state x="477" y="112" key="RollbackChangesDialog" timestamp="1612184775804">
+      <screen x="0" y="0" width="1440" height="864" />
+    </state>
+    <state x="477" y="112" key="RollbackChangesDialog/0.0.1440.864@0.0.1440.864" timestamp="1612184775804" />
     <state x="221" y="63" key="SettingsEditor" timestamp="1611511223289">
       <screen x="0" y="0" width="1440" height="864" />
     </state>
     <state x="221" y="63" key="SettingsEditor/0.0.1440.864@0.0.1440.864" timestamp="1611511223289" />
-    <state x="320" y="164" key="Vcs.Push.Dialog.v2" timestamp="1611933487173">
+    <state x="320" y="164" key="Vcs.Push.Dialog.v2" timestamp="1611949396347">
       <screen x="0" y="0" width="1440" height="864" />
     </state>
-    <state x="320" y="164" key="Vcs.Push.Dialog.v2/0.0.1440.864@0.0.1440.864" timestamp="1611933487173" />
+    <state x="320" y="164" key="Vcs.Push.Dialog.v2/0.0.1440.864@0.0.1440.864" timestamp="1611949396347" />
+    <state x="100" y="100" width="1240" height="664" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1612185023985">
+      <screen x="0" y="0" width="1440" height="864" />
+    </state>
+    <state x="100" y="100" width="1240" height="664" key="com.intellij.history.integration.ui.views.FileHistoryDialog/0.0.1440.864@0.0.1440.864" timestamp="1612185023985" />
     <state x="424" y="171" width="592" height="580" key="find.popup" timestamp="1611344920372">
       <screen x="0" y="0" width="1440" height="864" />
     </state>
@@ -197,9 +224,9 @@
       <screen x="0" y="0" width="1440" height="864" />
     </state>
     <state x="384" y="191" key="run.anything.popup/0.0.1440.864@0.0.1440.864" timestamp="1611938939904" />
-    <state x="383" y="184" width="672" height="678" key="search.everywhere.popup" timestamp="1611941973345">
+    <state x="383" y="184" width="672" height="678" key="search.everywhere.popup" timestamp="1612196964323">
       <screen x="0" y="0" width="1440" height="864" />
     </state>
-    <state x="383" y="184" width="672" height="678" key="search.everywhere.popup/0.0.1440.864@0.0.1440.864" timestamp="1611941973345" />
+    <state x="383" y="184" width="672" height="678" key="search.everywhere.popup/0.0.1440.864@0.0.1440.864" timestamp="1612196964323" />
   </component>
 </project>

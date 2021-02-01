@@ -22,6 +22,7 @@ use nphysics3d::object::{
 
 use crate::load_mesh;
 use crate::physics::PhysicsWorld;
+use crate::graphics::Graphics;
 
 /// A struct that contains the body handle and body part handle of the various parts of a robot.
 /// Note that each body part also has a name, should that be more convenient.
@@ -79,8 +80,7 @@ impl RobotBodyPartIndex {
 /// Build a physical and visible robot.
 pub fn make_robot(
     physics: &mut PhysicsWorld,
-    scene: &mut SceneNode,
-    part_to_body: &mut Vec<(SceneNode, DefaultBodyPartHandle)>,
+    graphics: &mut Graphics,
 ) -> RobotBodyPartIndex {
     // Generates a Multibody of the robot, without any visible parts.
     let robot = make_multibody(physics);
@@ -94,39 +94,38 @@ pub fn make_robot(
         .unwrap()
         .set_deactivation_threshold(None);
 
-    build_graphics(scene, part_to_body, &robot);
+    build_graphics(&robot, graphics);
 
     robot
 }
 
 fn build_graphics(
-    scene: &mut SceneNode,
-    part_to_body: &mut Vec<(SceneNode, DefaultBodyPartHandle)>,
     robot: &RobotBodyPartIndex,
+    graphics: &mut Graphics
 ) {
     // Allocate some scene nodes and load the appropriate meshes.
-    let base = scene.add_trimesh(
+    let base = graphics.window.add_trimesh(
         load_mesh::trimesh_from_stl_sr(load_mesh::BASE_STL),
         Vector3::new(1.0, 1.0, 1.0),
     );
-    let swivel = scene.add_trimesh(
+    let swivel = graphics.window.add_trimesh(
         load_mesh::trimesh_from_stl_sr(load_mesh::SWIVEL_STL),
         Vector3::new(1.0, 1.0, 1.0),
     );
-    let link1 = scene.add_trimesh(
+    let link1 = graphics.window.add_trimesh(
         load_mesh::trimesh_from_stl_sr(load_mesh::ARMLINK_STL),
         Vector3::new(1.0, 1.0, 1.0),
     );
-    let link2 = scene.add_trimesh(
+    let link2 = graphics.window.add_trimesh(
         load_mesh::trimesh_from_stl_sr(load_mesh::ARMLINK_STL),
         Vector3::new(1.0, 1.0, 1.0),
     );
-    let gripper = scene.add_trimesh(
+    let gripper = graphics.window.add_trimesh(
         load_mesh::trimesh_from_stl_sr(load_mesh::GRIPPER_STL),
         Vector3::new(1.0, 1.0, 1.0),
     );
 
-    part_to_body.extend_from_slice(&[
+    graphics.bp_to_sn.extend_from_slice(&[
         (base, robot.base.clone()),
         (swivel, robot.swivel.clone()),
         (link1, robot.link1.clone()),
@@ -153,9 +152,9 @@ fn build_graphics(
         // Use the `wrap_transformed_trimesh` function since they need to be rotated,
         // which cannot be represented in the Multibody structure.
         let node = wrap_transformed_trimesh(mesh, transform);
-        scene.add_child(node.clone() /* Rc<RefCell<_>> construction. */);
+        graphics.window.scene_mut().add_child(node.clone() /* Rc<RefCell<_>> construction. */);
 
-        part_to_body.push((node, *bph));
+        graphics.bp_to_sn.push((node, *bph));
     }
 }
 

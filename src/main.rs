@@ -1,12 +1,16 @@
 #![allow(dead_code)]
 
 use std::convert::From;
+use std::option::Option;
 use std::option::Option::Some;
 use std::prelude::v1::Vec;
 
+use clap::Clap;
 use kiss3d::{light::Light, scene::SceneNode, window::Window};
 use na::{Isometry3, Point3, Translation3, Vector3};
 use nphysics3d::object::{BodyPartHandle, DefaultBodyPartHandle};
+
+use graphics::Graphics;
 
 use crate::physics::PhysicsWorld;
 use crate::spawn_utilities::{make_ground, make_pinned_ball};
@@ -20,73 +24,54 @@ mod physics;
 mod robot;
 mod spawn_utilities;
 mod tcp_controller;
+mod graphics;
 
 extern crate kiss3d;
 extern crate nalgebra as na;
 
-fn main() {
-    let mut window = Window::new("Robotic Gripper");
+#[derive(Clap, Debug)]
+#[clap(author = "Werner Kroneman <w.kroneman@ucr.nl>")]
+struct Opts {
+    #[clap(short, long, about="Draw a red tracing line from the tip of the end effector.")]
+    trace: bool,
 
-    window.set_framerate_limit(Some(60));
+    #[clap(short, long, about="If present, accepts remote control signal on specified port.")]
+    remote_control_port: Option<u16>
+}
+
+fn main() {
+
+    let opts: Opts = Opts::parse();
+
+    let mut graphics = Graphics::init();
+
     let mut physics = physics::PhysicsWorld::new();
 
-    let mut bp_to_sn = Vec::new();
+    let robot = robot::make_robot(&mut physics, &mut graphics);
 
-    let robot = robot::make_robot(&mut physics, window.scene_mut(), &mut bp_to_sn);
+    make_ground(&mut physics, &mut graphics);
+    make_pinned_ball(&mut physics, &mut graphics);
 
-    window.set_light(Light::StickToCamera);
+    if opts.trace {
+        println!("Tracing enabled.");
+        graphics.enable_trace(robot.gripper, Isometry3::translation(0.0,0.5,0.0));
+    }
 
-    make_ground(&mut window, &mut physics, &mut bp_to_sn);
-    let (_, BodyPartHandle(ball, _)) = make_pinned_ball(&mut window, &mut physics, &mut bp_to_sn);
+    let mut tctrl = opts.remote_control_port.map(|port| {
+        TcpController::new_on_port(11235).expect("Cannot establish TCP socket.")
+    });
 
-    let mut t = 0.0;
+    let mut should_close = false;
 
-    let mut marker = window.add_sphere(0.1);
+    while ! should_close {
 
-    let mut trace = Vec::new();
-
-    let mut frame = 0;
-
-    let mut tctrl =
-        TcpController::new_wait_until_connected(11235).expect("Cannot establish TCP socket.");
-
-    while window.render() {
-        let ball_pos = Point3::from(
-            physics
-                .bodies
-                .rigid_body(ball)
-                .unwrap()
-                .position()
-                .translation
-                .vector,
-        );
-        let target = &ball_pos + Vector3::new(0.0, 0.0, 0.0);
-        marker.set_local_translation(Translation3::from(target - Point3::new(0.0, 0.0, 0.0)));
-        marker.set_color(1.0, 0.0, 0.0);
-
-        t += physics.mechanical_world.timestep();
+        should_close |= !graphics.draw_frame(&physics);
 
         physics.step();
 
-        frame += 1;
-        if frame % 10 == 0 {
-            trace.push(gradient_descent_control::point_inside_gripper(
-                &physics, &robot,
-            ));
+        if let Some(rc) = &mut tctrl {
+            rc.control_cycle_synchronous(&mut physics, &robot);
         }
-
-        if trace.len() >= 2 {
-            for i in 0..trace.len() - 1 {
-                window.draw_line(&trace[i], &trace[i + 1], &Point3::new(1.0, 0.0, 0.0));
-            }
-        }
-
-        // tctrl.send_joint_angles(&mut physics, &robot).expect("Connection failed")
-        tctrl
-            .control_cycle_synchronous(&mut physics, &robot)
-            .expect("Connection failed");
-
-        synchronize_physics_to_graphics(&mut physics, &mut bp_to_sn);
 
         // control_demos::control_gripper_demo(&mut physics, &robot, t);
 
@@ -95,22 +80,5 @@ fn main() {
         // );
         // control_flailing_demo(&mut physics, &robot, t)
         // control_robot_by_keys(&window,&mut physics,&robot);
-    }
-}
-
-fn synchronize_physics_to_graphics(
-    physics: &mut PhysicsWorld,
-    bp_to_sn: &mut Vec<(SceneNode, DefaultBodyPartHandle)>,
-) {
-    for (sn, BodyPartHandle(bh, ph)) in bp_to_sn.iter_mut() {
-        let pos: Isometry3<f32> = physics
-            .bodies
-            .get(*bh)
-            .unwrap()
-            .part(*ph)
-            .unwrap()
-            .position();
-
-        sn.set_local_transformation(pos);
     }
 }
