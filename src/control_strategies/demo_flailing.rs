@@ -2,13 +2,13 @@ use std::iter::Iterator;
 
 use nphysics3d::joint::RevoluteJoint;
 
-use crate::physics::{PhysicsWorld, ControllerStrategy};
+use crate::physics::{ControllerStrategy, PhysicsWorld};
 use crate::robot;
 use crate::robot::{set_gripper_direction, GripperDirection, RobotBodyPartIndex};
 
 /// A dummy controller that simply sends a sine wave into the motor speed controllers.
 struct FlailController {
-    t: f32
+    t: f32,
 }
 
 impl ControllerStrategy for FlailController {
@@ -24,7 +24,7 @@ impl ControllerStrategy for FlailController {
 
 /// A dummy controller that opens and closes the gripper repeatedly.
 struct GripperOpenCloseDemo {
-    t: f32
+    t: f32,
 }
 
 impl ControllerStrategy for GripperOpenCloseDemo {

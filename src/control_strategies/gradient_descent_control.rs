@@ -5,7 +5,7 @@ use nphysics3d::joint::RevoluteJoint;
 use nphysics3d::object::BodyPart;
 use rand::Rng;
 
-use crate::physics::{PhysicsWorld, ControllerStrategy};
+use crate::physics::{ControllerStrategy, PhysicsWorld};
 use crate::robot;
 use crate::robot::{get_multibody_link, GripperDirection, RobotBodyPartIndex};
 use nalgebra::Matrix3;
@@ -17,7 +17,7 @@ use std::vec::Vec;
 /// Controls the robot using a gradient-descent-based inverse kinematic controller.
 /// Sets target motor speeds based on gradients of the distance of a point in front of the gripper.
 struct GradientDescentController {
-    target_position: Point3<f32>
+    target_position: Point3<f32>,
 }
 
 impl ControllerStrategy for GradientDescentController {
@@ -27,7 +27,7 @@ impl ControllerStrategy for GradientDescentController {
         let gripper_pos = point_inside_gripper(&physics, robot);
 
         // Will be used as our energy function to be minimized.
-        let remaining_distance = distance_squared(&self.target_position, &gripper_pos);
+        let _remaining_distance = distance_squared(&self.target_position, &gripper_pos);
 
         // Gradient of square distance is simply the difference in positions.
         let distance_gradient = &self.target_position - gripper_pos;

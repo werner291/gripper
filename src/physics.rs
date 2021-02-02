@@ -12,7 +12,10 @@ use nphysics3d::force_generator::DefaultForceGeneratorSet;
 use nphysics3d::joint::DefaultJointConstraintSet;
 use nphysics3d::nalgebra::RealField;
 use nphysics3d::ncollide3d::broad_phase::BroadPhasePairFilter;
-use nphysics3d::object::{Body, BodyPartHandle, BodySet, ColliderAnchor, ColliderSet, DefaultBodyHandle, DefaultBodyPartHandle, DefaultBodySet, DefaultColliderSet};
+use nphysics3d::object::{
+    Body, BodyPartHandle, BodySet, ColliderAnchor, ColliderSet, DefaultBodyHandle,
+    DefaultBodyPartHandle, DefaultBodySet, DefaultColliderSet,
+};
 use nphysics3d::world::{
     BroadPhasePairFilterSets, DefaultGeometricalWorld, DefaultMechanicalWorld,
 };
@@ -78,7 +81,6 @@ pub struct PhysicsWorld {
 }
 
 impl PhysicsWorld {
-
     /// Initialize an empty PhysicsWorld with some default parameters.
     pub fn new() -> Self {
         PhysicsWorld {
@@ -108,11 +110,14 @@ impl PhysicsWorld {
 
 /// A callback that implements logic to control the robot's motors.
 /// TODO Too much mutability for my liking, better make a function returning motor speeds.
-pub trait ControllerStrategy : Send + 'static {
+pub trait ControllerStrategy: Send + 'static {
     fn apply_controller(&mut self, physics_world: &mut PhysicsWorld, robot: &RobotBodyPartIndex);
 }
 
-impl<F> ControllerStrategy for F where F : FnMut(&mut PhysicsWorld, &RobotBodyPartIndex) + Send + 'static {
+impl<F> ControllerStrategy for F
+where
+    F: FnMut(&mut PhysicsWorld, &RobotBodyPartIndex) + Send + 'static,
+{
     fn apply_controller(&mut self, pw: &mut PhysicsWorld, rob: &RobotBodyPartIndex) {
         self(pw, rob)
     }
@@ -142,13 +147,16 @@ pub type PhysicsUpdate = HashMap<DefaultBodyPartHandle, Isometry3<f32>>;
 /// * `physics` - The PhysicsWorld, initialized with whatever needs to be present in the simulation.
 ///
 /// TODO: Maybe pass the Sender in as a parameter instead?
-pub fn start_physics_thread<C, W>(robot: RobotBodyPartIndex,
-                        mut controller: C,
-                        mut wait_strategy: W,
-                        mut physics: PhysicsWorld) -> (JoinHandle<()>, Receiver<PhysicsUpdate>)
-    where C : ControllerStrategy,
-          W : WaitStrategy {
-
+pub fn start_physics_thread<C, W>(
+    robot: RobotBodyPartIndex,
+    mut controller: C,
+    mut wait_strategy: W,
+    mut physics: PhysicsWorld,
+) -> (JoinHandle<()>, Receiver<PhysicsUpdate>)
+where
+    C: ControllerStrategy,
+    W: WaitStrategy,
+{
     // Create achannel for updates about positions.
     let (snd, rcv) = channel();
 
@@ -175,13 +183,17 @@ pub fn start_physics_thread<C, W>(robot: RobotBodyPartIndex,
 /// Take a snapshot of the Physics engine that can be safely sent to the graphics thread.
 fn snapshot_physics(physics: &PhysicsWorld) -> PhysicsUpdate {
     // For every body,
-    physics.bodies.iter().flat_map(|(bh, body): (DefaultBodyHandle, &dyn Body<f32>)| {
-        // for every body part,
-        (0..body.num_parts()).map(move |i| {
-            // register the BodyPartHandle and world position,
-            let bph = BodyPartHandle(bh, i);
-            let pos = body.part(i).unwrap().position().clone();
-            (bph, pos)
+    physics
+        .bodies
+        .iter()
+        .flat_map(|(bh, body): (DefaultBodyHandle, &dyn Body<f32>)| {
+            // for every body part,
+            (0..body.num_parts()).map(move |i| {
+                // register the BodyPartHandle and world position,
+                let bph = BodyPartHandle(bh, i);
+                let pos = body.part(i).unwrap().position().clone();
+                (bph, pos)
+            })
         })
-    }).collect() // then put them all in a HashMap for easy lookup.
+        .collect() // then put them all in a HashMap for easy lookup.
 }

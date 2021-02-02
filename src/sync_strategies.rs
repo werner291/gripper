@@ -1,15 +1,14 @@
+use std::marker::Send;
 use std::ops::FnMut;
-use std::marker::{Send, Sized};
-use std::sync::{Arc, Mutex, Condvar};
-use std::boxed::Box;
+use std::sync::{Arc, Condvar, Mutex};
+
 use std::clone::Clone;
 
 /// A WaitStrategy is a callable that blocks the thread until
 /// it is allowed to continue according to some policy.
 ///
-pub trait WaitStrategy : FnMut() + Send + 'static {}
-impl<W> WaitStrategy for W where W : FnMut() + Send + 'static {}
-
+pub trait WaitStrategy: FnMut() + Send + 'static {}
+impl<W> WaitStrategy for W where W: FnMut() + Send + 'static {}
 
 pub fn never_wait() {
     // Do nothing, just let the caller continue.
@@ -30,7 +29,6 @@ pub fn continue_once_of_allowed() -> (impl FnMut(), impl WaitStrategy) {
     let wait_mutex2 = wait_mutex.clone();
 
     let wait_strategy = move || {
-
         let (lock, cvar) = &*wait_mutex2;
 
         *cvar.wait_while(lock.lock().unwrap(), |wait| *wait).unwrap() = true;

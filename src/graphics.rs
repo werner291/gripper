@@ -5,7 +5,7 @@ use kiss3d::light::Light;
 use kiss3d::scene::SceneNode;
 use kiss3d::window::Window;
 use nalgebra::{Isometry3, Point3};
-use nphysics3d::object::{Body, BodyPart, BodyPartHandle, DefaultBodyPartHandle};
+use nphysics3d::object::{Body, BodyPart, DefaultBodyPartHandle};
 
 use crate::physics::PhysicsWorld;
 
@@ -58,9 +58,11 @@ impl Graphics {
         self.window.render()
     }
 
-    pub fn synchronize_physics_to_graphics(&mut self, physics: &HashMap<DefaultBodyPartHandle, Isometry3<f32>>) {
+    pub fn synchronize_physics_to_graphics(
+        &mut self,
+        physics: &HashMap<DefaultBodyPartHandle, Isometry3<f32>>,
+    ) {
         for (sn, bph) in self.bp_to_sn.iter_mut() {
-
             sn.set_local_transformation(physics[bph]);
         }
     }

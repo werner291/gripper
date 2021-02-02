@@ -1,24 +1,22 @@
-use std::net::{TcpListener, SocketAddr, Ipv6Addr, TcpStream};
-use std::sync::mpsc;
-use crate::physics::{PhysicsWorld, ControllerStrategy};
-use crate::robot::{RobotBodyPartIndex, get_joint_mut, get_joint, set_motor_speed};
-use std::result::Result::{Ok, Err};
-use std::io::{Error, Write, Result};
+use std::net::{TcpListener, TcpStream};
+
+use crate::physics::{ControllerStrategy, PhysicsWorld};
+use crate::robot::{get_joint, set_motor_speed, RobotBodyPartIndex};
+use byteorder::{BigEndian, ByteOrder, ReadBytesExt, WriteBytesExt};
 use nphysics3d::joint::RevoluteJoint;
-use byteorder::{ReadBytesExt, WriteBytesExt, ByteOrder, BigEndian};
-use std::option::Option::{None, Some};
+use std::io::{Error, Result, Write};
 use std::option::Option;
+use std::option::Option::{None, Some};
+use std::result::Result::Ok;
 
 pub struct TcpController {
     listener: TcpListener,
     current_stream: Option<TcpStream>,
-    frame_counter: usize
+    frame_counter: usize,
 }
 
 impl TcpController {
-
     pub fn new_on_port(port: u16) -> Result<TcpController> {
-
         let listener = TcpListener::bind(("0.0.0.0", port))?;
 
         println!("Listening on port {}", port);
@@ -26,9 +24,8 @@ impl TcpController {
         Ok(TcpController {
             current_stream: None,
             listener,
-            frame_counter: 0
+            frame_counter: 0,
         })
-
     }
 
     fn current_stream(&mut self) -> Result<&mut TcpStream> {
@@ -44,20 +41,21 @@ impl TcpController {
 
     pub fn control_cycle_synchronous(
         &mut self,
-        mut physics: &mut PhysicsWorld,
+        physics: &mut PhysicsWorld,
         robot: &RobotBodyPartIndex,
     ) -> std::result::Result<(), Error> {
         self.send_joint_angles(physics, robot)
             .and(self.receive_joint_angles(physics, robot))
-
     }
 
-    pub fn receive_joint_angles(&mut self, mut physics: &mut PhysicsWorld, robot: &RobotBodyPartIndex) -> Result<()> {
-
+    pub fn receive_joint_angles(
+        &mut self,
+        physics: &mut PhysicsWorld,
+        robot: &RobotBodyPartIndex,
+    ) -> Result<()> {
         let current_stream = self.current_stream()?;
 
         for x in robot.motor_parts().iter() {
-
             let v = current_stream.read_f32::<BigEndian>()?;
 
             set_motor_speed(physics, *x, v);
@@ -65,8 +63,11 @@ impl TcpController {
         Ok(())
     }
 
-    pub fn send_joint_angles(&mut self, physics: &PhysicsWorld, robot: &RobotBodyPartIndex) -> Result<()> {
-
+    pub fn send_joint_angles(
+        &mut self,
+        physics: &PhysicsWorld,
+        robot: &RobotBodyPartIndex,
+    ) -> Result<()> {
         let frm = self.frame_counter;
         self.frame_counter += 1;
 
