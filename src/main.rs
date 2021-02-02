@@ -1,7 +1,5 @@
 #![allow(dead_code)]
 
-use std::iter::Iterator;
-
 use std::option::Option;
 use std::option::Option::Some;
 use std::result::Result::{Err, Ok};
@@ -16,9 +14,10 @@ use na::Isometry3;
 use control_strategies::tcp_controller::TcpController;
 use graphics::Graphics;
 
-use crate::physics::PhysicsWorld;
-use crate::robot::RobotBodyPartIndex;
+use crate::physics::ControllerStrategy;
 use crate::spawn_utilities::{make_ground, make_pinned_ball};
+use crate::control_strategies::demo_flailing::FlailController;
+use std::boxed::Box;
 
 mod control_strategies;
 mod graphics;
@@ -67,21 +66,14 @@ fn main() {
         graphics.enable_trace(robot.gripper, Isometry3::translation(0.0, 0.5, 0.0));
     }
 
-    let mut tctrl = opts
-        .remote_control_port
-        .map(|port| TcpController::new_on_port(port).expect("Connection failed."));
-
-    let controller = move |pw: &mut PhysicsWorld, rb: &RobotBodyPartIndex| {
-        if let Some(rc) = &mut tctrl {
-            rc.control_cycle_synchronous(pw, rb).unwrap();
-        }
+    let tctrl: Box<dyn ControllerStrategy> = match opts.remote_control_port {
+        Option::None => Box::new(FlailController::new()),
+        Option::Some(port) => Box::new(TcpController::new_on_port(port).expect("Connection failed."))
     };
 
     let (mut notifier, ws) = sync_strategies::continue_once_of_allowed();
 
-    // let physics_mtx = Arc::new(Mutex::new(physics));
-
-    let (_jh, pos_updates) = physics::start_physics_thread(robot, controller, ws, physics);
+    let (_jh, pos_updates) = physics::start_physics_thread(robot, tctrl, ws, physics);
 
     let mut should_close = false;
 

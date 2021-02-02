@@ -2,7 +2,7 @@ use std::net::{TcpListener, TcpStream};
 
 use crate::physics::{ControllerStrategy, PhysicsWorld};
 use crate::robot::{get_joint, set_motor_speed, RobotBodyPartIndex};
-use byteorder::{BigEndian, ByteOrder, ReadBytesExt, WriteBytesExt};
+use byteorder::{BigEndian, ReadBytesExt, WriteBytesExt};
 use nphysics3d::joint::RevoluteJoint;
 use std::io::{Error, Result, Write};
 use std::option::Option;

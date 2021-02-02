@@ -7,8 +7,16 @@ use crate::robot;
 use crate::robot::{set_gripper_direction, GripperDirection, RobotBodyPartIndex};
 
 /// A dummy controller that simply sends a sine wave into the motor speed controllers.
-struct FlailController {
+pub(crate) struct FlailController {
     t: f32,
+}
+
+impl FlailController {
+    pub fn new() -> Self {
+        FlailController {
+            t : 0.0
+        }
+    }
 }
 
 impl ControllerStrategy for FlailController {

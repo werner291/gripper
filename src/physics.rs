@@ -22,6 +22,7 @@ use nphysics3d::world::{
 
 use crate::robot::RobotBodyPartIndex;
 use crate::sync_strategies::WaitStrategy;
+use std::boxed::Box;
 
 /// A contact filter that ensures that the robot cannot collide with itself,
 /// preventing glitchy physics from jointed parts.
@@ -147,14 +148,13 @@ pub type PhysicsUpdate = HashMap<DefaultBodyPartHandle, Isometry3<f32>>;
 /// * `physics` - The PhysicsWorld, initialized with whatever needs to be present in the simulation.
 ///
 /// TODO: Maybe pass the Sender in as a parameter instead?
-pub fn start_physics_thread<C, W>(
+pub fn start_physics_thread<W>(
     robot: RobotBodyPartIndex,
-    mut controller: C,
+    mut controller: Box<dyn ControllerStrategy>, // I hate that this is stateful...
     mut wait_strategy: W,
     mut physics: PhysicsWorld,
 ) -> (JoinHandle<()>, Receiver<PhysicsUpdate>)
 where
-    C: ControllerStrategy,
     W: WaitStrategy,
 {
     // Create achannel for updates about positions.
