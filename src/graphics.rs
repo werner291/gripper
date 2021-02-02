@@ -10,6 +10,7 @@ use nphysics3d::object::{Body, BodyPart, BodyPartHandle, DefaultBodyPartHandle};
 use crate::physics::PhysicsWorld;
 
 use generational_arena::{Arena, Index};
+use std::collections::HashMap;
 
 struct Trace {
     target: DefaultBodyPartHandle,
@@ -57,17 +58,10 @@ impl Graphics {
         self.window.render()
     }
 
-    pub fn synchronize_physics_to_graphics(&mut self, physics: &PhysicsWorld) {
-        for (sn, BodyPartHandle(bh, ph)) in self.bp_to_sn.iter_mut() {
-            let pos: Isometry3<f32> = physics
-                .bodies
-                .get(*bh)
-                .unwrap()
-                .part(*ph)
-                .unwrap()
-                .position();
+    pub fn synchronize_physics_to_graphics(&mut self, physics: &HashMap<DefaultBodyPartHandle, Isometry3<f32>>) {
+        for (sn, bph) in self.bp_to_sn.iter_mut() {
 
-            sn.set_local_transformation(pos);
+            sn.set_local_transformation(physics[bph]);
         }
     }
 

@@ -7,6 +7,7 @@ use std::io::{Error, Write, Result};
 use nphysics3d::joint::RevoluteJoint;
 use byteorder::{ReadBytesExt, WriteBytesExt, ByteOrder, BigEndian};
 use std::option::Option::{None, Some};
+use std::option::Option;
 
 pub struct TcpController {
     listener: TcpListener,
@@ -21,8 +22,6 @@ impl TcpController {
         let listener = TcpListener::bind(("0.0.0.0", port))?;
 
         println!("Listening on port {}", port);
-
-
 
         Ok(TcpController {
             current_stream: None,

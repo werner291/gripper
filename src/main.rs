@@ -19,6 +19,12 @@ use std::thread::JoinHandle;
 use std::ops::{FnMut, Fn};
 use std::marker::Send;
 use std::clone::Clone;
+use std::sync::mpsc::{Receiver, channel, RecvTimeoutError};
+use std::collections::HashMap;
+use nphysics3d::object::{DefaultBodyPartHandle, DefaultBodyHandle, Body, BodyPartHandle};
+use std::iter::Iterator;
+use std::time::{Duration, Instant};
+use std::result::Result::{Ok, Err};
 
 mod control_demos;
 mod gradient_descent_control;
@@ -83,7 +89,7 @@ fn main() {
 
     // let physics_mtx = Arc::new(Mutex::new(physics));
 
-    start_physics_thread(robot, controller, ws, physics);
+    let (jh, pos_updates) = start_physics_thread(robot, controller, ws, physics);
 
     let mut should_close = false;
 
@@ -95,15 +101,24 @@ fn main() {
     // control_flailing_demo(&mut physics, &robot, t)
     // control_robot_by_keys(&window,&mut physics,&robot);
 
+    let mut last_physics_update = Instant::now();
+
     while !should_close {
-        {
-            let physics = physics_mtx.lock().expect("Mutex may have been poisoned due to crash in another thread.");
-            graphics.synchronize_physics_to_graphics(&physics);
+
+        notifier();
+
+        match pos_updates.recv_timeout(Duration::from_millis(30)) {
+            Ok(positions) => {
+                last_physics_update = Instant::now();
+                graphics.synchronize_physics_to_graphics(&positions);
+            },
+            Err(RecvTimeoutError::Timeout) => println!("Timeout {}", graphics.frames_drawn),
+            Err(RecvTimeoutError::Disconnected) => panic!("Physics thread possibly crashed.")
         }
 
         should_close |= !graphics.draw_frame();
 
-        notifier();
+
 
     }
 }
@@ -111,18 +126,31 @@ fn main() {
 fn start_physics_thread<C, W>(robot: RobotBodyPartIndex,
                         mut controller: C,
                         mut wait_strategy: W,
-                        physics: Arc<Mutex<PhysicsWorld>>) -> JoinHandle<()>
+                        mut physics: PhysicsWorld) -> (JoinHandle<()>, Receiver<HashMap<DefaultBodyPartHandle, Isometry3<f32>>>)
     where C : FnMut(&mut PhysicsWorld, &RobotBodyPartIndex) + Send + 'static,
           W : FnMut() + Send + 'static {
 
-    thread::spawn(move || {
+    let (snd, rcv) = channel();
+
+    let join = thread::spawn(move || {
         loop {
             wait_strategy();
 
-            let mut physics = physics_mtx.lock().expect("Mutex may have been poisoned due to crash in another thread.");
             physics.step();
 
             controller(&mut physics, &robot);
+
+            snd.send(
+                physics.bodies.iter().flat_map(|(bh, body) : (DefaultBodyHandle, &dyn Body<f32>)| {
+                    (0..body.num_parts()).map(move |i| {
+                        let bph = BodyPartHandle(bh, i);
+                        let pos = body.part(i).unwrap().position().clone();
+                        (bph, pos)
+                    })
+                }).collect()
+            ).unwrap()
         }
-    })
+    });
+
+    (join, rcv)
 }
