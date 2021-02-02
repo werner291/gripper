@@ -52,9 +52,8 @@ impl Graphics {
         })
     }
 
-    pub fn draw_frame(&mut self, physics: &PhysicsWorld) -> bool {
+    pub fn draw_frame(&mut self) -> bool {
         self.frames_drawn += 1;
-        self.synchronize_physics_to_graphics(physics);
         self.window.render()
     }
 
