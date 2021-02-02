@@ -16,11 +16,15 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="99bfd17e-0b5a-4a4c-b788-1095db1046ef" name="Default Changelist" comment="Started a wierd attempt at multithreading?">
+    <list default="true" id="99bfd17e-0b5a-4a4c-b788-1095db1046ef" name="Default Changelist" comment="Implemented multithreating, app no longer freezes when the simulation does.">
+      <change afterPath="$PROJECT_DIR$/src/control_strategies/demo_flailing.rs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/control_strategies/mod.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/graphics.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/graphics.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/control_demos.rs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/gradient_descent_control.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/control_strategies/gradient_descent_control.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/tcp_controller.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/tcp_controller.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/physics.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/physics.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tcp_controller.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/control_strategies/tcp_controller.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -71,6 +75,11 @@
     <property name="project.structure.proportion" value="0.0" />
     <property name="project.structure.side.proportion" value="0.0" />
     <property name="settings.editor.selected.configurable" value="project.propCompiler" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/control_strategies" />
+    </key>
   </component>
   <component name="RunManager" selected="Cargo.run">
     <configuration name="build" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
@@ -166,7 +175,8 @@
     <MESSAGE value="Reverted some changes, they weren'timprovements and just added complexity." />
     <MESSAGE value="Modified the tcp controller to delay waiting for the connection to the first update." />
     <MESSAGE value="Started a wierd attempt at multithreading?" />
-    <option name="LAST_COMMIT_MESSAGE" value="Started a wierd attempt at multithreading?" />
+    <MESSAGE value="Implemented multithreating, app no longer freezes when the simulation does." />
+    <option name="LAST_COMMIT_MESSAGE" value="Implemented multithreating, app no longer freezes when the simulation does." />
   </component>
   <component name="WindowStateProjectService">
     <state x="320" y="72" width="1017" height="719" key="#Plugins" timestamp="1611925219950">
@@ -181,6 +191,10 @@
       <screen x="0" y="0" width="1440" height="864" />
     </state>
     <state x="178" y="90" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1440.864@0.0.1440.864" timestamp="1612272593667" />
+    <state x="533" y="147" key="#com.intellij.ide.util.MemberChooser" timestamp="1612292895037">
+      <screen x="0" y="0" width="1440" height="864" />
+    </state>
+    <state x="533" y="147" key="#com.intellij.ide.util.MemberChooser/0.0.1440.864@0.0.1440.864" timestamp="1612292895037" />
     <state x="458" y="177" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1611931515043">
       <screen x="0" y="0" width="1440" height="864" />
     </state>
@@ -197,25 +211,25 @@
       <screen x="0" y="0" width="1440" height="864" />
     </state>
     <state x="0" y="0" key="FileDocumentManager.FileCacheConflict/0.0.1440.864@0.0.1440.864" timestamp="1611932380535" />
-    <state width="1394" height="213" key="GridCell.Tab.0.bottom" timestamp="1612286048416">
+    <state width="1394" height="213" key="GridCell.Tab.0.bottom" timestamp="1612293124603">
       <screen x="0" y="0" width="1440" height="864" />
     </state>
-    <state width="1394" height="213" key="GridCell.Tab.0.bottom/0.0.1440.864@0.0.1440.864" timestamp="1612286048416" />
+    <state width="1394" height="213" key="GridCell.Tab.0.bottom/0.0.1440.864@0.0.1440.864" timestamp="1612293124603" />
     <state width="1394" height="213" key="GridCell.Tab.0.bottom/0.0.1440.900@0.0.1440.900" timestamp="1612217831067" />
-    <state width="1394" height="213" key="GridCell.Tab.0.center" timestamp="1612286048415">
+    <state width="1394" height="213" key="GridCell.Tab.0.center" timestamp="1612293124603">
       <screen x="0" y="0" width="1440" height="864" />
     </state>
-    <state width="1394" height="213" key="GridCell.Tab.0.center/0.0.1440.864@0.0.1440.864" timestamp="1612286048415" />
+    <state width="1394" height="213" key="GridCell.Tab.0.center/0.0.1440.864@0.0.1440.864" timestamp="1612293124603" />
     <state width="1394" height="213" key="GridCell.Tab.0.center/0.0.1440.900@0.0.1440.900" timestamp="1612217831066" />
-    <state width="1394" height="213" key="GridCell.Tab.0.left" timestamp="1612286048415">
+    <state width="1394" height="213" key="GridCell.Tab.0.left" timestamp="1612293124603">
       <screen x="0" y="0" width="1440" height="864" />
     </state>
-    <state width="1394" height="213" key="GridCell.Tab.0.left/0.0.1440.864@0.0.1440.864" timestamp="1612286048415" />
+    <state width="1394" height="213" key="GridCell.Tab.0.left/0.0.1440.864@0.0.1440.864" timestamp="1612293124603" />
     <state width="1394" height="213" key="GridCell.Tab.0.left/0.0.1440.900@0.0.1440.900" timestamp="1612217831064" />
-    <state width="1394" height="213" key="GridCell.Tab.0.right" timestamp="1612286048416">
+    <state width="1394" height="213" key="GridCell.Tab.0.right" timestamp="1612293124603">
       <screen x="0" y="0" width="1440" height="864" />
     </state>
-    <state width="1394" height="213" key="GridCell.Tab.0.right/0.0.1440.864@0.0.1440.864" timestamp="1612286048416" />
+    <state width="1394" height="213" key="GridCell.Tab.0.right/0.0.1440.864@0.0.1440.864" timestamp="1612293124603" />
     <state width="1394" height="213" key="GridCell.Tab.0.right/0.0.1440.900@0.0.1440.900" timestamp="1612217831067" />
     <state x="477" y="112" key="RollbackChangesDialog" timestamp="1612278263242">
       <screen x="0" y="0" width="1440" height="864" />
@@ -225,10 +239,10 @@
       <screen x="0" y="0" width="1440" height="864" />
     </state>
     <state x="221" y="63" key="SettingsEditor/0.0.1440.864@0.0.1440.864" timestamp="1611511223289" />
-    <state x="320" y="164" key="Vcs.Push.Dialog.v2" timestamp="1612276957897">
+    <state x="320" y="164" key="Vcs.Push.Dialog.v2" timestamp="1612286940264">
       <screen x="0" y="0" width="1440" height="864" />
     </state>
-    <state x="320" y="164" key="Vcs.Push.Dialog.v2/0.0.1440.864@0.0.1440.864" timestamp="1612276957897" />
+    <state x="320" y="164" key="Vcs.Push.Dialog.v2/0.0.1440.864@0.0.1440.864" timestamp="1612286940264" />
     <state x="100" y="100" width="1240" height="664" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1612185023985">
       <screen x="0" y="0" width="1440" height="864" />
     </state>
@@ -253,9 +267,9 @@
       <screen x="0" y="0" width="1440" height="864" />
     </state>
     <state x="384" y="191" key="run.anything.popup/0.0.1440.864@0.0.1440.864" timestamp="1611938939904" />
-    <state x="383" y="184" width="672" height="678" key="search.everywhere.popup" timestamp="1612274260349">
+    <state x="383" y="184" width="672" height="678" key="search.everywhere.popup" timestamp="1612288429627">
       <screen x="0" y="0" width="1440" height="864" />
     </state>
-    <state x="383" y="184" width="672" height="678" key="search.everywhere.popup/0.0.1440.864@0.0.1440.864" timestamp="1612274260349" />
+    <state x="383" y="184" width="672" height="678" key="search.everywhere.popup/0.0.1440.864@0.0.1440.864" timestamp="1612288429627" />
   </component>
 </project>

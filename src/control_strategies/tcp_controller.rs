@@ -1,6 +1,6 @@
 use std::net::{TcpListener, SocketAddr, Ipv6Addr, TcpStream};
 use std::sync::mpsc;
-use crate::physics::PhysicsWorld;
+use crate::physics::{PhysicsWorld, ControllerStrategy};
 use crate::robot::{RobotBodyPartIndex, get_joint_mut, get_joint, set_motor_speed};
 use std::result::Result::{Ok, Err};
 use std::io::{Error, Write, Result};
@@ -84,3 +84,10 @@ impl TcpController {
     }
 }
 
+impl ControllerStrategy for TcpController {
+    fn apply_controller(&mut self, physics_world: &mut PhysicsWorld, robot: &RobotBodyPartIndex) {
+        self.control_cycle_synchronous(physics_world, robot)
+            // FIXME errors shouldn't get up to this point...
+            .expect("Network error while attempting to run robot controller.");
+    }
+}
