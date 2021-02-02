@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 
 use std::option::Option;
-use std::option::Option::Some;
+
 use std::result::Result::{Err, Ok};
 
 use std::sync::mpsc::RecvTimeoutError;
@@ -14,9 +14,9 @@ use na::Isometry3;
 use control_strategies::tcp_controller::TcpController;
 use graphics::Graphics;
 
+use crate::control_strategies::demo_flailing::FlailController;
 use crate::physics::ControllerStrategy;
 use crate::spawn_utilities::{make_ground, make_pinned_ball};
-use crate::control_strategies::demo_flailing::FlailController;
 use std::boxed::Box;
 
 mod control_strategies;
@@ -68,7 +68,9 @@ fn main() {
 
     let tctrl: Box<dyn ControllerStrategy> = match opts.remote_control_port {
         Option::None => Box::new(FlailController::new()),
-        Option::Some(port) => Box::new(TcpController::new_on_port(port).expect("Connection failed."))
+        Option::Some(port) => {
+            Box::new(TcpController::new_on_port(port).expect("Connection failed."))
+        }
     };
 
     let (mut notifier, ws) = sync_strategies::continue_once_of_allowed();

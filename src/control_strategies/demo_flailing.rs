@@ -13,9 +13,7 @@ pub(crate) struct FlailController {
 
 impl FlailController {
     pub fn new() -> Self {
-        FlailController {
-            t : 0.0
-        }
+        FlailController { t: 0.0 }
     }
 }
 
