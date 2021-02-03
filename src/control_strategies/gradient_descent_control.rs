@@ -1,6 +1,6 @@
 use std::iter::Iterator;
 
-use kiss3d::ncollide3d::na::{distance_squared, Point3, Unit, Vector3};
+use nalgebra::{distance_squared, Point3, Unit, Vector3, Vector4, Vector6};
 use nphysics3d::joint::RevoluteJoint;
 use nphysics3d::object::{BodyPart, DefaultBodyHandle};
 use rand::Rng;
@@ -10,7 +10,7 @@ use crate::physics::PhysicsWorld;
 use crate::robot::{
     get_multibody_link, JointVelocities, RobotBodyPartIndex,
 };
-use nalgebra::Matrix3;
+use nalgebra::{Matrix3x4, Matrix4x3, Matrix4, Matrix6x4, Matrix4x6};
 use std::convert::From;
 use std::option::Option::Some;
 
@@ -22,11 +22,12 @@ use crate::simulator_thread::ControllerStrategy;
 /// Sets target motor speeds based on gradients of the distance of a point in front of the gripper.
 pub(crate) struct GradientDescentController {
     target: DefaultBodyHandle,
+    heading_vector: Unit<Vector3<f32>>
 }
 
 impl GradientDescentController {
-    pub fn new(target: DefaultBodyHandle) -> Self {
-        GradientDescentController { target }
+    pub fn new(target: DefaultBodyHandle, heading_vector: Unit<Vector3<f32>>) -> Self {
+        GradientDescentController { target, heading_vector }
     }
 }
 
@@ -45,19 +46,24 @@ impl ControllerStrategy for GradientDescentController {
             .position()
             * Point3::new(0.0, 0.0, 0.0);
 
-        let gripper_pos = point_inside_gripper(&physics, robot);
+        let physics_argument = &physics;
+        let gripper = get_multibody_link(&physics_argument, robot.gripper).unwrap();
+
+        let gripper_pos: Point3<f32> = gripper.position() * Point3::new(0.0, 1.0, 0.0);
+        let gripper_forward: Vector3<f32> = gripper.position() * Vector3::new(0.0, 1.0, 0.0);
 
         // Will be used as our energy function to be minimized.
-        let _remaining_distance = distance_squared(&target_position, &gripper_pos);
+        // let _remaining_distance = distance_squared(&target_position, &gripper_pos);
+        // let _remaining_heading_distance = (&self.heading_vector - &gripper_forward).norm_squared();
 
         // Gradient of square distance is simply the difference in positions.
         let distance_gradient = &target_position - gripper_pos;
+        let preferred_rotation = gripper_forward.cross(&self.heading_vector.into_inner());
+        let heading_gradient = preferred_rotation.norm_squared();
 
-        // let gripper_forward : Vector3<f32> = gripper_position * Vector3::new(0.0, 1.0, 0.0);
+        let combined_gradient = Vector4::new(distance_gradient.x, distance_gradient.y, distance_gradient.z, heading_gradient);
 
-        // let gripper_preferred_rotation_axis: Vector3<f32> = target_heading.cross(&gripper_forward);
-
-        let motors = [robot.swivel, robot.link1, robot.link2];
+        let motors = [robot.swivel, robot.link1, robot.link2, robot.gripper];
 
         let motor_gradients = motors
             .iter()
@@ -86,31 +92,22 @@ impl ControllerStrategy for GradientDescentController {
 
                 // Velocity of the gripper if the current joint was rotating at unit velocity,
                 // all others immobile.
-                -toward_gripper.cross(&rot_axis_global)
+                let joint_trans_gradient = -toward_gripper.cross(&rot_axis_global);
+                let joint_heading = preferred_rotation.dot(&rot_axis_global);
 
-                // let gradient_at_joint = induced_velocity.dot(&distance_gradient);
-
-                // let ideal_rotation = toward_gripper.cross(&toward_ball) / toward_ball.norm();
-                //
-                //
-                // let translational_gradient = ideal_rotation.dot(&rot_axis_global) / 1.5;
-                //
-                // let rotational_gradient = -rot_axis_global.dot(&gripper_preferred_rotation_axis);
-
-                // rotational_gradient +
-                // -gradient_at_joint
+                Vector4::new(joint_trans_gradient.x, joint_trans_gradient.y, joint_trans_gradient.z, joint_heading)
             })
             .collect::<Vec<_>>();
 
-        let mut rng = rand::thread_rng();
-
-        // let overall_size = motor_gradients.iter().map(|x| x.abs()).sum::<f32>();
-
-        // dbg!(&motor_gradients);
-
-        let motor_speeds = Matrix3::from_columns(&motor_gradients)
+        let motor_speeds = Matrix4::from_columns(motor_gradients.as_slice())
             .lu()
-            .solve(&distance_gradient);
+            .solve(&combined_gradient);
+
+        // let motor_speeds = Matrix3x4::from_columns(motor_gradients.as_slice())
+        //     .svd()
+        //     .solve(&distance_gradient);
+        //
+        // let motor_speeds = Some(Vector4::new(0.0,0.0,0.0,0.0));
 
         let final_target_speeds = if let Some(speeds) = motor_speeds {
             if speeds.norm() > 1.0 {
@@ -119,7 +116,10 @@ impl ControllerStrategy for GradientDescentController {
                 speeds
             }
         } else {
-            Vector3::new(
+            println!("Haha, motor go brrr!");
+            let mut rng = rand::thread_rng();
+            Vector4::new(
+                rng.gen_range(-0.1..0.1),
                 rng.gen_range(-0.1..0.1),
                 rng.gen_range(-0.1..0.1),
                 rng.gen_range(-0.1..0.1),
@@ -130,23 +130,14 @@ impl ControllerStrategy for GradientDescentController {
             swivel: final_target_speeds[0],
             link1: final_target_speeds[1],
             link2: final_target_speeds[2],
-            gripper: 0.0,
-            finger_0: 0.1,
-            finger_1: 0.1,
-            finger_2: 0.1,
-            finger_0_2: 0.1,
-            finger_1_2: 0.1,
-            finger_2_2: 0.1,
+            gripper: final_target_speeds[3],
+            finger_0: 0.5,
+            finger_1: 0.5,
+            finger_2: 0.5,
+            finger_0_2: 0.5,
+            finger_1_2: 0.5,
+            finger_2_2: 0.5,
         }
     }
 }
 
-pub fn point_inside_gripper(physics: &PhysicsWorld, robot: &RobotBodyPartIndex) -> Point3<f32> {
-    // Get the position and orientation of the "gripper", i.e. the base of the end-effector.
-    let gripper = get_multibody_link(&physics, robot.gripper).unwrap();
-
-    // Extract spatial position without orientation, including a bit of offset to get a position
-    // inside the gripper, instead of at the wrist.
-    let gripper_pos: Point3<f32> = gripper.position() * Point3::new(0.0, 1.0, 0.0); // + &target_heading.into_inner() * 0.9;
-    gripper_pos
-}
