@@ -17,7 +17,7 @@ use graphics::Graphics;
 
 use crate::control_strategies::demo_flailing::FlailController;
 use crate::control_strategies::gradient_descent_control::GradientDescentController;
-use crate::physics::ControllerStrategy;
+use crate::simulator_thread::{ControllerStrategy, start_physics_thread};
 use crate::spawn_utilities::{make_ground, make_pinned_ball};
 use std::boxed::Box;
 
@@ -29,9 +29,11 @@ mod physics;
 mod robot;
 mod spawn_utilities;
 mod sync_strategies;
+mod simulator_thread;
 
 extern crate kiss3d;
 extern crate nalgebra as na;
+extern crate array_init;
 
 #[derive(Clap, Debug)]
 #[clap(author = "Werner Kroneman <w.kroneman@ucr.nl>")]
@@ -69,7 +71,9 @@ fn main() {
     }
 
     let tctrl: Box<dyn ControllerStrategy> = match opts.remote_control_port {
-        Option::None => Box::new(GradientDescentController::new(physics.bodies.rigid_body(ball_bh).unwrap().position() * Point3::new(0.0,0.0,0.0))),
+        Option::None => {
+            Box::new(GradientDescentController::new(ball_bh))
+        },
         Option::Some(port) => {
             Box::new(TcpController::new_on_port(port).expect("Connection failed."))
         }
@@ -77,7 +81,7 @@ fn main() {
 
     let (mut notifier, ws) = sync_strategies::continue_once_of_allowed();
 
-    let (_jh, pos_updates) = physics::start_physics_thread(robot, tctrl, ws, physics);
+    let (_jh, pos_updates) = start_physics_thread(robot, tctrl, ws, physics);
 
     let mut should_close = false;
 

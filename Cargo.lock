@@ -71,6 +71,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "array-init"
+version = "1.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a51c983d65b6691893a791e55aa8bda43bbd9b11f947e5a9581710362277cc95"
+
+[[package]]
 name = "atty"
 version = "0.2.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -739,6 +745,7 @@ dependencies = [
 name = "gripper_experiment"
 version = "0.2.0"
 dependencies = [
+ "array-init",
  "byteorder",
  "clap",
  "generational-arena",

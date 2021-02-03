@@ -16,6 +16,7 @@ rand = "0.8.2"
 byteorder = "1.4.2"
 clap = "3.0.0-beta.2"
 generational-arena = "0.2.8"
+array-init = "1.0.0"
 
 [profile.dev]
 opt-level = 0

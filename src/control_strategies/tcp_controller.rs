@@ -1,13 +1,14 @@
 use std::net::{TcpListener, TcpStream};
 
-use crate::physics::{ControllerStrategy, PhysicsWorld};
-use crate::robot::{get_joint, set_motor_speed, RobotBodyPartIndex};
+use crate::physics::{PhysicsWorld};
+use crate::robot::{get_joint, set_motor_speed, RobotBodyPartIndex, NUM_CHANNELS, JointVelocities};
 use byteorder::{BigEndian, ReadBytesExt, WriteBytesExt};
 use nphysics3d::joint::RevoluteJoint;
 use std::io::{Error, Result, Write};
 use std::option::Option;
 use std::option::Option::{None, Some};
 use std::result::Result::Ok;
+use crate::simulator_thread::ControllerStrategy;
 
 pub struct TcpController {
     listener: TcpListener,
@@ -41,26 +42,30 @@ impl TcpController {
 
     pub fn control_cycle_synchronous(
         &mut self,
-        physics: &mut PhysicsWorld,
+        physics: &PhysicsWorld,
         robot: &RobotBodyPartIndex,
-    ) -> std::result::Result<(), Error> {
+    ) -> std::result::Result<JointVelocities, Error> {
         self.send_joint_angles(physics, robot)
-            .and(self.receive_joint_angles(physics, robot))
+            .and(self.receive_joint_angles())
     }
 
     pub fn receive_joint_angles(
         &mut self,
-        physics: &mut PhysicsWorld,
-        robot: &RobotBodyPartIndex,
-    ) -> Result<()> {
+    ) -> Result<JointVelocities> {
         let current_stream = self.current_stream()?;
 
-        for x in robot.motor_parts().iter() {
-            let v = current_stream.read_f32::<BigEndian>()?;
-
-            set_motor_speed(physics, *x, v);
-        }
-        Ok(())
+        Ok(JointVelocities {
+            swivel: current_stream.read_f32::<BigEndian>()?,
+            link1: current_stream.read_f32::<BigEndian>()?,
+            link2: current_stream.read_f32::<BigEndian>()?,
+            gripper: current_stream.read_f32::<BigEndian>()?,
+            finger_0: current_stream.read_f32::<BigEndian>()?,
+            finger_1: current_stream.read_f32::<BigEndian>()?,
+            finger_2: current_stream.read_f32::<BigEndian>()?,
+            finger_0_2: current_stream.read_f32::<BigEndian>()?,
+            finger_1_2: current_stream.read_f32::<BigEndian>()?,
+            finger_2_2: current_stream.read_f32::<BigEndian>()?
+        })
     }
 
     pub fn send_joint_angles(
@@ -86,9 +91,9 @@ impl TcpController {
 }
 
 impl ControllerStrategy for TcpController {
-    fn apply_controller(&mut self, physics_world: &mut PhysicsWorld, robot: &RobotBodyPartIndex) {
+    fn apply_controller(&mut self, physics_world: &PhysicsWorld, robot: &RobotBodyPartIndex) -> JointVelocities {
         self.control_cycle_synchronous(physics_world, robot)
             // FIXME errors shouldn't get up to this point...
-            .expect("Network error while attempting to run robot controller.");
+            .expect("Network error while attempting to run robot controller.")
     }
 }

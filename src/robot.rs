@@ -24,6 +24,35 @@ use crate::graphics::Graphics;
 use crate::load_mesh;
 use crate::physics::PhysicsWorld;
 
+pub(crate) const NUM_CHANNELS: usize = 10;
+
+// TODO This is way too risky, need to improve.
+pub const CHANNEL_SWIVEL: usize = 0;
+pub const CHANNEL_LINK1: usize = 1;
+pub const CHANNEL_LINK2: usize = 2;
+pub const CHANNEL_GRIPPER : usize = 3;
+pub const CHANNEL_FINGER_0: usize = 4;
+pub const CHANNEL_FINGER_1: usize = 5;
+pub const CHANNEL_FINGER_2: usize = 6;
+pub const CHANNEL_FINGER_0_2: usize = 7;
+pub const CHANNEL_FINGER_1_2: usize = 8;
+pub const CHANNEL_FINGER_2_2: usize = 9;
+
+pub struct JointMap<T> {
+    pub swivel: T,
+    pub link1: T,
+    pub link2: T,
+    pub gripper: T,
+    pub finger_0: T,
+    pub finger_1: T,
+    pub finger_2: T,
+    pub finger_0_2: T,
+    pub finger_1_2: T,
+    pub finger_2_2: T,
+}
+
+pub type JointVelocities = JointMap<f32>;
+
 /// A struct that contains the body handle and body part handle of the various parts of a robot.
 /// Note that each body part also has a name, should that be more convenient.
 #[derive(Debug)]

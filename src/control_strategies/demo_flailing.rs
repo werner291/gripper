@@ -2,9 +2,11 @@ use std::iter::Iterator;
 
 use nphysics3d::joint::RevoluteJoint;
 
-use crate::physics::{ControllerStrategy, PhysicsWorld};
+use crate::physics::PhysicsWorld;
+use crate::simulator_thread::ControllerStrategy;
 use crate::robot;
-use crate::robot::{set_gripper_direction, GripperDirection, RobotBodyPartIndex};
+use crate::robot::{set_gripper_direction, GripperDirection, RobotBodyPartIndex, NUM_CHANNELS, JointVelocities};
+use array_init::array_init;
 
 /// A dummy controller that simply sends a sine wave into the motor speed controllers.
 pub(crate) struct FlailController {
@@ -18,32 +20,19 @@ impl FlailController {
 }
 
 impl ControllerStrategy for FlailController {
-    fn apply_controller(&mut self, physics: &mut PhysicsWorld, robot: &RobotBodyPartIndex) {
+    fn apply_controller(&mut self, _physics: &PhysicsWorld, _robot: &RobotBodyPartIndex) -> JointVelocities {
         self.t += 0.05;
-        for (i, bph) in robot.motor_parts().iter().enumerate() {
-            let v = (self.t + i as f32).sin();
-            let revjoint = robot::get_joint_mut::<RevoluteJoint<f32>>(physics, *bph).unwrap();
-            revjoint.set_desired_angular_motor_velocity(v);
+        JointVelocities {
+            swivel: (self.t + 0.0).sin(),
+            link1: (self.t + 1.0).sin(),
+            link2: (self.t + 2.0).sin(),
+            gripper: (self.t + 3.0).sin(),
+            finger_0: (self.t + 4.0).sin(),
+            finger_1: (self.t + 5.0).sin(),
+            finger_2: (self.t + 6.0).sin(),
+            finger_0_2: (self.t + 7.0).sin(),
+            finger_1_2: (self.t + 8.0).sin(),
+            finger_2_2: (self.t + 9.0).sin(),
         }
-    }
-}
-
-/// A dummy controller that opens and closes the gripper repeatedly.
-struct GripperOpenCloseDemo {
-    t: f32,
-}
-
-impl ControllerStrategy for GripperOpenCloseDemo {
-    fn apply_controller(&mut self, physics: &mut PhysicsWorld, robot: &RobotBodyPartIndex) {
-        self.t += 0.05;
-        set_gripper_direction(
-            physics,
-            &robot,
-            if (self.t / 5.0) as i64 % 2 == 0 {
-                GripperDirection::Open
-            } else {
-                GripperDirection::Closed
-            },
-        );
     }
 }
