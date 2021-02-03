@@ -16,8 +16,14 @@ use std::vec::Vec;
 
 /// Controls the robot using a gradient-descent-based inverse kinematic controller.
 /// Sets target motor speeds based on gradients of the distance of a point in front of the gripper.
-struct GradientDescentController {
+pub(crate) struct GradientDescentController {
     target_position: Point3<f32>,
+}
+
+impl GradientDescentController {
+    pub fn new(target_position: Point3<f32>) -> Self {
+        GradientDescentController {target_position}
+    }
 }
 
 impl ControllerStrategy for GradientDescentController {

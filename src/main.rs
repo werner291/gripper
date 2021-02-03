@@ -10,11 +10,13 @@ use std::time::{Duration, Instant};
 
 use clap::Clap;
 use na::Isometry3;
+use na::Point3;
 
 use control_strategies::tcp_controller::TcpController;
 use graphics::Graphics;
 
 use crate::control_strategies::demo_flailing::FlailController;
+use crate::control_strategies::gradient_descent_control::GradientDescentController;
 use crate::physics::ControllerStrategy;
 use crate::spawn_utilities::{make_ground, make_pinned_ball};
 use std::boxed::Box;
@@ -59,7 +61,7 @@ fn main() {
     let robot = robot::make_robot(&mut physics, &mut graphics);
 
     make_ground(&mut physics, &mut graphics);
-    make_pinned_ball(&mut physics, &mut graphics);
+    let (_,ball_bh) = make_pinned_ball(&mut physics, &mut graphics);
 
     if opts.trace {
         println!("Tracing enabled.");
@@ -67,7 +69,7 @@ fn main() {
     }
 
     let tctrl: Box<dyn ControllerStrategy> = match opts.remote_control_port {
-        Option::None => Box::new(FlailController::new()),
+        Option::None => Box::new(GradientDescentController::new(physics.bodies.rigid_body(ball_bh).unwrap().position() * Point3::new(0.0,0.0,0.0))),
         Option::Some(port) => {
             Box::new(TcpController::new_on_port(port).expect("Connection failed."))
         }
@@ -93,12 +95,12 @@ fn main() {
         notifier();
         should_close |= !graphics.draw_frame();
 
-        match pos_updates.recv_timeout(Duration::from_millis(30)) {
+        match pos_updates.recv_timeout(Duration::from_millis(100)) {
             Ok(positions) => {
                 last_physics_update = Instant::now();
                 graphics.synchronize_physics_to_graphics(&positions);
             }
-            Err(RecvTimeoutError::Timeout) => println!("Timeout {}", graphics.frames_drawn),
+            Err(RecvTimeoutError::Timeout) => println!("Simulation thread taking more than 100ms last timestep."),
             Err(RecvTimeoutError::Disconnected) => panic!("Physics thread possibly crashed."),
         }
     }

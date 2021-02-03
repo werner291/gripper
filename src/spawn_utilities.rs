@@ -12,6 +12,7 @@ use nphysics3d::{
 use std::clone::Clone;
 
 use crate::graphics::Graphics;
+use nphysics3d::object::DefaultBodyHandle;
 
 /// Spawns a new ball with a radius of 0.3 at (4.0, 1.0, 0.0).
 ///
@@ -20,7 +21,7 @@ use crate::graphics::Graphics;
 pub fn make_pinned_ball(
     physics: &mut PhysicsWorld,
     graphics: &mut Graphics,
-) -> (SceneNode, DefaultBodyPartHandle) {
+) -> (SceneNode, DefaultBodyHandle) {
     const RADIUS: f32 = 0.3;
 
     let rb = RigidBodyDesc::new()
@@ -39,7 +40,7 @@ pub fn make_pinned_ball(
         .bp_to_sn
         .push((ball_sn.clone(), BodyPartHandle(ball, 0)));
 
-    (ball_sn, BodyPartHandle(ball, 0))
+    (ball_sn, ball)
 }
 
 /// Spawns a ground plane.
