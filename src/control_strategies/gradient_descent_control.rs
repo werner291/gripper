@@ -8,9 +8,7 @@ use rand::Rng;
 use crate::physics::PhysicsWorld;
 
 use crate::robot::{
-    get_multibody_link, GripperDirection, JointVelocities, RobotBodyPartIndex, CHANNEL_FINGER_0,
-    CHANNEL_FINGER_0_2, CHANNEL_FINGER_1, CHANNEL_FINGER_1_2, CHANNEL_FINGER_2, CHANNEL_FINGER_2_2,
-    CHANNEL_GRIPPER, CHANNEL_LINK1, CHANNEL_LINK2, CHANNEL_SWIVEL, NUM_CHANNELS,
+    get_multibody_link, JointVelocities, RobotBodyPartIndex,
 };
 use nalgebra::Matrix3;
 use std::convert::From;

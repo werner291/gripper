@@ -1,9 +1,7 @@
 use crate::physics::PhysicsWorld;
 use crate::simulator_thread::ControllerStrategy;
 
-use crate::robot::{
-    set_gripper_direction, GripperDirection, JointVelocities, RobotBodyPartIndex, NUM_CHANNELS,
-};
+use crate::robot::{JointVelocities, RobotBodyPartIndex};
 
 /// A dummy controller that simply sends a sine wave into the motor speed controllers.
 pub(crate) struct FlailController {

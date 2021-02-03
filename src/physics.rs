@@ -1,5 +1,4 @@
 use std::option::Option::Some;
-use std::prelude::v1::Iterator;
 
 use nalgebra::Vector3;
 use nphysics3d::force_generator::DefaultForceGeneratorSet;
@@ -7,8 +6,8 @@ use nphysics3d::joint::DefaultJointConstraintSet;
 use nphysics3d::nalgebra::RealField;
 use nphysics3d::ncollide3d::broad_phase::BroadPhasePairFilter;
 use nphysics3d::object::{
-    Body, BodyPartHandle, BodySet, ColliderAnchor, ColliderSet, DefaultBodyHandle,
-    DefaultBodyPartHandle, DefaultBodySet, DefaultColliderSet,
+    BodySet, ColliderAnchor, ColliderSet,
+    DefaultBodySet, DefaultColliderSet,
 };
 use nphysics3d::world::{
     BroadPhasePairFilterSets, DefaultGeometricalWorld, DefaultMechanicalWorld,

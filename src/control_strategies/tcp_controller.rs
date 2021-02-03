@@ -1,7 +1,7 @@
 use std::net::{TcpListener, TcpStream};
 
 use crate::physics::PhysicsWorld;
-use crate::robot::{get_joint, set_motor_speed, JointVelocities, RobotBodyPartIndex, NUM_CHANNELS};
+use crate::robot::{get_joint, JointVelocities, RobotBodyPartIndex};
 use crate::simulator_thread::ControllerStrategy;
 use byteorder::{BigEndian, ReadBytesExt, WriteBytesExt};
 use nphysics3d::joint::RevoluteJoint;

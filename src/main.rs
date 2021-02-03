@@ -1,12 +1,10 @@
 #![allow(dead_code)]
 
+use std::boxed::Box;
 use std::option::Option;
-
 use std::result::Result::{Err, Ok};
-
 use std::sync::mpsc::RecvTimeoutError;
-
-use std::time::{Duration, Instant};
+use std::time::{Duration};
 
 use clap::Clap;
 use na::Isometry3;
@@ -15,13 +13,11 @@ use control_strategies::tcp_controller::TcpController;
 use graphics::Graphics;
 
 use crate::control_strategies::gradient_descent_control::GradientDescentController;
-use crate::simulator_thread::{start_physics_thread, ControllerStrategy};
+use crate::simulator_thread::{ControllerStrategy, start_physics_thread};
 use crate::spawn_utilities::{make_ground, make_pinned_ball};
-use std::boxed::Box;
 
 mod control_strategies;
 mod graphics;
-mod keyboard_control;
 mod load_mesh;
 mod physics;
 mod robot;
@@ -89,15 +85,12 @@ fn main() {
     // control_flailing_demo(&mut physics, &robot, t)
     // control_robot_by_keys(&window,&mut physics,&robot);
 
-    let mut last_physics_update = Instant::now();
-
     while !should_close {
         notifier();
         should_close |= !graphics.draw_frame();
 
         match pos_updates.recv_timeout(Duration::from_millis(100)) {
             Ok(positions) => {
-                last_physics_update = Instant::now();
                 graphics.synchronize_physics_to_graphics(&positions);
             }
             Err(RecvTimeoutError::Timeout) => {
