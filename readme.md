@@ -17,7 +17,7 @@ For ease of use, every tagged version of the code is automatically compiled.
 Pre-compiled versions can be found in the [releases](https://github.com/werner291/gripper/releases),
 which should simply run out-of-the-box on most Windows, OSX and Linux systems.
 
-## Remote-control-mode
+## Remote-control mode
 
 To enable remote-control mode, apply the `--remote_control_port <port>` option
 when running the simulator, where `<port>` is an available TCP port of your choice.
