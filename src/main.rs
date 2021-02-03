@@ -10,14 +10,12 @@ use std::time::{Duration, Instant};
 
 use clap::Clap;
 use na::Isometry3;
-use na::Point3;
 
 use control_strategies::tcp_controller::TcpController;
 use graphics::Graphics;
 
-use crate::control_strategies::demo_flailing::FlailController;
 use crate::control_strategies::gradient_descent_control::GradientDescentController;
-use crate::simulator_thread::{ControllerStrategy, start_physics_thread};
+use crate::simulator_thread::{start_physics_thread, ControllerStrategy};
 use crate::spawn_utilities::{make_ground, make_pinned_ball};
 use std::boxed::Box;
 
@@ -27,13 +25,13 @@ mod keyboard_control;
 mod load_mesh;
 mod physics;
 mod robot;
+mod simulator_thread;
 mod spawn_utilities;
 mod sync_strategies;
-mod simulator_thread;
 
+extern crate array_init;
 extern crate kiss3d;
 extern crate nalgebra as na;
-extern crate array_init;
 
 #[derive(Clap, Debug)]
 #[clap(author = "Werner Kroneman <w.kroneman@ucr.nl>")]
@@ -63,7 +61,7 @@ fn main() {
     let robot = robot::make_robot(&mut physics, &mut graphics);
 
     make_ground(&mut physics, &mut graphics);
-    let (_,ball_bh) = make_pinned_ball(&mut physics, &mut graphics);
+    let (_, ball_bh) = make_pinned_ball(&mut physics, &mut graphics);
 
     if opts.trace {
         println!("Tracing enabled.");
@@ -71,9 +69,7 @@ fn main() {
     }
 
     let tctrl: Box<dyn ControllerStrategy> = match opts.remote_control_port {
-        Option::None => {
-            Box::new(GradientDescentController::new(ball_bh))
-        },
+        Option::None => Box::new(GradientDescentController::new(ball_bh)),
         Option::Some(port) => {
             Box::new(TcpController::new_on_port(port).expect("Connection failed."))
         }
@@ -104,7 +100,9 @@ fn main() {
                 last_physics_update = Instant::now();
                 graphics.synchronize_physics_to_graphics(&positions);
             }
-            Err(RecvTimeoutError::Timeout) => println!("Simulation thread taking more than 100ms last timestep."),
+            Err(RecvTimeoutError::Timeout) => {
+                println!("Simulation thread taking more than 100ms last timestep.")
+            }
             Err(RecvTimeoutError::Disconnected) => panic!("Physics thread possibly crashed."),
         }
     }

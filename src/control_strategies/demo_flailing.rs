@@ -1,12 +1,9 @@
-use std::iter::Iterator;
-
-use nphysics3d::joint::RevoluteJoint;
-
 use crate::physics::PhysicsWorld;
 use crate::simulator_thread::ControllerStrategy;
-use crate::robot;
-use crate::robot::{set_gripper_direction, GripperDirection, RobotBodyPartIndex, NUM_CHANNELS, JointVelocities};
-use array_init::array_init;
+
+use crate::robot::{
+    set_gripper_direction, GripperDirection, JointVelocities, RobotBodyPartIndex, NUM_CHANNELS,
+};
 
 /// A dummy controller that simply sends a sine wave into the motor speed controllers.
 pub(crate) struct FlailController {
@@ -20,7 +17,11 @@ impl FlailController {
 }
 
 impl ControllerStrategy for FlailController {
-    fn apply_controller(&mut self, _physics: &PhysicsWorld, _robot: &RobotBodyPartIndex) -> JointVelocities {
+    fn apply_controller(
+        &mut self,
+        _physics: &PhysicsWorld,
+        _robot: &RobotBodyPartIndex,
+    ) -> JointVelocities {
         self.t += 0.05;
         JointVelocities {
             swivel: (self.t + 0.0).sin(),

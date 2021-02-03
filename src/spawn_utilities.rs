@@ -4,10 +4,7 @@ use kiss3d::scene::SceneNode;
 use nalgebra::{Point3, Unit, Vector3};
 use nphysics3d::ncollide3d::shape::{Ball, Plane, ShapeHandle};
 use nphysics3d::{
-    object::BodyStatus,
-    object::ColliderDesc,
-    object::RigidBodyDesc,
-    object::{BodyPartHandle, DefaultBodyPartHandle},
+    object::BodyPartHandle, object::BodyStatus, object::ColliderDesc, object::RigidBodyDesc,
 };
 use std::clone::Clone;
 

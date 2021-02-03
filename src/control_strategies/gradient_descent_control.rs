@@ -5,34 +5,47 @@ use nphysics3d::joint::RevoluteJoint;
 use nphysics3d::object::{BodyPart, DefaultBodyHandle};
 use rand::Rng;
 
-use crate::physics::{PhysicsWorld};
-use crate::robot;
-use crate::robot::{get_multibody_link, GripperDirection, RobotBodyPartIndex, NUM_CHANNELS, CHANNEL_SWIVEL, CHANNEL_LINK1, CHANNEL_LINK2, CHANNEL_FINGER_0, CHANNEL_GRIPPER, CHANNEL_FINGER_1, CHANNEL_FINGER_2, CHANNEL_FINGER_1_2, CHANNEL_FINGER_0_2, CHANNEL_FINGER_2_2, JointVelocities};
+use crate::physics::PhysicsWorld;
+
+use crate::robot::{
+    get_multibody_link, GripperDirection, JointVelocities, RobotBodyPartIndex, CHANNEL_FINGER_0,
+    CHANNEL_FINGER_0_2, CHANNEL_FINGER_1, CHANNEL_FINGER_1_2, CHANNEL_FINGER_2, CHANNEL_FINGER_2_2,
+    CHANNEL_GRIPPER, CHANNEL_LINK1, CHANNEL_LINK2, CHANNEL_SWIVEL, NUM_CHANNELS,
+};
 use nalgebra::Matrix3;
 use std::convert::From;
 use std::option::Option::Some;
-use std::process::exit;
+
 use std::vec::Vec;
-use array_init::array_init;
+
 use crate::simulator_thread::ControllerStrategy;
 
 /// Controls the robot using a gradient-descent-based inverse kinematic controller.
 /// Sets target motor speeds based on gradients of the distance of a point in front of the gripper.
 pub(crate) struct GradientDescentController {
-    target: DefaultBodyHandle
+    target: DefaultBodyHandle,
 }
 
 impl GradientDescentController {
     pub fn new(target: DefaultBodyHandle) -> Self {
-        GradientDescentController {target}
+        GradientDescentController { target }
     }
 }
 
 impl ControllerStrategy for GradientDescentController {
-    fn apply_controller(&mut self, physics: &PhysicsWorld, robot: &RobotBodyPartIndex) -> JointVelocities {
+    fn apply_controller(
+        &mut self,
+        physics: &PhysicsWorld,
+        robot: &RobotBodyPartIndex,
+    ) -> JointVelocities {
         // FIXME robot::set_gripper_direction(physics, &robot, GripperDirection::Open);
 
-        let target_position = physics.bodies.rigid_body(self.target).expect("Target is not a rigid body!").position() * Point3::new(0.0,0.0,0.0);
+        let target_position = physics
+            .bodies
+            .rigid_body(self.target)
+            .expect("Target is not a rigid body!")
+            .position()
+            * Point3::new(0.0, 0.0, 0.0);
 
         let gripper_pos = point_inside_gripper(&physics, robot);
 
@@ -108,9 +121,11 @@ impl ControllerStrategy for GradientDescentController {
                 speeds
             }
         } else {
-            Vector3::new(rng.gen_range(-0.1..0.1),
-            rng.gen_range(-0.1..0.1),
-            rng.gen_range(-0.1..0.1))
+            Vector3::new(
+                rng.gen_range(-0.1..0.1),
+                rng.gen_range(-0.1..0.1),
+                rng.gen_range(-0.1..0.1),
+            )
         };
 
         JointVelocities {
@@ -123,7 +138,7 @@ impl ControllerStrategy for GradientDescentController {
             finger_2: 0.1,
             finger_0_2: 0.1,
             finger_1_2: 0.1,
-            finger_2_2: 0.1
+            finger_2_2: 0.1,
         }
     }
 }

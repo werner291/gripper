@@ -1,14 +1,14 @@
 use std::net::{TcpListener, TcpStream};
 
-use crate::physics::{PhysicsWorld};
-use crate::robot::{get_joint, set_motor_speed, RobotBodyPartIndex, NUM_CHANNELS, JointVelocities};
+use crate::physics::PhysicsWorld;
+use crate::robot::{get_joint, set_motor_speed, JointVelocities, RobotBodyPartIndex, NUM_CHANNELS};
+use crate::simulator_thread::ControllerStrategy;
 use byteorder::{BigEndian, ReadBytesExt, WriteBytesExt};
 use nphysics3d::joint::RevoluteJoint;
 use std::io::{Error, Result, Write};
 use std::option::Option;
 use std::option::Option::{None, Some};
 use std::result::Result::Ok;
-use crate::simulator_thread::ControllerStrategy;
 
 pub struct TcpController {
     listener: TcpListener,
@@ -49,9 +49,7 @@ impl TcpController {
             .and(self.receive_joint_angles())
     }
 
-    pub fn receive_joint_angles(
-        &mut self,
-    ) -> Result<JointVelocities> {
+    pub fn receive_joint_angles(&mut self) -> Result<JointVelocities> {
         let current_stream = self.current_stream()?;
 
         Ok(JointVelocities {
@@ -64,7 +62,7 @@ impl TcpController {
             finger_2: current_stream.read_f32::<BigEndian>()?,
             finger_0_2: current_stream.read_f32::<BigEndian>()?,
             finger_1_2: current_stream.read_f32::<BigEndian>()?,
-            finger_2_2: current_stream.read_f32::<BigEndian>()?
+            finger_2_2: current_stream.read_f32::<BigEndian>()?,
         })
     }
 
@@ -91,7 +89,11 @@ impl TcpController {
 }
 
 impl ControllerStrategy for TcpController {
-    fn apply_controller(&mut self, physics_world: &PhysicsWorld, robot: &RobotBodyPartIndex) -> JointVelocities {
+    fn apply_controller(
+        &mut self,
+        physics_world: &PhysicsWorld,
+        robot: &RobotBodyPartIndex,
+    ) -> JointVelocities {
         self.control_cycle_synchronous(physics_world, robot)
             // FIXME errors shouldn't get up to this point...
             .expect("Network error while attempting to run robot controller.")

@@ -1,13 +1,6 @@
-use std::boxed::Box;
-use std::collections::HashMap;
-use std::marker::Send;
 use std::option::Option::Some;
-use std::prelude::v1::{FnMut, Iterator};
-use std::sync::mpsc::{channel, Receiver};
-use std::thread;
-use std::thread::JoinHandle;
+use std::prelude::v1::Iterator;
 
-use kiss3d::ncollide3d::na::Isometry3;
 use nalgebra::Vector3;
 use nphysics3d::force_generator::DefaultForceGeneratorSet;
 use nphysics3d::joint::DefaultJointConstraintSet;
@@ -20,9 +13,6 @@ use nphysics3d::object::{
 use nphysics3d::world::{
     BroadPhasePairFilterSets, DefaultGeometricalWorld, DefaultMechanicalWorld,
 };
-
-use crate::robot::RobotBodyPartIndex;
-use crate::sync_strategies::WaitStrategy;
 
 /// A contact filter that ensures that the robot cannot collide with itself,
 /// preventing glitchy physics from jointed parts.
