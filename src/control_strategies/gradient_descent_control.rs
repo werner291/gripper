@@ -7,9 +7,7 @@ use rand::Rng;
 
 use crate::physics::PhysicsWorld;
 
-use crate::robot::{
-    get_multibody_link, JointVelocities, RobotBodyPartIndex,
-};
+use crate::robot::{get_multibody_link, JointVelocities, RobotBodyPartIndex, ArmJointVelocities, ArmJointMap, GripperDirection};
 use nalgebra::{Matrix3x4, Matrix4x3, Matrix4, Matrix6x4, Matrix4x6};
 use std::convert::From;
 use std::option::Option::Some;
@@ -46,19 +44,59 @@ impl ControllerStrategy for GradientDescentController {
             .position()
             * Point3::new(0.0, 0.0, 0.0);
 
-        let physics_argument = &physics;
-        let gripper = get_multibody_link(&physics_argument, robot.gripper).unwrap();
+        let target_heading = &self.heading_vector;
 
-        let gripper_pos: Point3<f32> = gripper.position() * Point3::new(0.0, 1.0, 0.0);
+        let (dist, jv) = GradientDescentController::gradient_descent_inverse_kinematics(&physics, robot, &target_position, &target_heading);
+
+        let gripper_direction = if dist < 0.01 {
+            GripperDirection::Closed
+        } else {
+            GripperDirection::Open
+        };
+
+        GradientDescentController::joint_velocities_with_gripper(jv, gripper_direction)
+    }
+}
+
+
+impl GradientDescentController {
+    fn joint_velocities_with_gripper(jv: ArmJointVelocities, gripper_direction: GripperDirection) -> JointVelocities {
+        let finger_v = match gripper_direction {
+            GripperDirection::Open => 0.5,
+            GripperDirection::Closed => -0.5
+        };
+
+        JointVelocities {
+            swivel: jv.swivel,
+            link1: jv.link1,
+            link2: jv.link2,
+            gripper: jv.gripper,
+            finger_0: finger_v,
+            finger_1: finger_v,
+            finger_2: finger_v,
+            finger_0_2: finger_v,
+            finger_1_2: finger_v,
+            finger_2_2: finger_v,
+        }
+    }
+}
+
+impl GradientDescentController {
+    fn gradient_descent_inverse_kinematics(physics: &PhysicsWorld, robot: &RobotBodyPartIndex, target_position: &Point3<f32>, target_heading: &Unit<Vector3<f32>>) -> (f32, ArmJointMap<f32>) {
+        let gripper = get_multibody_link(&physics, robot.gripper).unwrap();
+
+        let gripper_pos: Point3<f32> = gripper.position() * Point3::new(0.0, 1.2, 0.0);
         let gripper_forward: Vector3<f32> = gripper.position() * Vector3::new(0.0, 1.0, 0.0);
 
         // Will be used as our energy function to be minimized.
-        // let _remaining_distance = distance_squared(&target_position, &gripper_pos);
-        // let _remaining_heading_distance = (&self.heading_vector - &gripper_forward).norm_squared();
+        let remaining_distance = distance_squared(&target_position, &gripper_pos);
+        let remaining_heading_distance = (&target_heading.into_inner() - &gripper_forward).norm_squared();
+
+        let total_remaining_distance = remaining_heading_distance + remaining_distance;
 
         // Gradient of square distance is simply the difference in positions.
-        let distance_gradient = &target_position - gripper_pos;
-        let preferred_rotation = gripper_forward.cross(&self.heading_vector.into_inner());
+        let distance_gradient = target_position - gripper_pos;
+        let preferred_rotation = gripper_forward.cross(&target_heading.into_inner());
         let heading_gradient = preferred_rotation.norm_squared();
 
         let combined_gradient = Vector4::new(distance_gradient.x, distance_gradient.y, distance_gradient.z, heading_gradient);
@@ -103,12 +141,6 @@ impl ControllerStrategy for GradientDescentController {
             .lu()
             .solve(&combined_gradient);
 
-        // let motor_speeds = Matrix3x4::from_columns(motor_gradients.as_slice())
-        //     .svd()
-        //     .solve(&distance_gradient);
-        //
-        // let motor_speeds = Some(Vector4::new(0.0,0.0,0.0,0.0));
-
         let final_target_speeds = if let Some(speeds) = motor_speeds {
             if speeds.norm() > 1.0 {
                 speeds.normalize()
@@ -116,7 +148,6 @@ impl ControllerStrategy for GradientDescentController {
                 speeds
             }
         } else {
-            println!("Haha, motor go brrr!");
             let mut rng = rand::thread_rng();
             Vector4::new(
                 rng.gen_range(-0.1..0.1),
@@ -126,18 +157,12 @@ impl ControllerStrategy for GradientDescentController {
             )
         };
 
-        JointVelocities {
+        let jv = ArmJointVelocities {
             swivel: final_target_speeds[0],
             link1: final_target_speeds[1],
             link2: final_target_speeds[2],
             gripper: final_target_speeds[3],
-            finger_0: 0.5,
-            finger_1: 0.5,
-            finger_2: 0.5,
-            finger_0_2: 0.5,
-            finger_1_2: 0.5,
-            finger_2_2: 0.5,
-        }
+        };
+        (remaining_distance, jv)
     }
 }
-

@@ -38,6 +38,13 @@ pub(crate) const NUM_CHANNELS: usize = 10;
 // pub const CHANNEL_FINGER_1_2: usize = 8;
 // pub const CHANNEL_FINGER_2_2: usize = 9;
 
+pub struct ArmJointMap<T> {
+    pub swivel: T,
+    pub link1: T,
+    pub link2: T,
+    pub gripper: T
+}
+
 pub struct JointMap<T> {
     pub swivel: T,
     pub link1: T,
@@ -52,6 +59,7 @@ pub struct JointMap<T> {
 }
 
 pub type JointVelocities = JointMap<f32>;
+pub type ArmJointVelocities = ArmJointMap<f32>;
 
 /// A struct that contains the body handle and body part handle of the various parts of a robot.
 /// Note that each body part also has a name, should that be more convenient.
@@ -313,7 +321,7 @@ fn make_link<'a>(
 ) -> &'a mut MultibodyDesc<f32> {
     let mut joint = RevoluteJoint::new(Unit::new_normalize(rev_axis), 0.0);
     joint.enable_angular_motor();
-    joint.set_max_angular_motor_torque(10.0);
+    joint.set_max_angular_motor_torque(50.0);
     joint.enable_min_angle(min_angle);
     joint.enable_max_angle(max_angle);
     swivel
