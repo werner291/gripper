@@ -89,6 +89,7 @@ impl ControllerStrategy for GradientDescentController {
                 let jv =
                     joint_velocities_for_velocity_at_point_and_angular_velocity(physics, robot, &point_inside_gripper, &target_velocity_at_point)
                         .unwrap_or_else(|| GradientDescentController::random_arm_velocities())
+                        //The solver can sometimes return solutions that are a teensy bit excessive.
                         .limit_to_safe(10.0);
 
                 // If the remaining distance is smaller than a threshold, go to state Grabbing.
