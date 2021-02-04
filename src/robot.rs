@@ -15,10 +15,7 @@ use kiss3d::ncollide3d::shape::{ConvexHull, ShapeHandle};
 use kiss3d::resource::{MaterialManager, Mesh, TextureManager};
 use kiss3d::scene::{Object, SceneNode};
 use nphysics3d::joint::{FixedJoint, Joint, RevoluteJoint};
-use nphysics3d::object::{
-    BodyPartHandle, ColliderDesc, DefaultBodyHandle, DefaultBodyPartHandle, MultibodyDesc,
-    MultibodyLink,
-};
+use nphysics3d::object::{BodyPartHandle, ColliderDesc, DefaultBodyHandle, DefaultBodyPartHandle, MultibodyDesc, MultibodyLink, BodyPart};
 
 use crate::graphics::Graphics;
 use crate::load_mesh;
@@ -38,6 +35,7 @@ pub(crate) const NUM_CHANNELS: usize = 10;
 // pub const CHANNEL_FINGER_1_2: usize = 8;
 // pub const CHANNEL_FINGER_2_2: usize = 9;
 
+#[derive(Debug, Clone)]
 pub struct ArmJointMap<T> {
     pub swivel: T,
     pub link1: T,
@@ -45,6 +43,7 @@ pub struct ArmJointMap<T> {
     pub gripper: T
 }
 
+#[derive(Debug, Clone)]
 pub struct JointMap<T> {
     pub swivel: T,
     pub link1: T,
@@ -60,6 +59,35 @@ pub struct JointMap<T> {
 
 pub type JointVelocities = JointMap<f32>;
 pub type ArmJointVelocities = ArmJointMap<f32>;
+
+impl ArmJointVelocities {
+    pub fn limit_to_safe(self, lim:f32) -> ArmJointVelocities {
+        let max = self.swivel.abs().max(self.link1.abs()).max(self.link2.abs()).max(self.gripper.abs());
+        if max > lim {
+            Self {
+                swivel: self.swivel / max,
+                link1: self.link1 / max,
+                link2: self.link2 / max,
+                gripper: self.gripper / max
+            }
+        } else {
+            self
+        }
+    }
+}
+
+pub const ZERO_JOINT_VELOCITIES: JointVelocities = JointVelocities {
+    swivel: 0.0,
+    link1: 0.0,
+    link2: 0.0,
+    gripper: 0.0,
+    finger_0: 0.0,
+    finger_1: 0.0,
+    finger_2: 0.0,
+    finger_0_2: 0.0,
+    finger_1_2: 0.0,
+    finger_2_2: 0.0
+};
 
 /// A struct that contains the body handle and body part handle of the various parts of a robot.
 /// Note that each body part also has a name, should that be more convenient.
@@ -267,8 +295,8 @@ fn make_multibody(physics: &mut PhysicsWorld) -> RobotBodyPartIndex {
         make_link(
             &mut phalanx_1,
             &rot * Vector3::new(0.0, 0.5, 0.0),
-            -0.4,
-            FRAC_PI_2,
+            -1.0,
+            0.0,
             &rot * Vector3::x(),
             format!("finger_{}_2", i),
         );
@@ -403,4 +431,8 @@ pub fn set_gripper_direction(
             },
         );
     }
+}
+
+pub fn multibody_link_position(physics: &PhysicsWorld, bph: DefaultBodyPartHandle) -> Option<Isometry3<f32>> {
+    get_multibody_link(physics, bph).map(MultibodyLink::position)
 }

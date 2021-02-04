@@ -19,7 +19,7 @@ pub fn make_pinned_ball(
     physics: &mut PhysicsWorld,
     graphics: &mut Graphics,
 ) -> (SceneNode, DefaultBodyHandle) {
-    const RADIUS: f32 = 0.3;
+    const RADIUS: f32 = 0.35;
 
     let rb = RigidBodyDesc::new()
         .translation(Vector3::new(3.0, 1.0, 0.0))
