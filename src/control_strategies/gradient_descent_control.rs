@@ -1,30 +1,34 @@
-use std::iter::{Iterator, IntoIterator};
+use std::iter::{IntoIterator, Iterator};
 use std::option::Option;
 use std::vec::Vec;
 
-use nalgebra::{Point3, Unit, Vector3, Vector4};
 use nalgebra::Matrix4;
+use nalgebra::{Point3, Unit, Vector3, Vector4};
 use nphysics3d::algebra::Velocity3;
 use nphysics3d::joint::RevoluteJoint;
 use nphysics3d::object::{BodyPart, DefaultBodyHandle, DefaultBodyPartHandle};
 use rand::Rng;
 
-use crate::control_strategies::gradient_descent_control::SphereGrabState::{Approaching, Grabbing, Lifting};
+use crate::control_strategies::gradient_descent_control::SphereGrabState::{
+    Approaching, Grabbing, Lifting,
+};
 use crate::multibody_util::get_multibody_link;
 use crate::physics::PhysicsWorld;
-use crate::robot::{ArmJointVelocities, GripperDirection, JointVelocities, RobotBodyPartIndex, FingerJointMap};
-use crate::robot::GripperDirection::{Closed, Open};
-use crate::simulator_thread::ControllerStrategy;
 use crate::robot;
-use nphysics3d::ncollide3d::query::{PointQuery};
-use kiss3d::ncollide3d::shape::ConvexHull;
-use std::convert::From;
+use crate::robot::GripperDirection::{Closed, Open};
+use crate::robot::{
+    ArmJointVelocities, FingerJointMap, GripperDirection, JointVelocities, RobotBodyPartIndex,
+};
+use crate::simulator_thread::ControllerStrategy;
 use kiss3d::ncollide3d::na::Isometry3;
+use kiss3d::ncollide3d::shape::ConvexHull;
+use nphysics3d::ncollide3d::query::PointQuery;
+use std::convert::From;
 
 enum SphereGrabState {
     Approaching,
     Grabbing,
-    Lifting
+    Lifting,
 }
 
 /// Controls the robot using a gradient-descent-based inverse kinematic controller.
@@ -116,7 +120,7 @@ impl ControllerStrategy for GradientDescentController {
             }
             Grabbing => {
                 // let angles = gripper_finger_angles(physics, robot);
-                // 
+                //
                 // ;
 
                 if grabbed(physics, robot, self.target) {
@@ -134,7 +138,6 @@ impl ControllerStrategy for GradientDescentController {
                 )
             }
             Lifting => {
-
                 println!("Lifting!");
 
                 let jv = joint_velocities_for_velocity_at_point_and_angular_velocity(
@@ -143,19 +146,17 @@ impl ControllerStrategy for GradientDescentController {
                     &target_position,
                     &Velocity3::linear(0.0, 1.0, 0.0),
                 )
-                    .unwrap_or_else(|| GradientDescentController::random_arm_velocities())
-                    //The solver can sometimes return solutions that are a teensy bit excessive.
-                    .limit_to_safe(10.0);
+                .unwrap_or_else(|| GradientDescentController::random_arm_velocities())
+                //The solver can sometimes return solutions that are a teensy bit excessive.
+                .limit_to_safe(10.0);
 
                 dbg!(&jv);
 
                 GradientDescentController::joint_velocities_with_gripper(jv, Closed)
-
-            },
+            }
         }
     }
 }
-
 
 ///
 /// Indeed, the method name is a bit of a mouthful. Basically, this method is the core of
@@ -287,30 +288,32 @@ impl GradientDescentController {
             finger_2_2: finger_v,
         }
     }
-
 }
 
 impl GradientDescentController {
     fn gripper_is_closed(angles: FingerJointMap<f32>) -> bool {
         let finger_base = angles.finger_0.min(angles.finger_1).min(angles.finger_2);
-        let finger_middle = angles.finger_0_2.min(angles.finger_1_2).min(angles.finger_2_2);
+        let finger_middle = angles
+            .finger_0_2
+            .min(angles.finger_1_2)
+            .min(angles.finger_2_2);
 
         dbg!(finger_base);
 
-        finger_base <= robot::FINGER_BASE_JOINT_MIN_ANGLE + 0.05 &&
-                finger_middle <= robot::FINGER_MIDDLE_JOINT_MIN_ANGLE + 0.05
+        finger_base <= robot::FINGER_BASE_JOINT_MIN_ANGLE + 0.05
+            && finger_middle <= robot::FINGER_MIDDLE_JOINT_MIN_ANGLE + 0.05
     }
 }
 
 fn grabbed(physics: &PhysicsWorld, robot: &RobotBodyPartIndex, target: DefaultBodyHandle) -> bool {
-
     let mut normals = Vec::new();
 
     for fc in robot.gripper_colliders().iter() {
-
-        for (_, ca, _, cb, _, cman) in physics.geometrical_world.contacts_with(&physics.colliders, *fc, true)
-            .expect("Finger collider does not exist in the world?") {
-
+        for (_, ca, _, cb, _, cman) in physics
+            .geometrical_world
+            .contacts_with(&physics.colliders, *fc, true)
+            .expect("Finger collider does not exist in the world?")
+        {
             if ca.body() == target {
                 for contact in cman.contacts() {
                     normals.push(contact.contact.normal.clone())
@@ -323,17 +326,24 @@ fn grabbed(physics: &PhysicsWorld, robot: &RobotBodyPartIndex, target: DefaultBo
                 }
             }
         }
-
     }
 
     if normals.len() <= 3 {
         false
     } else {
-        let ch: Option<ConvexHull<f32>> = ConvexHull::try_from_points(normals.into_iter().map(|n| Point3::from(n.into_inner())).collect::<Vec<_>>().as_slice());
+        let ch: Option<ConvexHull<f32>> = ConvexHull::try_from_points(
+            normals
+                .into_iter()
+                .map(|n| Point3::from(n.into_inner()))
+                .collect::<Vec<_>>()
+                .as_slice(),
+        );
 
         match ch {
             Option::None => false,
-            Option::Some(c) => c.contains_point(&Isometry3::identity(), &Point3::new(0.0, 0.0, 0.0))
+            Option::Some(c) => {
+                c.contains_point(&Isometry3::identity(), &Point3::new(0.0, 0.0, 0.0))
+            }
         }
     }
 }

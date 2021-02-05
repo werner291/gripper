@@ -1,9 +1,9 @@
 //! Module containing a few shorthand functions to do common things related to Multibodies.
 
-use std::option::Option;
-use nphysics3d::ncollide3d::na::Isometry3;
 use nphysics3d::joint::{Joint, RevoluteJoint};
-use nphysics3d::object::{DefaultBodyPartHandle, MultibodyLink, BodyPart};
+use nphysics3d::ncollide3d::na::Isometry3;
+use nphysics3d::object::{BodyPart, DefaultBodyPartHandle, MultibodyLink};
+use std::option::Option;
 
 use crate::physics::PhysicsWorld;
 

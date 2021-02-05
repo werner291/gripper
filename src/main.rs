@@ -19,12 +19,12 @@ use crate::spawn_utilities::{make_ground, make_pinned_ball};
 mod control_strategies;
 mod graphics;
 mod load_mesh;
+mod multibody_util;
 mod physics;
 mod robot;
 mod simulator_thread;
 mod spawn_utilities;
 mod sync_strategies;
-mod multibody_util;
 
 extern crate array_init;
 extern crate kiss3d;

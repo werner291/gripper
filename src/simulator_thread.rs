@@ -8,8 +8,8 @@ use std::thread;
 use std::thread::JoinHandle;
 
 use nalgebra::geometry::Isometry3;
-use nphysics3d::object::{BodyPartHandle, DefaultBodyHandle, DefaultBodyPartHandle};
 use nphysics3d::object::Body;
+use nphysics3d::object::{BodyPartHandle, DefaultBodyHandle, DefaultBodyPartHandle};
 
 use crate::multibody_util::set_motor_speed;
 use crate::physics::PhysicsWorld;
