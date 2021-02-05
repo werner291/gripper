@@ -689,7 +689,7 @@ dependencies = [
 
 [[package]]
 name = "gripper_experiment"
-version = "0.3.1-dev"
+version = "0.3.2"
 dependencies = [
  "array-init",
  "byteorder",

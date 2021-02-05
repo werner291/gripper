@@ -17,17 +17,7 @@
     <cargoProject FILE="$PROJECT_DIR$/src/simulator_thread/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="99bfd17e-0b5a-4a4c-b788-1095db1046ef" name="Default Changelist" comment="Removed dependency on k, fixed some warnings.">
-      <change afterPath="$PROJECT_DIR$/src/multibody_util.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/control_strategies/gradient_descent_control.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/control_strategies/gradient_descent_control.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/control_strategies/keyboard_control.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/control_strategies/keyboard_control.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/control_strategies/tcp_controller.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/control_strategies/tcp_controller.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/robot.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/robot.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/simulator_thread.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/simulator_thread.rs" afterDir="false" />
-    </list>
+    <list default="true" id="99bfd17e-0b5a-4a4c-b788-1095db1046ef" name="Default Changelist" comment="Fixed and formatted." />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -154,8 +144,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixed wrong inclusion of Vec." />
-    <MESSAGE value="Implemented TCP controller and example script." />
     <MESSAGE value="Ran format and fix." />
     <MESSAGE value="Added documentation to example file." />
     <MESSAGE value="Reverted some changes, they weren'timprovements and just added complexity." />
@@ -179,7 +167,9 @@
     <MESSAGE value="Bumped Cargo version." />
     <MESSAGE value="Updated Cargo.lock" />
     <MESSAGE value="Removed dependency on k, fixed some warnings." />
-    <option name="LAST_COMMIT_MESSAGE" value="Removed dependency on k, fixed some warnings." />
+    <MESSAGE value="Gripper can now detect whether it has properly grasped the object and lifts it up. Still glitches out after a certain height threshold has been passed." />
+    <MESSAGE value="Fixed and formatted." />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed and formatted." />
   </component>
   <component name="WindowStateProjectService">
     <state x="320" y="72" width="1017" height="719" key="#Plugins" timestamp="1611925219950">
@@ -215,26 +205,26 @@
       <screen x="0" y="0" width="1440" height="864" />
     </state>
     <state x="0" y="0" key="FileDocumentManager.FileCacheConflict/0.0.1440.864@0.0.1440.864" timestamp="1611932380535" />
-    <state width="1394" height="224" key="GridCell.Tab.0.bottom" timestamp="1612541641486">
+    <state width="1394" height="224" key="GridCell.Tab.0.bottom" timestamp="1612542388135">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state width="1394" height="213" key="GridCell.Tab.0.bottom/0.0.1440.864@0.0.1440.864" timestamp="1612297058044" />
-    <state width="1394" height="224" key="GridCell.Tab.0.bottom/0.0.1440.900@0.0.1440.900" timestamp="1612541641486" />
-    <state width="1394" height="224" key="GridCell.Tab.0.center" timestamp="1612541641486">
+    <state width="1394" height="224" key="GridCell.Tab.0.bottom/0.0.1440.900@0.0.1440.900" timestamp="1612542388135" />
+    <state width="1394" height="224" key="GridCell.Tab.0.center" timestamp="1612542388135">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state width="1394" height="213" key="GridCell.Tab.0.center/0.0.1440.864@0.0.1440.864" timestamp="1612297058043" />
-    <state width="1394" height="224" key="GridCell.Tab.0.center/0.0.1440.900@0.0.1440.900" timestamp="1612541641486" />
-    <state width="1394" height="224" key="GridCell.Tab.0.left" timestamp="1612541641485">
+    <state width="1394" height="224" key="GridCell.Tab.0.center/0.0.1440.900@0.0.1440.900" timestamp="1612542388135" />
+    <state width="1394" height="224" key="GridCell.Tab.0.left" timestamp="1612542388135">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state width="1394" height="213" key="GridCell.Tab.0.left/0.0.1440.864@0.0.1440.864" timestamp="1612297058042" />
-    <state width="1394" height="224" key="GridCell.Tab.0.left/0.0.1440.900@0.0.1440.900" timestamp="1612541641485" />
-    <state width="1394" height="224" key="GridCell.Tab.0.right" timestamp="1612541641486">
+    <state width="1394" height="224" key="GridCell.Tab.0.left/0.0.1440.900@0.0.1440.900" timestamp="1612542388135" />
+    <state width="1394" height="224" key="GridCell.Tab.0.right" timestamp="1612542388135">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state width="1394" height="213" key="GridCell.Tab.0.right/0.0.1440.864@0.0.1440.864" timestamp="1612297058044" />
-    <state width="1394" height="224" key="GridCell.Tab.0.right/0.0.1440.900@0.0.1440.900" timestamp="1612541641486" />
+    <state width="1394" height="224" key="GridCell.Tab.0.right/0.0.1440.900@0.0.1440.900" timestamp="1612542388135" />
     <state x="144" y="72" key="MergeDialog" timestamp="1612371589541">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
@@ -273,19 +263,19 @@
       <screen x="0" y="0" width="1440" height="864" />
     </state>
     <state x="459" y="329" key="git4idea.remote.GitConfigureRemotesDialog/0.0.1440.864@0.0.1440.864" timestamp="1611922821198" />
-    <state x="482" y="374" width="478" height="317" key="git4idea.ui.GitTagDialog" timestamp="1612456958130">
+    <state x="482" y="374" width="478" height="317" key="git4idea.ui.GitTagDialog" timestamp="1612542454151">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state x="486" y="273" width="478" height="317" key="git4idea.ui.GitTagDialog/0.0.1440.864@0.0.1440.864" timestamp="1611933076360" />
-    <state x="482" y="374" width="478" height="317" key="git4idea.ui.GitTagDialog/0.0.1440.900@0.0.1440.900" timestamp="1612456958130" />
+    <state x="482" y="374" width="478" height="317" key="git4idea.ui.GitTagDialog/0.0.1440.900@0.0.1440.900" timestamp="1612542454151" />
     <state x="384" y="191" key="run.anything.popup" timestamp="1611938939904">
       <screen x="0" y="0" width="1440" height="864" />
     </state>
     <state x="384" y="191" key="run.anything.popup/0.0.1440.864@0.0.1440.864" timestamp="1611938939904" />
-    <state x="383" y="191" width="672" height="707" key="search.everywhere.popup" timestamp="1612538128180">
+    <state x="383" y="191" width="672" height="707" key="search.everywhere.popup" timestamp="1612542447873">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state x="383" y="184" width="672" height="678" key="search.everywhere.popup/0.0.1440.864@0.0.1440.864" timestamp="1612293271812" />
-    <state x="383" y="191" width="672" height="707" key="search.everywhere.popup/0.0.1440.900@0.0.1440.900" timestamp="1612538128180" />
+    <state x="383" y="191" width="672" height="707" key="search.everywhere.popup/0.0.1440.900@0.0.1440.900" timestamp="1612542447873" />
   </component>
 </project>
