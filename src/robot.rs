@@ -15,7 +15,10 @@ use kiss3d::ncollide3d::shape::{ConvexHull, ShapeHandle};
 use kiss3d::resource::{MaterialManager, Mesh, TextureManager};
 use kiss3d::scene::{Object, SceneNode};
 use nphysics3d::joint::{FixedJoint, Joint, RevoluteJoint};
-use nphysics3d::object::{BodyPartHandle, ColliderDesc, DefaultBodyHandle, DefaultBodyPartHandle, MultibodyDesc, MultibodyLink, BodyPart};
+use nphysics3d::object::{
+    BodyPart, BodyPartHandle, ColliderDesc, DefaultBodyHandle, DefaultBodyPartHandle,
+    MultibodyDesc, MultibodyLink,
+};
 
 use crate::graphics::Graphics;
 use crate::load_mesh;
@@ -40,7 +43,7 @@ pub struct ArmJointMap<T> {
     pub swivel: T,
     pub link1: T,
     pub link2: T,
-    pub gripper: T
+    pub gripper: T,
 }
 
 #[derive(Debug, Clone)]
@@ -61,14 +64,19 @@ pub type JointVelocities = JointMap<f32>;
 pub type ArmJointVelocities = ArmJointMap<f32>;
 
 impl ArmJointVelocities {
-    pub fn limit_to_safe(self, lim:f32) -> ArmJointVelocities {
-        let max = self.swivel.abs().max(self.link1.abs()).max(self.link2.abs()).max(self.gripper.abs());
+    pub fn limit_to_safe(self, lim: f32) -> ArmJointVelocities {
+        let max = self
+            .swivel
+            .abs()
+            .max(self.link1.abs())
+            .max(self.link2.abs())
+            .max(self.gripper.abs());
         if max > lim {
             Self {
                 swivel: self.swivel / max,
                 link1: self.link1 / max,
                 link2: self.link2 / max,
-                gripper: self.gripper / max
+                gripper: self.gripper / max,
             }
         } else {
             self
@@ -86,7 +94,7 @@ pub const ZERO_JOINT_VELOCITIES: JointVelocities = JointVelocities {
     finger_2: 0.0,
     finger_0_2: 0.0,
     finger_1_2: 0.0,
-    finger_2_2: 0.0
+    finger_2_2: 0.0,
 };
 
 /// A struct that contains the body handle and body part handle of the various parts of a robot.
@@ -433,6 +441,9 @@ pub fn set_gripper_direction(
     }
 }
 
-pub fn multibody_link_position(physics: &PhysicsWorld, bph: DefaultBodyPartHandle) -> Option<Isometry3<f32>> {
+pub fn multibody_link_position(
+    physics: &PhysicsWorld,
+    bph: DefaultBodyPartHandle,
+) -> Option<Isometry3<f32>> {
     get_multibody_link(physics, bph).map(MultibodyLink::position)
 }

@@ -4,18 +4,17 @@ use std::boxed::Box;
 use std::option::Option;
 use std::result::Result::{Err, Ok};
 use std::sync::mpsc::RecvTimeoutError;
-use std::time::{Duration};
+use std::time::Duration;
 
 use clap::Clap;
-use na::{Isometry3, Vector3, Unit};
+use na::{Isometry3, Unit, Vector3};
 
 use control_strategies::tcp_controller::TcpController;
 use graphics::Graphics;
 
 use crate::control_strategies::gradient_descent_control::GradientDescentController;
-use crate::simulator_thread::{ControllerStrategy, start_physics_thread};
+use crate::simulator_thread::{start_physics_thread, ControllerStrategy};
 use crate::spawn_utilities::{make_ground, make_pinned_ball};
-
 
 mod control_strategies;
 mod graphics;
@@ -66,7 +65,10 @@ fn main() {
     }
 
     let tctrl: Box<dyn ControllerStrategy> = match opts.remote_control_port {
-        Option::None => Box::new(GradientDescentController::new(ball_bh, Unit::new_unchecked(Vector3::new(0.0, -1.0, 0.0)))),
+        Option::None => Box::new(GradientDescentController::new(
+            ball_bh,
+            Unit::new_unchecked(Vector3::new(0.0, -1.0, 0.0)),
+        )),
         Option::Some(port) => {
             Box::new(TcpController::new_on_port(port).expect("Connection failed."))
         }

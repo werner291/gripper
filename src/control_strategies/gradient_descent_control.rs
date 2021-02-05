@@ -1,23 +1,23 @@
 use std::iter::Iterator;
 
-use nalgebra::{distance_squared, Point3, Unit, Vector3, Vector4, Vector6};
+use nalgebra::{Point3, Unit, Vector3, Vector4};
 use nphysics3d::joint::RevoluteJoint;
 use nphysics3d::object::{BodyPart, DefaultBodyHandle, DefaultBodyPartHandle};
 use rand::Rng;
 
 use crate::physics::PhysicsWorld;
 
-use crate::robot::{get_multibody_link, JointVelocities, RobotBodyPartIndex, ArmJointVelocities, ArmJointMap, GripperDirection, multibody_link_position};
-use nalgebra::{Matrix3x4, Matrix4x3, Matrix4, Matrix6x4, Matrix4x6};
-use std::convert::From;
-use std::option::Option::Some;
+use crate::robot::{
+    get_multibody_link, ArmJointVelocities, GripperDirection,
+    JointVelocities, RobotBodyPartIndex,
+};
+use nalgebra::Matrix4;
 
 use std::vec::Vec;
 
-use crate::simulator_thread::ControllerStrategy;
 use crate::control_strategies::gradient_descent_control::SphereGrabState::{Approaching, Grabbing};
-use crate::robot::GripperDirection::{Open, Closed};
-use k::joint::Velocity;
+use crate::robot::GripperDirection::{Closed, Open};
+use crate::simulator_thread::ControllerStrategy;
 use nphysics3d::algebra::Velocity3;
 use std::option::Option;
 
@@ -31,12 +31,16 @@ enum SphereGrabState {
 pub(crate) struct GradientDescentController {
     target: DefaultBodyHandle,
     heading_vector: Unit<Vector3<f32>>,
-    state: SphereGrabState
+    state: SphereGrabState,
 }
 
 impl GradientDescentController {
     pub fn new(target: DefaultBodyHandle, heading_vector: Unit<Vector3<f32>>) -> Self {
-        GradientDescentController { target, heading_vector, state: Approaching }
+        GradientDescentController {
+            target,
+            heading_vector,
+            state: Approaching,
+        }
     }
 }
 
@@ -46,7 +50,6 @@ impl ControllerStrategy for GradientDescentController {
         physics: &PhysicsWorld,
         robot: &RobotBodyPartIndex,
     ) -> JointVelocities {
-
         let target_position = physics
             .bodies
             .rigid_body(self.target)
@@ -56,14 +59,14 @@ impl ControllerStrategy for GradientDescentController {
 
         match self.state {
             Approaching => {
-
                 // The ball sits on the ground, so we want the gripper to be pointing down.
                 let target_heading = Unit::new_unchecked(Vector3::new(0.0, -1.0, 0.0));
 
                 let gripper = get_multibody_link(&physics, robot.gripper).unwrap();
 
                 // Get the current forward vector of the gripper, which we'd like to eventually match target_heading.
-                let gripper_forward: Vector3<f32> = gripper.position() * Vector3::new(0.0, 1.0, 0.0);
+                let gripper_forward: Vector3<f32> =
+                    gripper.position() * Vector3::new(0.0, 1.0, 0.0);
 
                 // Get a point, in global coordinates, inside the gripper.
                 // This roughly corresponds to where the center of the sphere will be once grasped.
@@ -80,17 +83,25 @@ impl ControllerStrategy for GradientDescentController {
 
                 // Compute the desired velocity to bring the gripper into position.
                 let target_velocity_at_point = Velocity3::new(
-                    if distance_remaining > 1.0 { translation_delta / distance_remaining } else { translation_delta },
-                    2.0 * rotation_delta
+                    if distance_remaining > 1.0 {
+                        translation_delta / distance_remaining
+                    } else {
+                        translation_delta
+                    },
+                    2.0 * rotation_delta,
                 );
 
                 // Compute the necessary joint velocities.
                 // If no solution, apply random velocities to try to break gimbal lock.
-                let jv =
-                    joint_velocities_for_velocity_at_point_and_angular_velocity(physics, robot, &point_inside_gripper, &target_velocity_at_point)
-                        .unwrap_or_else(|| GradientDescentController::random_arm_velocities())
-                        //The solver can sometimes return solutions that are a teensy bit excessive.
-                        .limit_to_safe(10.0);
+                let jv = joint_velocities_for_velocity_at_point_and_angular_velocity(
+                    physics,
+                    robot,
+                    &point_inside_gripper,
+                    &target_velocity_at_point,
+                )
+                .unwrap_or_else(|| GradientDescentController::random_arm_velocities())
+                //The solver can sometimes return solutions that are a teensy bit excessive.
+                .limit_to_safe(10.0);
 
                 // If the remaining distance is smaller than a threshold, go to state Grabbing.
                 // The robot will act upon this state next turn.
@@ -102,25 +113,27 @@ impl ControllerStrategy for GradientDescentController {
                 // to open the gripper, then return the velocities for execution.
                 GradientDescentController::joint_velocities_with_gripper(jv, Open)
             }
-            Grabbing => {
-                GradientDescentController::joint_velocities_with_gripper(ArmJointVelocities {
+            Grabbing => GradientDescentController::joint_velocities_with_gripper(
+                ArmJointVelocities {
                     swivel: 0.0,
                     link1: 0.0,
                     link2: 0.0,
-                    gripper: 0.0
-                }, Closed)
-            }
+                    gripper: 0.0,
+                },
+                Closed,
+            ),
         }
-
     }
 }
 
-
 impl GradientDescentController {
-    fn joint_velocities_with_gripper(jv: ArmJointVelocities, gripper_direction: GripperDirection) -> JointVelocities {
+    fn joint_velocities_with_gripper(
+        jv: ArmJointVelocities,
+        gripper_direction: GripperDirection,
+    ) -> JointVelocities {
         let finger_v = match gripper_direction {
             GripperDirection::Open => 0.5,
-            GripperDirection::Closed => -0.5
+            GripperDirection::Closed => -0.5,
         };
 
         JointVelocities {
@@ -138,7 +151,6 @@ impl GradientDescentController {
     }
 }
 
-
 ///
 /// Indeed, the method name is a bit of a mouthful. Basically, this method is the core of
 /// the inverse kinematics solver.
@@ -150,10 +162,11 @@ impl GradientDescentController {
 /// Returns None if the requested velocity cannot be achieved by the joints.
 ///
 fn joint_velocities_for_velocity_at_point_and_angular_velocity(
-    physics: &PhysicsWorld, robot: &RobotBodyPartIndex,
+    physics: &PhysicsWorld,
+    robot: &RobotBodyPartIndex,
     at_point: &Point3<f32>,
-    velocity: &Velocity3<f32>) -> Option<ArmJointVelocities> {
-
+    velocity: &Velocity3<f32>,
+) -> Option<ArmJointVelocities> {
     let motor_gradients =
         // List of all body parts corresponding to all MultibodyLinks that have a joint that affects the gripper position.
         [robot.swivel, robot.link1, robot.link2, robot.gripper]
@@ -199,7 +212,7 @@ fn joint_velocities_for_velocity_at_point_and_angular_velocity(
         velocity.linear.z,
         // Squashes the angular velocity down to a magnitude, since the robotic arm only has 4 DoF.
         // TODO: Find out if I can just have the solver return None for impossible rotations.
-        velocity.angular.norm()
+        velocity.angular.norm(),
     );
 
     // Combine the vectors into a matrix, then solve.
@@ -210,11 +223,11 @@ fn joint_velocities_for_velocity_at_point_and_angular_velocity(
             swivel: motor_speeds[0],
             link1: motor_speeds[1],
             link2: motor_speeds[2],
-            gripper: motor_speeds[3]
+            gripper: motor_speeds[3],
         })
 }
 
-fn global_joint_axis(physics: &PhysicsWorld, bph : DefaultBodyPartHandle) -> Unit<Vector3<f32>> {
+fn global_joint_axis(physics: &PhysicsWorld, bph: DefaultBodyPartHandle) -> Unit<Vector3<f32>> {
     // Retrieve the position and rotation of the body link being considered.
     let link = physics
         .bodies
@@ -242,7 +255,7 @@ impl GradientDescentController {
             swivel: rng.gen_range(-0.1..0.1),
             link1: rng.gen_range(-0.1..0.1),
             link2: rng.gen_range(-0.1..0.1),
-            gripper: rng.gen_range(-0.1..0.1)
+            gripper: rng.gen_range(-0.1..0.1),
         }
     }
 }

@@ -6,8 +6,7 @@ use nphysics3d::joint::DefaultJointConstraintSet;
 use nphysics3d::nalgebra::RealField;
 use nphysics3d::ncollide3d::broad_phase::BroadPhasePairFilter;
 use nphysics3d::object::{
-    BodySet, ColliderAnchor, ColliderSet,
-    DefaultBodySet, DefaultColliderSet,
+    BodySet, ColliderAnchor, ColliderSet, DefaultBodySet, DefaultColliderSet,
 };
 use nphysics3d::world::{
     BroadPhasePairFilterSets, DefaultGeometricalWorld, DefaultMechanicalWorld,
