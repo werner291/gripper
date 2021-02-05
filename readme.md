@@ -1,5 +1,3 @@
-![Delta Robotics](logo.svg)
-
 # Robotic Arm Simulator
 
 This project consists of a small robot simulator, 
