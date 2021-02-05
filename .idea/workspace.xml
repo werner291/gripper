@@ -17,11 +17,16 @@
     <cargoProject FILE="$PROJECT_DIR$/src/simulator_thread/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="99bfd17e-0b5a-4a4c-b788-1095db1046ef" name="Default Changelist" comment="Gradient descent controller can now pick up the sphere, and has basic behavior state management.">
+    <list default="true" id="99bfd17e-0b5a-4a4c-b788-1095db1046ef" name="Default Changelist" comment="Removed dependency on k, fixed some warnings.">
+      <change afterPath="$PROJECT_DIR$/src/multibody_util.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Cargo.lock" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.toml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/control_strategies/gradient_descent_control.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/control_strategies/gradient_descent_control.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/control_strategies/keyboard_control.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/control_strategies/keyboard_control.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/control_strategies/tcp_controller.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/control_strategies/tcp_controller.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/robot.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/robot.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/simulator_thread.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/simulator_thread.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -149,7 +154,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Added caching rule for dependencies." />
     <MESSAGE value="Fixed wrong inclusion of Vec." />
     <MESSAGE value="Implemented TCP controller and example script." />
     <MESSAGE value="Ran format and fix." />
@@ -174,7 +178,8 @@
     <MESSAGE value="Added a comment." />
     <MESSAGE value="Bumped Cargo version." />
     <MESSAGE value="Updated Cargo.lock" />
-    <option name="LAST_COMMIT_MESSAGE" value="Updated Cargo.lock" />
+    <MESSAGE value="Removed dependency on k, fixed some warnings." />
+    <option name="LAST_COMMIT_MESSAGE" value="Removed dependency on k, fixed some warnings." />
   </component>
   <component name="WindowStateProjectService">
     <state x="320" y="72" width="1017" height="719" key="#Plugins" timestamp="1611925219950">
@@ -201,35 +206,35 @@
       <screen x="0" y="0" width="1440" height="864" />
     </state>
     <state x="144" y="68" key="DiffContextDialog/0.0.1440.864@0.0.1440.864" timestamp="1612205159361" />
-    <state x="508" y="194" width="424" height="491" key="FileChooserDialogImpl" timestamp="1612372696195">
+    <state x="508" y="194" width="424" height="491" key="FileChooserDialogImpl" timestamp="1612531844230">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state x="508" y="186" width="424" height="491" key="FileChooserDialogImpl/0.0.1440.864@0.0.1440.864" timestamp="1612186121559" />
-    <state x="508" y="194" key="FileChooserDialogImpl/0.0.1440.900@0.0.1440.900" timestamp="1612372696195" />
+    <state x="508" y="194" key="FileChooserDialogImpl/0.0.1440.900@0.0.1440.900" timestamp="1612531844230" />
     <state x="0" y="0" key="FileDocumentManager.FileCacheConflict" timestamp="1611932380535">
       <screen x="0" y="0" width="1440" height="864" />
     </state>
     <state x="0" y="0" key="FileDocumentManager.FileCacheConflict/0.0.1440.864@0.0.1440.864" timestamp="1611932380535" />
-    <state width="1394" height="224" key="GridCell.Tab.0.bottom" timestamp="1612530215056">
+    <state width="1394" height="224" key="GridCell.Tab.0.bottom" timestamp="1612541641486">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state width="1394" height="213" key="GridCell.Tab.0.bottom/0.0.1440.864@0.0.1440.864" timestamp="1612297058044" />
-    <state width="1394" height="224" key="GridCell.Tab.0.bottom/0.0.1440.900@0.0.1440.900" timestamp="1612530215056" />
-    <state width="1394" height="224" key="GridCell.Tab.0.center" timestamp="1612530215056">
+    <state width="1394" height="224" key="GridCell.Tab.0.bottom/0.0.1440.900@0.0.1440.900" timestamp="1612541641486" />
+    <state width="1394" height="224" key="GridCell.Tab.0.center" timestamp="1612541641486">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state width="1394" height="213" key="GridCell.Tab.0.center/0.0.1440.864@0.0.1440.864" timestamp="1612297058043" />
-    <state width="1394" height="224" key="GridCell.Tab.0.center/0.0.1440.900@0.0.1440.900" timestamp="1612530215056" />
-    <state width="1394" height="224" key="GridCell.Tab.0.left" timestamp="1612530215055">
+    <state width="1394" height="224" key="GridCell.Tab.0.center/0.0.1440.900@0.0.1440.900" timestamp="1612541641486" />
+    <state width="1394" height="224" key="GridCell.Tab.0.left" timestamp="1612541641485">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state width="1394" height="213" key="GridCell.Tab.0.left/0.0.1440.864@0.0.1440.864" timestamp="1612297058042" />
-    <state width="1394" height="224" key="GridCell.Tab.0.left/0.0.1440.900@0.0.1440.900" timestamp="1612530215055" />
-    <state width="1394" height="224" key="GridCell.Tab.0.right" timestamp="1612530215056">
+    <state width="1394" height="224" key="GridCell.Tab.0.left/0.0.1440.900@0.0.1440.900" timestamp="1612541641485" />
+    <state width="1394" height="224" key="GridCell.Tab.0.right" timestamp="1612541641486">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state width="1394" height="213" key="GridCell.Tab.0.right/0.0.1440.864@0.0.1440.864" timestamp="1612297058044" />
-    <state width="1394" height="224" key="GridCell.Tab.0.right/0.0.1440.900@0.0.1440.900" timestamp="1612530215056" />
+    <state width="1394" height="224" key="GridCell.Tab.0.right/0.0.1440.900@0.0.1440.900" timestamp="1612541641486" />
     <state x="144" y="72" key="MergeDialog" timestamp="1612371589541">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
@@ -246,11 +251,11 @@
       <screen x="0" y="0" width="1440" height="864" />
     </state>
     <state x="221" y="63" key="SettingsEditor/0.0.1440.864@0.0.1440.864" timestamp="1611511223289" />
-    <state x="320" y="171" width="800" height="563" key="Vcs.Push.Dialog.v2" timestamp="1612455485341">
+    <state x="320" y="171" width="800" height="563" key="Vcs.Push.Dialog.v2" timestamp="1612530509786">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state x="320" y="164" key="Vcs.Push.Dialog.v2/0.0.1440.864@0.0.1440.864" timestamp="1612295522291" />
-    <state x="320" y="171" width="800" height="563" key="Vcs.Push.Dialog.v2/0.0.1440.900@0.0.1440.900" timestamp="1612455485341" />
+    <state x="320" y="171" width="800" height="563" key="Vcs.Push.Dialog.v2/0.0.1440.900@0.0.1440.900" timestamp="1612530509786" />
     <state x="100" y="100" width="1240" height="664" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1612185023985">
       <screen x="0" y="0" width="1440" height="864" />
     </state>
@@ -277,10 +282,10 @@
       <screen x="0" y="0" width="1440" height="864" />
     </state>
     <state x="384" y="191" key="run.anything.popup/0.0.1440.864@0.0.1440.864" timestamp="1611938939904" />
-    <state x="383" y="191" width="672" height="707" key="search.everywhere.popup" timestamp="1612456949365">
+    <state x="383" y="191" width="672" height="707" key="search.everywhere.popup" timestamp="1612538128180">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state x="383" y="184" width="672" height="678" key="search.everywhere.popup/0.0.1440.864@0.0.1440.864" timestamp="1612293271812" />
-    <state x="383" y="191" width="672" height="707" key="search.everywhere.popup/0.0.1440.900@0.0.1440.900" timestamp="1612456949365" />
+    <state x="383" y="191" width="672" height="707" key="search.everywhere.popup/0.0.1440.900@0.0.1440.900" timestamp="1612538128180" />
   </component>
 </project>

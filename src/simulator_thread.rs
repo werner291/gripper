@@ -1,17 +1,20 @@
-use crate::physics::PhysicsWorld;
-use crate::robot::{set_motor_speed, JointVelocities, RobotBodyPartIndex};
-use crate::sync_strategies::WaitStrategy;
 use core::marker::Send;
 use core::ops::FnMut;
-use nalgebra::geometry::Isometry3;
-use nphysics3d::object::Body;
-use nphysics3d::object::{BodyPartHandle, DefaultBodyHandle, DefaultBodyPartHandle};
 use std::boxed::Box;
 use std::collections::HashMap;
 use std::iter::Iterator;
 use std::sync::mpsc::{channel, Receiver};
 use std::thread;
 use std::thread::JoinHandle;
+
+use nalgebra::geometry::Isometry3;
+use nphysics3d::object::{BodyPartHandle, DefaultBodyHandle, DefaultBodyPartHandle};
+use nphysics3d::object::Body;
+
+use crate::multibody_util::set_motor_speed;
+use crate::physics::PhysicsWorld;
+use crate::robot::{JointVelocities, RobotBodyPartIndex};
+use crate::sync_strategies::WaitStrategy;
 
 /// A callback that implements logic to control the robot's motors.
 /// TODO Too much mutability for my liking, better make a function returning motor speeds.

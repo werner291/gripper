@@ -1,14 +1,16 @@
-use std::net::{TcpListener, TcpStream};
-
-use crate::physics::PhysicsWorld;
-use crate::robot::{get_joint, JointVelocities, RobotBodyPartIndex};
-use crate::simulator_thread::ControllerStrategy;
-use byteorder::{BigEndian, ReadBytesExt, WriteBytesExt};
-use nphysics3d::joint::RevoluteJoint;
 use std::io::{Error, Result, Write};
+use std::net::{TcpListener, TcpStream};
 use std::option::Option;
 use std::option::Option::{None, Some};
 use std::result::Result::Ok;
+
+use byteorder::{BigEndian, ReadBytesExt, WriteBytesExt};
+use nphysics3d::joint::RevoluteJoint;
+
+use crate::multibody_util::get_joint;
+use crate::physics::PhysicsWorld;
+use crate::robot::{JointVelocities, RobotBodyPartIndex};
+use crate::simulator_thread::ControllerStrategy;
 
 pub struct TcpController {
     listener: TcpListener,

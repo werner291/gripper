@@ -3,8 +3,8 @@ use kiss3d::window::Window;
 use nphysics3d::joint::RevoluteJoint;
 use nphysics3d::object::DefaultBodyPartHandle;
 
+use crate::multibody_util;
 use crate::physics::PhysicsWorld;
-use crate::robot;
 use crate::robot::RobotBodyPartIndex;
 
 /// Allows for basic keyboard-based control of the robot.
@@ -39,7 +39,7 @@ fn revjoint_control(
     forward: Key,
     bph: DefaultBodyPartHandle,
 ) {
-    robot::get_joint_mut::<RevoluteJoint<f32>>(&mut physics, bph)
+    multibody_util::get_joint_mut::<RevoluteJoint<f32>>(&mut physics, bph)
         .unwrap()
         .set_desired_angular_motor_velocity(key_forward_backward(&window, back, forward));
 }
