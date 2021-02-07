@@ -3,10 +3,11 @@ use std::result::Result::{Err, Ok};
 use std::sync::mpsc::RecvTimeoutError;
 use std::time::Duration;
 
+use crate::control_strategies::ControllerStrategy;
 use crate::graphics::Graphics;
 use crate::physics::PhysicsWorld;
 use crate::robot::RobotBodyPartIndex;
-use crate::simulator_thread::{ControllerStrategy, start_physics_thread};
+use crate::simulator_thread::start_physics_thread;
 use crate::sync_strategies;
 
 pub fn run_synced_to_graphics(graphics: &mut Graphics, physics: PhysicsWorld, robot: RobotBodyPartIndex, tctrl: Box<dyn ControllerStrategy>) {

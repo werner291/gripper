@@ -7,6 +7,7 @@ use std::option::Option;
 
 use crate::physics::PhysicsWorld;
 
+/// Look up the body part, then downcast to the given type.
 pub fn get_joint<J: Joint<f32>>(
     physics: &PhysicsWorld,
     part_handle: DefaultBodyPartHandle,
@@ -16,6 +17,7 @@ pub fn get_joint<J: Joint<f32>>(
         .downcast_ref()
 }
 
+/// Look up the body part, then downcast to the given type. (Mutable reference)
 pub fn get_joint_mut<J: Joint<f32>>(
     physics: &mut PhysicsWorld,
     part_handle: DefaultBodyPartHandle,
@@ -25,6 +27,7 @@ pub fn get_joint_mut<J: Joint<f32>>(
         .downcast_mut()
 }
 
+/// Look up the Multibody and extract the given link.
 pub fn get_multibody_link(
     physics: &PhysicsWorld,
     part_handle: DefaultBodyPartHandle,
@@ -32,6 +35,7 @@ pub fn get_multibody_link(
     physics.bodies.multibody(part_handle.0)?.link(part_handle.1)
 }
 
+/// Look up the Multibody and extract the given link. (Mutable reference)
 pub fn get_multibody_link_mut(
     physics: &mut PhysicsWorld,
     part_handle: DefaultBodyPartHandle,
@@ -42,6 +46,8 @@ pub fn get_multibody_link_mut(
         .link_mut(part_handle.1)
 }
 
+/// Looks up the corresponding MultibodyLink, assumes that it has a motorized, revolute joint,
+/// then sets the target speed to the specified parameter.
 pub fn set_motor_speed(physics: &mut PhysicsWorld, part_handle: DefaultBodyPartHandle, speed: f32) {
     get_joint_mut::<RevoluteJoint<f32>>(physics, part_handle)
         .unwrap()

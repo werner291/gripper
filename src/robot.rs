@@ -22,8 +22,6 @@ use crate::physics::PhysicsWorld;
 use crate::{load_mesh, multibody_util};
 use std::prelude::v1::Vec;
 
-pub(crate) const NUM_CHANNELS: usize = 10;
-
 #[derive(Debug, Clone)]
 pub struct ArmJointMap<T> {
     pub swivel: T,

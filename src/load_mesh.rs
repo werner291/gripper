@@ -24,7 +24,7 @@ pub fn trimesh_from_stl_sr(src: &str) -> TriMesh<f32> {
 ///
 /// Note: Rotates the mesh to make the Y axis point up instead of Z,
 /// since OpenSCAD uses a different convention.
-fn stl_to_trimesh(path: &str) -> TriMesh<f32> {
+pub fn stl_to_trimesh(path: &str) -> TriMesh<f32> {
     let mut file = OpenOptions::new().read(true).open(path).unwrap();
 
     let stl = stl_io::read_stl(&mut file).unwrap();

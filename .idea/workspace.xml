@@ -17,9 +17,20 @@
     <cargoProject FILE="$PROJECT_DIR$/src/simulator_thread/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="99bfd17e-0b5a-4a4c-b788-1095db1046ef" name="Default Changelist" comment="Gradient descent controller works again after refactoring, still need to clean up further.">
+    <list default="true" id="99bfd17e-0b5a-4a4c-b788-1095db1046ef" name="Default Changelist" comment="Ran fix and clippy fix.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/control_strategies/demo_flailing.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/control_strategies/demo_flailing.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/control_strategies/gradient_descent_control.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/control_strategies/gradient_descent_control.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/control_strategies/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/control_strategies/mod.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/control_strategies/tcp_controller.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/control_strategies/tcp_controller.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/graphics.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/graphics.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/kinematics.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/kinematics.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/load_mesh.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/load_mesh.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/multibody_util.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/multibody_util.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/robot.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/robot.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/simulation.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/simulation.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/simulator_thread.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/simulator_thread.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -164,7 +175,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Did some refactoring." />
     <MESSAGE value="Ran fix and cleanup." />
     <MESSAGE value="Enabled the flailing controller as a fallback if TCP controller not specified." />
     <MESSAGE value="Brought Gradient control into new ControlStrategy interface." />
@@ -189,7 +199,8 @@
     <MESSAGE value="Fixed gradient descent controller not working with fixed speed limiter." />
     <MESSAGE value="Started work on dedicated kinematics module, random path planning controller." />
     <MESSAGE value="Gradient descent controller works again after refactoring, still need to clean up further." />
-    <option name="LAST_COMMIT_MESSAGE" value="Gradient descent controller works again after refactoring, still need to clean up further." />
+    <MESSAGE value="Ran fix and clippy fix." />
+    <option name="LAST_COMMIT_MESSAGE" value="Ran fix and clippy fix." />
   </component>
   <component name="WindowStateProjectService">
     <state x="320" y="75" width="1017" height="719" key="#Plugins" timestamp="1612725403803">
@@ -210,44 +221,45 @@
     </state>
     <state x="533" y="147" key="#com.intellij.ide.util.MemberChooser/0.0.1440.864@0.0.1440.864" timestamp="1612292895037" />
     <state x="533" y="153" key="#com.intellij.ide.util.MemberChooser/0.0.1440.900@0.0.1440.900" timestamp="1612653631553" />
-    <state x="458" y="177" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1611931515043">
-      <screen x="0" y="0" width="1440" height="864" />
+    <state x="458" y="184" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1612730589984">
+      <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state x="458" y="177" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1440.864@0.0.1440.864" timestamp="1611931515043" />
+    <state x="458" y="184" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1440.900@0.0.1440.900" timestamp="1612730589984" />
     <state x="144" y="71" key="DiffContextDialog" timestamp="1612712786982">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state x="144" y="68" key="DiffContextDialog/0.0.1440.864@0.0.1440.864" timestamp="1612205159361" />
     <state x="144" y="71" key="DiffContextDialog/0.0.1440.900@0.0.1440.900" timestamp="1612712786982" />
-    <state x="508" y="194" width="424" height="491" key="FileChooserDialogImpl" timestamp="1612654770276">
+    <state x="508" y="194" width="424" height="491" key="FileChooserDialogImpl" timestamp="1612730453962">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state x="508" y="186" width="424" height="491" key="FileChooserDialogImpl/0.0.1440.864@0.0.1440.864" timestamp="1612186121559" />
-    <state x="508" y="194" key="FileChooserDialogImpl/0.0.1440.900@0.0.1440.900" timestamp="1612654770276" />
+    <state x="508" y="194" key="FileChooserDialogImpl/0.0.1440.900@0.0.1440.900" timestamp="1612730453962" />
     <state x="0" y="0" key="FileDocumentManager.FileCacheConflict" timestamp="1611932380535">
       <screen x="0" y="0" width="1440" height="864" />
     </state>
     <state x="0" y="0" key="FileDocumentManager.FileCacheConflict/0.0.1440.864@0.0.1440.864" timestamp="1611932380535" />
-    <state width="1394" height="224" key="GridCell.Tab.0.bottom" timestamp="1612725174774">
+    <state width="1394" height="224" key="GridCell.Tab.0.bottom" timestamp="1612730394423">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state width="1394" height="213" key="GridCell.Tab.0.bottom/0.0.1440.864@0.0.1440.864" timestamp="1612297058044" />
-    <state width="1394" height="224" key="GridCell.Tab.0.bottom/0.0.1440.900@0.0.1440.900" timestamp="1612725174774" />
-    <state width="1394" height="224" key="GridCell.Tab.0.center" timestamp="1612725174774">
+    <state width="1394" height="224" key="GridCell.Tab.0.bottom/0.0.1440.900@0.0.1440.900" timestamp="1612730394423" />
+    <state width="1394" height="224" key="GridCell.Tab.0.center" timestamp="1612730394423">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state width="1394" height="213" key="GridCell.Tab.0.center/0.0.1440.864@0.0.1440.864" timestamp="1612297058043" />
-    <state width="1394" height="224" key="GridCell.Tab.0.center/0.0.1440.900@0.0.1440.900" timestamp="1612725174774" />
-    <state width="1394" height="224" key="GridCell.Tab.0.left" timestamp="1612725174773">
+    <state width="1394" height="224" key="GridCell.Tab.0.center/0.0.1440.900@0.0.1440.900" timestamp="1612730394423" />
+    <state width="1394" height="224" key="GridCell.Tab.0.left" timestamp="1612730394421">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state width="1394" height="213" key="GridCell.Tab.0.left/0.0.1440.864@0.0.1440.864" timestamp="1612297058042" />
-    <state width="1394" height="224" key="GridCell.Tab.0.left/0.0.1440.900@0.0.1440.900" timestamp="1612725174773" />
-    <state width="1394" height="224" key="GridCell.Tab.0.right" timestamp="1612725174774">
+    <state width="1394" height="224" key="GridCell.Tab.0.left/0.0.1440.900@0.0.1440.900" timestamp="1612730394421" />
+    <state width="1394" height="224" key="GridCell.Tab.0.right" timestamp="1612730394423">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state width="1394" height="213" key="GridCell.Tab.0.right/0.0.1440.864@0.0.1440.864" timestamp="1612297058044" />
-    <state width="1394" height="224" key="GridCell.Tab.0.right/0.0.1440.900@0.0.1440.900" timestamp="1612725174774" />
+    <state width="1394" height="224" key="GridCell.Tab.0.right/0.0.1440.900@0.0.1440.900" timestamp="1612730394423" />
     <state x="144" y="72" key="MergeDialog" timestamp="1612371589541">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
@@ -266,20 +278,20 @@
     </state>
     <state x="221" y="63" key="SettingsEditor/0.0.1440.864@0.0.1440.864" timestamp="1611511223289" />
     <state x="221" y="66" key="SettingsEditor/0.0.1440.900@0.0.1440.900" timestamp="1612725419447" />
-    <state x="320" y="171" width="800" height="563" key="Vcs.Push.Dialog.v2" timestamp="1612720032322">
+    <state x="320" y="171" width="800" height="563" key="Vcs.Push.Dialog.v2" timestamp="1612725692516">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state x="320" y="164" key="Vcs.Push.Dialog.v2/0.0.1440.864@0.0.1440.864" timestamp="1612295522291" />
-    <state x="320" y="171" width="800" height="563" key="Vcs.Push.Dialog.v2/0.0.1440.900@0.0.1440.900" timestamp="1612720032322" />
+    <state x="320" y="171" width="800" height="563" key="Vcs.Push.Dialog.v2/0.0.1440.900@0.0.1440.900" timestamp="1612725692516" />
     <state x="100" y="100" width="1240" height="664" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1612185023985">
       <screen x="0" y="0" width="1440" height="864" />
     </state>
     <state x="100" y="100" width="1240" height="664" key="com.intellij.history.integration.ui.views.FileHistoryDialog/0.0.1440.864@0.0.1440.864" timestamp="1612185023985" />
-    <state x="424" y="178" width="592" height="605" key="find.popup" timestamp="1612713854798">
+    <state x="424" y="178" width="592" height="605" key="find.popup" timestamp="1612726652781">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state x="424" y="171" width="592" height="580" key="find.popup/0.0.1440.864@0.0.1440.864" timestamp="1612294526043" />
-    <state x="424" y="178" width="592" height="605" key="find.popup/0.0.1440.900@0.0.1440.900" timestamp="1612713854798" />
+    <state x="424" y="178" width="592" height="605" key="find.popup/0.0.1440.900@0.0.1440.900" timestamp="1612726652781" />
     <state x="482" y="122" key="git4idea.branch.GitSmartOperationDialog" timestamp="1612278265597">
       <screen x="0" y="0" width="1440" height="864" />
     </state>
@@ -298,10 +310,10 @@
     </state>
     <state x="384" y="191" key="run.anything.popup/0.0.1440.864@0.0.1440.864" timestamp="1611938939904" />
     <state x="384" y="199" key="run.anything.popup/0.0.1440.900@0.0.1440.900" timestamp="1612709276035" />
-    <state x="383" y="191" width="672" height="707" key="search.everywhere.popup" timestamp="1612725409946">
+    <state x="383" y="191" width="672" height="707" key="search.everywhere.popup" timestamp="1612731731118">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state x="383" y="184" width="672" height="678" key="search.everywhere.popup/0.0.1440.864@0.0.1440.864" timestamp="1612293271812" />
-    <state x="383" y="191" width="672" height="707" key="search.everywhere.popup/0.0.1440.900@0.0.1440.900" timestamp="1612725409946" />
+    <state x="383" y="191" width="672" height="707" key="search.everywhere.popup/0.0.1440.900@0.0.1440.900" timestamp="1612731731118" />
   </component>
 </project>

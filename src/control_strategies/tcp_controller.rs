@@ -10,7 +10,7 @@ use nphysics3d::joint::RevoluteJoint;
 use crate::multibody_util::get_joint;
 use crate::physics::PhysicsWorld;
 use crate::robot::{JointVelocities, RobotBodyPartIndex};
-use crate::simulator_thread::ControllerStrategy;
+use crate::control_strategies::ControllerStrategy;
 
 pub struct TcpController {
     listener: TcpListener,

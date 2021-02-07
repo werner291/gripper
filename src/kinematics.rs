@@ -1,6 +1,7 @@
 //! A module containing some utilities with respect to kinematics.
 
 
+
 use std::prelude::v1::{Iterator, Vec};
 
 use na::{Isometry3, Unit, Vector3, Vector6, Point3, Matrix3xX, Matrix6xX, Translation3};
@@ -36,44 +37,41 @@ struct KinematicLink {
 /// around which the link rotates, and the offset is the vector from the base to the tip of the link
 /// when at 0 angle.
 ///
-/// The "position" of each link
-///
 #[derive(Debug)]
 pub struct KinematicModel {
     // The position of the first link with 0 angle.
     origin: Isometry3<f32>,
-    links: Vec<KinematicLink>
+    links: Vec<KinematicLink>,
 }
 
 pub struct PredictedPositions {
-    pub link_base_positions : Vec<Isometry3<f32>>,
-    pub tip_position: Isometry3<f32>
+    pub link_base_positions: Vec<Isometry3<f32>>,
+    pub tip_position: Isometry3<f32>,
 }
 
 impl KinematicModel {
 
     /// Predict global the tip position of every kinematic link.
-    pub fn predict(&self, angles : &[f32]) -> PredictedPositions {
-
-        let mut last_tip_position = self.origin;
+    pub fn predict(&self, angles: &[f32]) -> PredictedPositions {
+        let mut last_tip_position = self.origin.clone();
 
         let mut base_positions = Vec::new();
 
-        for (a,l) in angles.iter().zip(self.links.iter()) {
-            let base_pos = last_tip_position * Isometry3::new(Vector3::new(0.0,0.0,0.0), l.axis.into_inner() * *a);
+        for (a, l) in angles.iter().zip(self.links.iter()) {
+            let base_pos = last_tip_position * Isometry3::new(Vector3::new(0.0, 0.0, 0.0), l.axis.into_inner() * *a);
             last_tip_position = base_pos * Translation3::from(l.offset);
             base_positions.push(base_pos);
         }
 
         PredictedPositions {
             link_base_positions: base_positions,
-            tip_position: last_tip_position
+            tip_position: last_tip_position,
         }
     }
 
     /// Small convenience function to randomly mutate the given slice of angles by at most `range`,
     /// while capping them to the legal angles of the kinematic model.
-    pub fn mutate_angles(&self, angles : &mut [f32], rng: &mut ThreadRng, range: f32) {
+    pub fn mutate_angles(&self, angles: &mut [f32], rng: &mut ThreadRng, range: f32) {
         for angle in angles.iter_mut() {
             *angle += rng.gen_range(-range..range);
         }
@@ -94,14 +92,13 @@ impl KinematicModel {
     /// each of the joints was rotating at exactly unit speed.
     ///
     pub fn velocity_gradients(&self, angles: &[f32]) -> Vec<Velocity3<f32>> {
-
         let PredictedPositions {
             link_base_positions, tip_position
         } = self.predict(angles);
 
         let end_position = tip_position.translation.vector.into();
 
-        angles.iter().enumerate().map(|(i,_a)| {
+        angles.iter().enumerate().map(|(i, _a)| {
             // Global point at the center of the joint.
             let link_position = link_base_positions[i] * Point3::new(0.0, 0.0, 0.0);
 
@@ -116,47 +113,42 @@ impl KinematicModel {
 
             Velocity3 {
                 linear: lv_g,
-                angular: -rot_axis.into_inner()
+                angular: -rot_axis.into_inner(),
             }
         }).collect()
     }
 
     pub fn predict_tip_linear_velocity(&self, angles: &[f32], motor_speeds: &[f32]) -> Vector3<f32> {
         self.velocity_gradients(angles).into_iter().zip(motor_speeds.iter())
-            .map(|(v,ms)| v.linear * *ms)
+            .map(|(v, ms)| v.linear * *ms)
             .sum()
     }
 
     pub fn inverse_solve_velocity(&self, angles: &[f32], tip_velocity: &Velocity3<f32>) -> Option<Vec<f32>> {
-
-        let vg : Vec<Vector6<f32>> = self.velocity_gradients(angles).into_iter().map(|v| *v.as_vector() ).collect();
+        let vg: Vec<Vector6<f32>> = self.velocity_gradients(angles).into_iter().map(|v| *v.as_vector()).collect();
 
         let mtx = Matrix6xX::from_columns(vg.as_slice());
 
         (mtx.transpose() * &mtx).lu().solve(&(mtx.transpose() * tip_velocity.as_vector())).map(|v| v.into_iter().cloned().collect())
-
     }
 
     pub fn inverse_solve_linear_velocity(&self, angles: &[f32], tip_linear_velocity: &Vector3<f32>) -> Option<Vec<f32>> {
-
-        let vg : Vec<Vector3<f32>> = self.velocity_gradients(angles).into_iter().map(|v| v.linear ).collect();
+        let vg: Vec<Vector3<f32>> = self.velocity_gradients(angles).into_iter().map(|v| v.linear).collect();
 
         let mtx = Matrix3xX::from_columns(vg.as_slice());
 
         (mtx.transpose() * &mtx).lu().solve(&(mtx.transpose() * tip_linear_velocity)).map(|v| v.into_iter().cloned().collect())
-
     }
+
 
     //noinspection RsTypeCheck (Typechecking is apparently broken for cloning the parent shift...)
     /// Derive a KinematicModel from a Multibody, given a set of links that are assumed
     /// to form a kinematic chain
-    pub fn from_multibody(physics: &PhysicsWorld, base: DefaultBodyPartHandle, links: &[DefaultBodyPartHandle], last_tip : Vector3<f32>) -> Self {
+    pub fn from_multibody(physics: &PhysicsWorld, base: DefaultBodyPartHandle, links: &[DefaultBodyPartHandle], last_tip: Vector3<f32>) -> Self {
         Self {
             origin: get_multibody_link(physics, base).unwrap().position() * Translation3::from(*get_multibody_link(physics, *links.first().unwrap()).unwrap().parent_shift()),
-            links: links.iter().enumerate().map(|(i,bph)| {
-
-
-                let offset: Vector3<f32> = if let Some(next_bph) = links.get(i+1) {
+            links: links.iter().enumerate().map(|(i, bph)| {
+                let offset: Vector3<f32> = if let Some(next_bph) = links.get(i + 1) {
                     *get_multibody_link(physics, *next_bph).unwrap().parent_shift()
                 } else {
                     last_tip
@@ -167,9 +159,9 @@ impl KinematicModel {
                     offset,
                     axis: link_joint.axis(),
                     min: link_joint.min_angle().unwrap_or(std::f32::NEG_INFINITY),
-                    max: link_joint.max_angle().unwrap_or(std::f32::INFINITY)
+                    max: link_joint.max_angle().unwrap_or(std::f32::INFINITY),
                 }
-            }).collect()
+            }).collect(),
         }
     }
 }

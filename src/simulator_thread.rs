@@ -1,5 +1,3 @@
-use core::marker::Send;
-use core::ops::FnMut;
 use std::boxed::Box;
 use std::collections::HashMap;
 use std::iter::Iterator;
@@ -8,32 +6,14 @@ use std::thread;
 use std::thread::JoinHandle;
 
 use nalgebra::geometry::Isometry3;
-use nphysics3d::object::Body;
 use nphysics3d::object::{BodyPartHandle, DefaultBodyHandle, DefaultBodyPartHandle};
+use nphysics3d::object::Body;
 
+use crate::control_strategies::ControllerStrategy;
 use crate::multibody_util::set_motor_speed;
 use crate::physics::PhysicsWorld;
 use crate::robot::{JointVelocities, RobotBodyPartIndex};
 use crate::sync_strategies::WaitStrategy;
-
-/// A callback that implements logic to control the robot's motors.
-/// TODO Too much mutability for my liking, better make a function returning motor speeds.
-pub trait ControllerStrategy: Send + 'static {
-    fn apply_controller(
-        &mut self,
-        physics_world: &PhysicsWorld,
-        robot: &RobotBodyPartIndex,
-    ) -> JointVelocities;
-}
-
-impl<F> ControllerStrategy for F
-where
-    F: FnMut(&PhysicsWorld, &RobotBodyPartIndex) -> JointVelocities + Send + 'static,
-{
-    fn apply_controller(&mut self, pw: &PhysicsWorld, rob: &RobotBodyPartIndex) -> JointVelocities {
-        self(pw, rob)
-    }
-}
 
 /// Message sent from physics thread about the state of the world.
 pub type PhysicsUpdate = HashMap<DefaultBodyPartHandle, Isometry3<f32>>;
