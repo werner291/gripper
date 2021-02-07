@@ -84,6 +84,7 @@ impl ControllerStrategy for GradientDescentController {
 
                 // Compute the remaining distance and angle
                 let distance_remaining = translation_delta.norm();
+
                 let angle_remaining = rotation_delta.norm(); // FIXME sign?
 
                 // Compute the desired velocity to bring the gripper into position.
@@ -106,7 +107,7 @@ impl ControllerStrategy for GradientDescentController {
                 )
                 .unwrap_or_else(|| GradientDescentController::random_arm_velocities())
                 //The solver can sometimes return solutions that are a teensy bit excessive.
-                .limit_to_safe(10.0);
+                .limit_to_safe(100.0);
 
                 // If the remaining distance is smaller than a threshold, go to state Grabbing.
                 // The robot will act upon this state next turn.
@@ -116,7 +117,7 @@ impl ControllerStrategy for GradientDescentController {
 
                 // Combine the requested arm joint velocities with finger joint velocities
                 // to open the gripper, then return the velocities for execution.
-                GradientDescentController::joint_velocities_with_gripper(jv, Open)
+                JointVelocities::joint_velocities_with_gripper(jv, Open)
             }
             Grabbing => {
                 // let angles = gripper_finger_angles(physics, robot);
@@ -127,7 +128,7 @@ impl ControllerStrategy for GradientDescentController {
                     self.state = Lifting
                 }
 
-                GradientDescentController::joint_velocities_with_gripper(
+                JointVelocities::joint_velocities_with_gripper(
                     ArmJointVelocities {
                         swivel: 0.0,
                         link1: 0.0,
@@ -152,7 +153,7 @@ impl ControllerStrategy for GradientDescentController {
 
                 dbg!(&jv);
 
-                GradientDescentController::joint_velocities_with_gripper(jv, Closed)
+                JointVelocities::joint_velocities_with_gripper(jv, Closed)
             }
         }
     }
@@ -266,28 +267,7 @@ impl GradientDescentController {
         }
     }
 
-    fn joint_velocities_with_gripper(
-        jv: ArmJointVelocities,
-        gripper_direction: GripperDirection,
-    ) -> JointVelocities {
-        let finger_v = match gripper_direction {
-            GripperDirection::Open => 0.5,
-            GripperDirection::Closed => -0.5,
-        };
 
-        JointVelocities {
-            swivel: jv.swivel,
-            link1: jv.link1,
-            link2: jv.link2,
-            gripper: jv.gripper,
-            finger_0: finger_v,
-            finger_1: finger_v,
-            finger_2: finger_v,
-            finger_0_2: finger_v,
-            finger_1_2: finger_v,
-            finger_2_2: finger_v,
-        }
-    }
 }
 
 impl GradientDescentController {
