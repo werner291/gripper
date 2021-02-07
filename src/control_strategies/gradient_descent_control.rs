@@ -165,14 +165,6 @@ fn joint_velocities_for_velocity_at_point_and_angular_velocity(
         get_joint::<RevoluteJoint<f32>>(physics, *bph).unwrap().angle()
     }).collect();
 
-    let predictions = kinematic.predict(joint_angles.as_slice());
-
-    // dbg!(joint_angles);
-    let _predicted = predictions.link_base_positions.iter().map(|i| i.translation.vector).collect::<Vec<_>>();
-    let _actual = [robot.swivel, robot.link1, robot.link2, robot.gripper].iter().map(|bph|{
-        get_multibody_link(physics, *bph).unwrap().position().translation.vector
-    }).collect::<Vec<_>>();
-
     kinematic.inverse_solve_velocity(joint_angles.as_slice(), &velocity)
         .map(|speeds|
             ArmJointVelocities {
