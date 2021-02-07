@@ -42,6 +42,24 @@ pub struct FingerJointMap<T> {
     pub finger_2_2: T,
 }
 
+pub const FINGERS_OPEN : FingerJointMap<f32> = FingerJointMap {
+    finger_0: 0.5,
+    finger_1: 0.5,
+    finger_2: 0.5,
+    finger_0_2: 0.5,
+    finger_1_2: 0.5,
+    finger_2_2: 0.5
+};
+
+pub const FINGERS_CLOSE : FingerJointMap<f32> = FingerJointMap {
+    finger_0: -0.5,
+    finger_1: -0.5,
+    finger_2: -0.5,
+    finger_0_2: -0.5,
+    finger_1_2: -0.5,
+    finger_2_2: -0.5
+};
+
 #[derive(Debug, Clone)]
 pub struct JointMap<T> {
     pub swivel: T,
@@ -57,7 +75,7 @@ pub struct JointMap<T> {
 }
 
 impl<T> JointMap<T> {
-    fn from_arm_and_finger(arm: ArmJointMap<T>, finger: FingerJointMap<T>) -> JointMap<T> {
+    pub(crate) fn from_arm_and_finger(arm: ArmJointMap<T>, finger: FingerJointMap<T>) -> JointMap<T> {
         JointMap {
             swivel: arm.swivel,
             link1: arm.link1,

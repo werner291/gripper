@@ -12,18 +12,17 @@ use rand::Rng;
 use crate::control_strategies::gradient_descent_control::SphereGrabState::{
     Approaching, Grabbing, Lifting,
 };
-use crate::multibody_util::get_multibody_link;
+use crate::multibody_util::{get_multibody_link, get_joint};
 use crate::physics::PhysicsWorld;
 use crate::robot;
 use crate::robot::GripperDirection::{Closed, Open};
-use crate::robot::{
-    ArmJointVelocities, FingerJointMap, GripperDirection, JointVelocities, RobotBodyPartIndex,
-};
+use crate::robot::{ArmJointVelocities, FingerJointMap, GripperDirection, JointVelocities, RobotBodyPartIndex, FINGERS_OPEN, FINGERS_CLOSE};
 use crate::simulator_thread::ControllerStrategy;
 use kiss3d::ncollide3d::na::Isometry3;
 use kiss3d::ncollide3d::shape::ConvexHull;
 use nphysics3d::ncollide3d::query::PointQuery;
 use std::convert::From;
+use crate::kinematics::KinematicModel;
 
 enum SphereGrabState {
     Approaching,
@@ -108,7 +107,7 @@ impl ControllerStrategy for GradientDescentController {
                 )
                 .unwrap_or_else(|| GradientDescentController::random_arm_velocities())
                 //The solver can sometimes return solutions that are a teensy bit excessive.
-                .limit_to_safe(100.0);
+                .limit_to_safe(1.0);
 
                 // If the remaining distance is smaller than a threshold, go to state Grabbing.
                 // The robot will act upon this state next turn.
@@ -118,7 +117,7 @@ impl ControllerStrategy for GradientDescentController {
 
                 // Combine the requested arm joint velocities with finger joint velocities
                 // to open the gripper, then return the velocities for execution.
-                JointVelocities::joint_velocities_with_gripper(jv, Open)
+                JointVelocities::from_arm_and_finger(jv, FINGERS_OPEN)
             }
             Grabbing => {
                 // let angles = gripper_finger_angles(physics, robot);
@@ -129,15 +128,14 @@ impl ControllerStrategy for GradientDescentController {
                     self.state = Lifting
                 }
 
-                JointVelocities::joint_velocities_with_gripper(
+                JointVelocities::from_arm_and_finger(
                     ArmJointVelocities {
                         swivel: 0.0,
                         link1: 0.0,
                         link2: 0.0,
                         gripper: 0.0,
                     },
-                    Closed,
-                )
+                    FINGERS_CLOSE)
             }
             Lifting => {
                 println!("Lifting!");
@@ -152,9 +150,7 @@ impl ControllerStrategy for GradientDescentController {
                 //The solver can sometimes return solutions that are a teensy bit excessive.
                 .limit_to_safe(10.0);
 
-                dbg!(&jv);
-
-                JointVelocities::joint_velocities_with_gripper(jv, Closed)
+                JointVelocities::from_arm_and_finger(jv, FINGERS_CLOSE)
             }
         }
     }
@@ -176,64 +172,89 @@ fn joint_velocities_for_velocity_at_point_and_angular_velocity(
     at_point: &Point3<f32>,
     velocity: &Velocity3<f32>,
 ) -> Option<ArmJointVelocities> {
-    let motor_gradients =
-        // List of all body parts corresponding to all MultibodyLinks that have a joint that affects the gripper position.
-        [robot.swivel, robot.link1, robot.link2, robot.gripper]
-        .iter()
-        .map(|bph| {
 
-            // Retrieve the position and rotation of the body link being considered.
-            let link = physics
-                .bodies
-                .multibody(robot.body)
-                .unwrap()
-                .link(bph.1)
-                .unwrap();
+    let kinematic = KinematicModel::from_multibody(physics, robot.base, &[robot.swivel, robot.link1, robot.link2, robot.gripper], Vector3::new(0.0, 1.0, 0.0));
 
-            // Global point at the center of the joint.
-            let link_position = link.position() * Point3::new(0.0, 0.0, 0.0);
+    let joint_angles : Vec<f32> = [robot.swivel, robot.link1, robot.link2, robot.gripper].iter().map(|bph| {
+        get_joint::<RevoluteJoint<f32>>(physics, *bph).unwrap().angle()
+    }).collect();
 
-            // A vector from the center of the joint to the point inside the gripper.
-            let toward_gripper = at_point - &link_position;
+    let predictions = kinematic.predict(joint_angles.as_slice());
 
-            // Extract the global rotation axis of this joint.
-            let rot_axis: Unit<Vector3<f32>> = link.position() * link
-                .joint()
-                .downcast_ref::<RevoluteJoint<f32>>()
-                .unwrap()
-                .axis();
+    // dbg!(joint_angles);
+    let predicted = predictions.link_base_positions.iter().map(|i| i.translation.vector).collect::<Vec<_>>();
+    let actual = [robot.swivel, robot.link1, robot.link2, robot.gripper].iter().map(|bph|{
+        get_multibody_link(physics, *bph).unwrap().position().translation.vector
+    }).collect::<Vec<_>>();
 
-            // Linear velocity of the gripper if the current joint was rotating at unit velocity, all others immobile.
-            let joint_trans_gradient = -toward_gripper.cross(&rot_axis);
+    kinematic.inverse_solve_velocity(joint_angles.as_slice(), &velocity)
+        .map(|speeds|
+            ArmJointVelocities {
+                swivel: speeds[0],
+                link1: speeds[1],
+                link2: speeds[2],
+                gripper: speeds[3]
+            }
+        )
 
-            // Angular velocity of the gripper, around the axis of the target velocity, if the current joint was rotating
-            // at unit velocity, all others immobile. Unfortunately, we need to do this since the robot arm has only 4 DoF.
-            let joint_rot_gradient = -velocity.angular.try_normalize(1.0e-10).map(|a| a.dot(&rot_axis)).unwrap_or(1.0);
-
-            // Assemble in a Vector4.
-            Vector4::new(joint_trans_gradient.x, joint_trans_gradient.y, joint_trans_gradient.z, joint_rot_gradient)
-        })
-        .collect::<Vec<_>>();
-
-    let target_vector = Vector4::new(
-        velocity.linear.x,
-        velocity.linear.y,
-        velocity.linear.z,
-        // Squashes the angular velocity down to a magnitude, since the robotic arm only has 4 DoF.
-        // TODO: Find out if I can just have the solver return None for impossible rotations.
-        velocity.angular.norm(),
-    );
-
-    // Combine the vectors into a matrix, then solve.
-    Matrix4::from_columns(motor_gradients.as_slice())
-        .lu()
-        .solve(&target_vector)
-        .map(|motor_speeds| ArmJointVelocities {
-            swivel: motor_speeds[0],
-            link1: motor_speeds[1],
-            link2: motor_speeds[2],
-            gripper: motor_speeds[3],
-        })
+    // let motor_gradients =
+    //     // List of all body parts corresponding to all MultibodyLinks that have a joint that affects the gripper position.
+    //     [robot.swivel, robot.link1, robot.link2, robot.gripper]
+    //     .iter()
+    //     .map(|bph| {
+    //
+    //         // Retrieve the position and rotation of the body link being considered.
+    //         let link = physics
+    //             .bodies
+    //             .multibody(robot.body)
+    //             .unwrap()
+    //             .link(bph.1)
+    //             .unwrap();
+    //
+    //         // Global point at the center of the joint.
+    //         let link_position = link.position() * Point3::new(0.0, 0.0, 0.0);
+    //
+    //         // A vector from the center of the joint to the point inside the gripper.
+    //         let toward_gripper = at_point - &link_position;
+    //
+    //         // Extract the global rotation axis of this joint.
+    //         let rot_axis: Unit<Vector3<f32>> = link.position() * link
+    //             .joint()
+    //             .downcast_ref::<RevoluteJoint<f32>>()
+    //             .unwrap()
+    //             .axis();
+    //
+    //         // Linear velocity of the gripper if the current joint was rotating at unit velocity, all others immobile.
+    //         let joint_trans_gradient = -toward_gripper.cross(&rot_axis);
+    //
+    //         // Angular velocity of the gripper, around the axis of the target velocity, if the current joint was rotating
+    //         // at unit velocity, all others immobile. Unfortunately, we need to do this since the robot arm has only 4 DoF.
+    //         let joint_rot_gradient = -velocity.angular.try_normalize(1.0e-10).map(|a| a.dot(&rot_axis)).unwrap_or(1.0);
+    //
+    //         // Assemble in a Vector4.
+    //         Vector4::new(joint_trans_gradient.x, joint_trans_gradient.y, joint_trans_gradient.z, joint_rot_gradient)
+    //     })
+    //     .collect::<Vec<_>>();
+    //
+    // let target_vector = Vector4::new(
+    //     velocity.linear.x,
+    //     velocity.linear.y,
+    //     velocity.linear.z,
+    //     // Squashes the angular velocity down to a magnitude, since the robotic arm only has 4 DoF.
+    //     // TODO: Find out if I can just have the solver return None for impossible rotations.
+    //     velocity.angular.norm(),
+    // );
+    //
+    // // Combine the vectors into a matrix, then solve.
+    // Matrix4::from_columns(motor_gradients.as_slice())
+    //     .lu()
+    //     .solve(&target_vector)
+    //     .map(|motor_speeds| ArmJointVelocities {
+    //         swivel: motor_speeds[0],
+    //         link1: motor_speeds[1],
+    //         link2: motor_speeds[2],
+    //         gripper: motor_speeds[3],
+    //     })
 }
 
 fn global_joint_axis(physics: &PhysicsWorld, bph: DefaultBodyPartHandle) -> Unit<Vector3<f32>> {
