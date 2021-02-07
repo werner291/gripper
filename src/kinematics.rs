@@ -1,9 +1,9 @@
 //! A module containing some utilities with respect to kinematics.
 
-use std::clone::Clone;
+
 use std::prelude::v1::{Iterator, Vec};
 
-use na::{Isometry3, Unit, Vector3, Vector6, Point3, distance, Matrix3xX, Matrix6xX, Translation3};
+use na::{Isometry3, Unit, Vector3, Vector6, Point3, Matrix3xX, Matrix6xX, Translation3};
 use nphysics3d::joint::RevoluteJoint;
 use nphysics3d::object::{BodyPart, DefaultBodyPartHandle};
 use rand::prelude::ThreadRng;
@@ -16,7 +16,7 @@ use std::iter::IntoIterator;
 use std::option::Option::Some;
 use std::option::Option;
 use std::convert::{From, Into};
-use kiss3d::ncollide3d::na::Rotation3;
+
 
 /// A link in a KinematicModel, assumed to consist of an axis of rotation,
 /// as well as a translation, and max/min angles (which may be infinite).
@@ -55,7 +55,7 @@ impl KinematicModel {
     /// Predict global the tip position of every kinematic link.
     pub fn predict(&self, angles : &[f32]) -> PredictedPositions {
 
-        let mut last_tip_position = self.origin.clone();
+        let mut last_tip_position = self.origin;
 
         let mut base_positions = Vec::new();
 
@@ -75,7 +75,7 @@ impl KinematicModel {
     /// while capping them to the legal angles of the kinematic model.
     pub fn mutate_angles(&self, angles : &mut [f32], rng: &mut ThreadRng, range: f32) {
         for angle in angles.iter_mut() {
-            *angle = *angle + rng.gen_range(-range..range);
+            *angle += rng.gen_range(-range..range);
         }
         self.cap_angles_to_legal(angles);
     }
@@ -101,7 +101,7 @@ impl KinematicModel {
 
         let end_position = tip_position.translation.vector.into();
 
-        angles.iter().enumerate().map(|(i,a)| {
+        angles.iter().enumerate().map(|(i,_a)| {
             // Global point at the center of the joint.
             let link_position = link_base_positions[i] * Point3::new(0.0, 0.0, 0.0);
 
@@ -129,7 +129,7 @@ impl KinematicModel {
 
     pub fn inverse_solve_velocity(&self, angles: &[f32], tip_velocity: &Velocity3<f32>) -> Option<Vec<f32>> {
 
-        let vg : Vec<Vector6<f32>> = self.velocity_gradients(angles).into_iter().map(|v| v.as_vector().clone() ).collect();
+        let vg : Vec<Vector6<f32>> = self.velocity_gradients(angles).into_iter().map(|v| *v.as_vector() ).collect();
 
         let mtx = Matrix6xX::from_columns(vg.as_slice());
 
@@ -152,12 +152,12 @@ impl KinematicModel {
     /// to form a kinematic chain
     pub fn from_multibody(physics: &PhysicsWorld, base: DefaultBodyPartHandle, links: &[DefaultBodyPartHandle], last_tip : Vector3<f32>) -> Self {
         Self {
-            origin: get_multibody_link(physics, base).unwrap().position() * Translation3::from(get_multibody_link(physics, *links.first().unwrap()).unwrap().parent_shift().clone()),
+            origin: get_multibody_link(physics, base).unwrap().position() * Translation3::from(*get_multibody_link(physics, *links.first().unwrap()).unwrap().parent_shift()),
             links: links.iter().enumerate().map(|(i,bph)| {
 
 
                 let offset: Vector3<f32> = if let Some(next_bph) = links.get(i+1) {
-                    get_multibody_link(physics, *next_bph).unwrap().parent_shift().clone()
+                    *get_multibody_link(physics, *next_bph).unwrap().parent_shift()
                 } else {
                     last_tip
                 };

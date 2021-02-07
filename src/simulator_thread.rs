@@ -120,7 +120,7 @@ fn snapshot_physics(physics: &PhysicsWorld) -> PhysicsUpdate {
             (0..body.num_parts()).map(move |i| {
                 // register the BodyPartHandle and world position,
                 let bph = BodyPartHandle(bh, i);
-                let pos = body.part(i).unwrap().position().clone();
+                let pos = body.part(i).unwrap().position();
                 (bph, pos)
             })
         })

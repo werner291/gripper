@@ -244,11 +244,11 @@ fn build_graphics(robot: &RobotBodyPartIndex, graphics: &mut Graphics) {
     );
 
     graphics.bp_to_sn.extend_from_slice(&[
-        (base, robot.base.clone()),
-        (swivel, robot.swivel.clone()),
-        (link1, robot.link1.clone()),
-        (link2, robot.link2.clone()),
-        (gripper, robot.gripper.clone()),
+        (base, robot.base),
+        (swivel, robot.swivel),
+        (link1, robot.link1),
+        (link2, robot.link2),
+        (gripper, robot.gripper),
     ]);
 
     // Fingers are special due to them being copies of each other and rotated.

@@ -2,9 +2,9 @@
 
 use std::boxed::Box;
 use std::option::Option;
-use std::result::Result::{Err, Ok};
-use std::sync::mpsc::RecvTimeoutError;
-use std::time::Duration;
+
+
+
 
 use clap::Clap;
 use na::{Isometry3, Unit, Vector3};
@@ -13,9 +13,9 @@ use control_strategies::tcp_controller::TcpController;
 use graphics::Graphics;
 
 use crate::control_strategies::gradient_descent_control::GradientDescentController;
-use crate::physics::PhysicsWorld;
-use crate::robot::RobotBodyPartIndex;
-use crate::simulator_thread::{ControllerStrategy, start_physics_thread};
+
+
+use crate::simulator_thread::{ControllerStrategy};
 use crate::spawn_utilities::{make_ground, make_pinned_ball};
 
 mod control_strategies;

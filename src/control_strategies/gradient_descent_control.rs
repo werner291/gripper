@@ -2,8 +2,8 @@ use std::iter::{IntoIterator, Iterator};
 use std::option::Option;
 use std::vec::Vec;
 
-use nalgebra::Matrix4;
-use nalgebra::{Point3, Unit, Vector3, Vector4};
+
+use nalgebra::{Point3, Unit, Vector3};
 use nphysics3d::algebra::Velocity3;
 use nphysics3d::joint::RevoluteJoint;
 use nphysics3d::object::{BodyPart, DefaultBodyHandle, DefaultBodyPartHandle};
@@ -15,8 +15,8 @@ use crate::control_strategies::gradient_descent_control::SphereGrabState::{
 use crate::multibody_util::{get_multibody_link, get_joint};
 use crate::physics::PhysicsWorld;
 use crate::robot;
-use crate::robot::GripperDirection::{Closed, Open};
-use crate::robot::{ArmJointVelocities, FingerJointMap, GripperDirection, JointVelocities, RobotBodyPartIndex, FINGERS_OPEN, FINGERS_CLOSE};
+
+use crate::robot::{ArmJointVelocities, FingerJointMap, JointVelocities, RobotBodyPartIndex, FINGERS_OPEN, FINGERS_CLOSE};
 use crate::simulator_thread::ControllerStrategy;
 use kiss3d::ncollide3d::na::Isometry3;
 use kiss3d::ncollide3d::shape::ConvexHull;
@@ -105,7 +105,7 @@ impl ControllerStrategy for GradientDescentController {
                     &point_inside_gripper,
                     &target_velocity_at_point,
                 )
-                .unwrap_or_else(|| GradientDescentController::random_arm_velocities())
+                .unwrap_or_else(GradientDescentController::random_arm_velocities)
                 //The solver can sometimes return solutions that are a teensy bit excessive.
                 .limit_to_safe(1.0);
 
@@ -146,7 +146,7 @@ impl ControllerStrategy for GradientDescentController {
                     &target_position,
                     &Velocity3::linear(0.0, 1.0, 0.0),
                 )
-                .unwrap_or_else(|| GradientDescentController::random_arm_velocities())
+                .unwrap_or_else(GradientDescentController::random_arm_velocities)
                 //The solver can sometimes return solutions that are a teensy bit excessive.
                 .limit_to_safe(10.0);
 
@@ -169,7 +169,7 @@ impl ControllerStrategy for GradientDescentController {
 fn joint_velocities_for_velocity_at_point_and_angular_velocity(
     physics: &PhysicsWorld,
     robot: &RobotBodyPartIndex,
-    at_point: &Point3<f32>,
+    _at_point: &Point3<f32>,
     velocity: &Velocity3<f32>,
 ) -> Option<ArmJointVelocities> {
 
@@ -182,8 +182,8 @@ fn joint_velocities_for_velocity_at_point_and_angular_velocity(
     let predictions = kinematic.predict(joint_angles.as_slice());
 
     // dbg!(joint_angles);
-    let predicted = predictions.link_base_positions.iter().map(|i| i.translation.vector).collect::<Vec<_>>();
-    let actual = [robot.swivel, robot.link1, robot.link2, robot.gripper].iter().map(|bph|{
+    let _predicted = predictions.link_base_positions.iter().map(|i| i.translation.vector).collect::<Vec<_>>();
+    let _actual = [robot.swivel, robot.link1, robot.link2, robot.gripper].iter().map(|bph|{
         get_multibody_link(physics, *bph).unwrap().position().translation.vector
     }).collect::<Vec<_>>();
 
@@ -318,7 +318,7 @@ fn grabbed(physics: &PhysicsWorld, robot: &RobotBodyPartIndex, target: DefaultBo
         {
             if ca.body() == target {
                 for contact in cman.contacts() {
-                    normals.push(contact.contact.normal.clone())
+                    normals.push(contact.contact.normal)
                 }
             }
 

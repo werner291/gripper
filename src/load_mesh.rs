@@ -7,11 +7,11 @@ use kiss3d::ncollide3d::na::{Isometry3, Point3, Vector3};
 use kiss3d::ncollide3d::procedural::TriMesh;
 use stl_io::{IndexedMesh, IndexedTriangle};
 
-pub const ARMLINK_STL: &'static str = include_str!("../scad/armlink.stl");
-pub const BASE_STL: &'static str = include_str!("../scad/base.stl");
-pub const SWIVEL_STL: &'static str = include_str!("../scad/rotbase.stl");
-pub const GRIPPER_STL: &'static str = include_str!("../scad/gripper.stl");
-pub const PHALANX_STL: &'static str = include_str!("../scad/phalanx.stl");
+pub const ARMLINK_STL: &str = include_str!("../scad/armlink.stl");
+pub const BASE_STL: &str = include_str!("../scad/base.stl");
+pub const SWIVEL_STL: &str = include_str!("../scad/rotbase.stl");
+pub const GRIPPER_STL: &str = include_str!("../scad/gripper.stl");
+pub const PHALANX_STL: &str = include_str!("../scad/phalanx.stl");
 
 pub fn trimesh_from_stl_sr(src: &str) -> TriMesh<f32> {
     let mut c = std::io::Cursor::new(src);

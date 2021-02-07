@@ -17,11 +17,9 @@
     <cargoProject FILE="$PROJECT_DIR$/src/simulator_thread/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="99bfd17e-0b5a-4a4c-b788-1095db1046ef" name="Default Changelist" comment="Started work on dedicated kinematics module, random path planning controller.">
+    <list default="true" id="99bfd17e-0b5a-4a4c-b788-1095db1046ef" name="Default Changelist" comment="Gradient descent controller works again after refactoring, still need to clean up further.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/control_strategies/gradient_descent_control.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/control_strategies/gradient_descent_control.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/kinematics.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/kinematics.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/robot.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/robot.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -72,7 +70,7 @@
     <property name="project.structure.last.edited" value="Project" />
     <property name="project.structure.proportion" value="0.0" />
     <property name="project.structure.side.proportion" value="0.0" />
-    <property name="settings.editor.selected.configurable" value="project.propCompiler" />
+    <property name="settings.editor.selected.configurable" value="language.rust.cargo" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
@@ -138,6 +136,7 @@
     </recent_temporary>
   </component>
   <component name="RustProjectSettings">
+    <option name="externalLinter" value="Clippy" />
     <option name="toolchainHomeDirectory" value="/nix/store/al0pqyyv2bp4j74nxxhnfwlya57nsp6p-rust-1.47.0-nightly-2020-08-17-792c645ca/bin" />
     <option name="version" value="2" />
   </component>
@@ -165,7 +164,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Implemented multithreating, app no longer freezes when the simulation does." />
     <MESSAGE value="Did some refactoring." />
     <MESSAGE value="Ran fix and cleanup." />
     <MESSAGE value="Enabled the flailing controller as a fallback if TCP controller not specified." />
@@ -190,13 +188,15 @@
     <MESSAGE value="Removed the logo again." />
     <MESSAGE value="Fixed gradient descent controller not working with fixed speed limiter." />
     <MESSAGE value="Started work on dedicated kinematics module, random path planning controller." />
-    <option name="LAST_COMMIT_MESSAGE" value="Started work on dedicated kinematics module, random path planning controller." />
+    <MESSAGE value="Gradient descent controller works again after refactoring, still need to clean up further." />
+    <option name="LAST_COMMIT_MESSAGE" value="Gradient descent controller works again after refactoring, still need to clean up further." />
   </component>
   <component name="WindowStateProjectService">
-    <state x="320" y="72" width="1017" height="719" key="#Plugins" timestamp="1611925219950">
-      <screen x="0" y="0" width="1440" height="864" />
+    <state x="320" y="75" width="1017" height="719" key="#Plugins" timestamp="1612725403803">
+      <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state x="320" y="72" width="1017" height="719" key="#Plugins/0.0.1440.864@0.0.1440.864" timestamp="1611925219950" />
+    <state x="320" y="75" key="#Plugins/0.0.1440.900@0.0.1440.900" timestamp="1612725403803" />
     <state x="208" y="6" key="#Project_Structure" timestamp="1611948373334">
       <screen x="0" y="0" width="1440" height="864" />
     </state>
@@ -228,26 +228,26 @@
       <screen x="0" y="0" width="1440" height="864" />
     </state>
     <state x="0" y="0" key="FileDocumentManager.FileCacheConflict/0.0.1440.864@0.0.1440.864" timestamp="1611932380535" />
-    <state width="1394" height="224" key="GridCell.Tab.0.bottom" timestamp="1612719557232">
+    <state width="1394" height="224" key="GridCell.Tab.0.bottom" timestamp="1612725174774">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state width="1394" height="213" key="GridCell.Tab.0.bottom/0.0.1440.864@0.0.1440.864" timestamp="1612297058044" />
-    <state width="1394" height="224" key="GridCell.Tab.0.bottom/0.0.1440.900@0.0.1440.900" timestamp="1612719557232" />
-    <state width="1394" height="224" key="GridCell.Tab.0.center" timestamp="1612719557232">
+    <state width="1394" height="224" key="GridCell.Tab.0.bottom/0.0.1440.900@0.0.1440.900" timestamp="1612725174774" />
+    <state width="1394" height="224" key="GridCell.Tab.0.center" timestamp="1612725174774">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state width="1394" height="213" key="GridCell.Tab.0.center/0.0.1440.864@0.0.1440.864" timestamp="1612297058043" />
-    <state width="1394" height="224" key="GridCell.Tab.0.center/0.0.1440.900@0.0.1440.900" timestamp="1612719557232" />
-    <state width="1394" height="224" key="GridCell.Tab.0.left" timestamp="1612719557231">
+    <state width="1394" height="224" key="GridCell.Tab.0.center/0.0.1440.900@0.0.1440.900" timestamp="1612725174774" />
+    <state width="1394" height="224" key="GridCell.Tab.0.left" timestamp="1612725174773">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state width="1394" height="213" key="GridCell.Tab.0.left/0.0.1440.864@0.0.1440.864" timestamp="1612297058042" />
-    <state width="1394" height="224" key="GridCell.Tab.0.left/0.0.1440.900@0.0.1440.900" timestamp="1612719557231" />
-    <state width="1394" height="224" key="GridCell.Tab.0.right" timestamp="1612719557232">
+    <state width="1394" height="224" key="GridCell.Tab.0.left/0.0.1440.900@0.0.1440.900" timestamp="1612725174773" />
+    <state width="1394" height="224" key="GridCell.Tab.0.right" timestamp="1612725174774">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state width="1394" height="213" key="GridCell.Tab.0.right/0.0.1440.864@0.0.1440.864" timestamp="1612297058044" />
-    <state width="1394" height="224" key="GridCell.Tab.0.right/0.0.1440.900@0.0.1440.900" timestamp="1612719557232" />
+    <state width="1394" height="224" key="GridCell.Tab.0.right/0.0.1440.900@0.0.1440.900" timestamp="1612725174774" />
     <state x="144" y="72" key="MergeDialog" timestamp="1612371589541">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
@@ -261,15 +261,16 @@
     </state>
     <state x="477" y="112" key="RollbackChangesDialog/0.0.1440.864@0.0.1440.864" timestamp="1612278263242" />
     <state x="477" y="117" width="486" height="640" key="RollbackChangesDialog/0.0.1440.900@0.0.1440.900" timestamp="1612712788435" />
-    <state x="221" y="63" key="SettingsEditor" timestamp="1611511223289">
-      <screen x="0" y="0" width="1440" height="864" />
+    <state x="221" y="66" key="SettingsEditor" timestamp="1612725419447">
+      <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state x="221" y="63" key="SettingsEditor/0.0.1440.864@0.0.1440.864" timestamp="1611511223289" />
-    <state x="320" y="171" width="800" height="563" key="Vcs.Push.Dialog.v2" timestamp="1612713281841">
+    <state x="221" y="66" key="SettingsEditor/0.0.1440.900@0.0.1440.900" timestamp="1612725419447" />
+    <state x="320" y="171" width="800" height="563" key="Vcs.Push.Dialog.v2" timestamp="1612720032322">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state x="320" y="164" key="Vcs.Push.Dialog.v2/0.0.1440.864@0.0.1440.864" timestamp="1612295522291" />
-    <state x="320" y="171" width="800" height="563" key="Vcs.Push.Dialog.v2/0.0.1440.900@0.0.1440.900" timestamp="1612713281841" />
+    <state x="320" y="171" width="800" height="563" key="Vcs.Push.Dialog.v2/0.0.1440.900@0.0.1440.900" timestamp="1612720032322" />
     <state x="100" y="100" width="1240" height="664" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1612185023985">
       <screen x="0" y="0" width="1440" height="864" />
     </state>
@@ -297,10 +298,10 @@
     </state>
     <state x="384" y="191" key="run.anything.popup/0.0.1440.864@0.0.1440.864" timestamp="1611938939904" />
     <state x="384" y="199" key="run.anything.popup/0.0.1440.900@0.0.1440.900" timestamp="1612709276035" />
-    <state x="383" y="191" width="672" height="707" key="search.everywhere.popup" timestamp="1612708656255">
+    <state x="383" y="191" width="672" height="707" key="search.everywhere.popup" timestamp="1612725409946">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state x="383" y="184" width="672" height="678" key="search.everywhere.popup/0.0.1440.864@0.0.1440.864" timestamp="1612293271812" />
-    <state x="383" y="191" width="672" height="707" key="search.everywhere.popup/0.0.1440.900@0.0.1440.900" timestamp="1612708656255" />
+    <state x="383" y="191" width="672" height="707" key="search.everywhere.popup/0.0.1440.900@0.0.1440.900" timestamp="1612725409946" />
   </component>
 </project>
