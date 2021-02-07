@@ -22,7 +22,7 @@ pub fn make_pinned_ball(
     const RADIUS: f32 = 0.35;
 
     let rb = RigidBodyDesc::new()
-        .translation(Vector3::new(3.0, 1.0, 0.0))
+        .translation(Vector3::new(3.0, RADIUS, 0.0))
         .kinematic_translations(Vector3::new(true, false, true))
         .build();
 

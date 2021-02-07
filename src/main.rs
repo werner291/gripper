@@ -13,7 +13,9 @@ use control_strategies::tcp_controller::TcpController;
 use graphics::Graphics;
 
 use crate::control_strategies::gradient_descent_control::GradientDescentController;
-use crate::simulator_thread::{start_physics_thread, ControllerStrategy};
+use crate::physics::PhysicsWorld;
+use crate::robot::RobotBodyPartIndex;
+use crate::simulator_thread::{ControllerStrategy, start_physics_thread};
 use crate::spawn_utilities::{make_ground, make_pinned_ball};
 
 mod control_strategies;
@@ -25,6 +27,8 @@ mod robot;
 mod simulator_thread;
 mod spawn_utilities;
 mod sync_strategies;
+mod kinematics;
+mod simulation;
 
 extern crate array_init;
 extern crate kiss3d;
@@ -47,6 +51,7 @@ struct Opts {
     )]
     remote_control_port: Option<u16>,
 }
+
 
 fn main() {
     let opts: Opts = Opts::parse();
@@ -75,32 +80,6 @@ fn main() {
         }
     };
 
-    let (mut notifier, ws) = sync_strategies::continue_once_of_allowed();
 
-    let (_jh, pos_updates) = start_physics_thread(robot, tctrl, ws, physics);
-
-    let mut should_close = false;
-
-    // control_demos::control_gripper_demo(&mut physics, &robot, t);
-
-    // gradient_descent_control::gradient_descent_control(
-    //     &mut physics, &robot, &(target), &Unit::new_unchecked(Vector3::new(0.0, -1.0, 0.0)),
-    // );
-    // control_flailing_demo(&mut physics, &robot, t)
-    // control_robot_by_keys(&window,&mut physics,&robot);
-
-    while !should_close {
-        notifier();
-        should_close |= !graphics.draw_frame();
-
-        match pos_updates.recv_timeout(Duration::from_millis(100)) {
-            Ok(positions) => {
-                graphics.synchronize_physics_to_graphics(&positions);
-            }
-            Err(RecvTimeoutError::Timeout) => {
-                println!("Simulation thread taking more than 100ms last timestep.")
-            }
-            Err(RecvTimeoutError::Disconnected) => panic!("Physics thread possibly crashed."),
-        }
-    }
+    simulation::run_synced_to_graphics(&mut graphics, physics, robot, tctrl)
 }

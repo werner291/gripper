@@ -28,7 +28,7 @@ pub struct Graphics {
 }
 
 impl Graphics {
-    pub(crate) fn init() -> Graphics {
+    pub fn init() -> Graphics {
         let mut window = Window::new("Robotic Gripper");
         window.set_framerate_limit(Some(60));
         window.set_light(Light::StickToCamera);

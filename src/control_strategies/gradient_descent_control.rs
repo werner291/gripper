@@ -55,6 +55,7 @@ impl ControllerStrategy for GradientDescentController {
         physics: &PhysicsWorld,
         robot: &RobotBodyPartIndex,
     ) -> JointVelocities {
+
         let target_position = physics
             .bodies
             .rigid_body(self.target)
