@@ -1,3 +1,6 @@
+//! Module to ease loading meshes from STL files.
+//! Includes a few models that are included in the module,
+//! requiring no external files post-compilation.
 use std::fs::OpenOptions;
 use std::iter::Iterator;
 use std::option::Option::None;
@@ -13,6 +16,7 @@ pub const SWIVEL_STL: &str = include_str!("../scad/rotbase.stl");
 pub const GRIPPER_STL: &str = include_str!("../scad/gripper.stl");
 pub const PHALANX_STL: &str = include_str!("../scad/phalanx.stl");
 
+/// Parse a triangle mesh from a string of STL code.
 pub fn trimesh_from_stl_sr(src: &str) -> TriMesh<f32> {
     let mut c = std::io::Cursor::new(src);
     let stl = stl_io::read_stl(&mut c).unwrap();

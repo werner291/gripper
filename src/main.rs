@@ -23,7 +23,6 @@ mod simulator_thread;
 mod spawn_utilities;
 mod sync_strategies;
 mod kinematics;
-mod simulation;
 
 extern crate array_init;
 extern crate kiss3d;
@@ -75,5 +74,5 @@ fn main() {
     };
 
 
-    simulation::run_synced_to_graphics(&mut graphics, physics, robot, tctrl)
+    simulator_thread::run_synced_to_graphics(&mut graphics, physics, robot, tctrl)
 }

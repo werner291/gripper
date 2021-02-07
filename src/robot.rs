@@ -40,24 +40,6 @@ pub struct FingerJointMap<T> {
     pub finger_2_2: T,
 }
 
-pub const FINGERS_OPEN : FingerJointMap<f32> = FingerJointMap {
-    finger_0: 0.5,
-    finger_1: 0.5,
-    finger_2: 0.5,
-    finger_0_2: 0.5,
-    finger_1_2: 0.5,
-    finger_2_2: 0.5
-};
-
-pub const FINGERS_CLOSE : FingerJointMap<f32> = FingerJointMap {
-    finger_0: -0.5,
-    finger_1: -0.5,
-    finger_2: -0.5,
-    finger_0_2: -0.5,
-    finger_1_2: -0.5,
-    finger_2_2: -0.5
-};
-
 #[derive(Debug, Clone)]
 pub struct JointMap<T> {
     pub swivel: T,
@@ -102,16 +84,34 @@ impl ArmJointVelocities {
             .max(self.gripper.abs());
         if max > lim {
             Self {
-                swivel: self.swivel / max,
-                link1: self.link1 / max,
-                link2: self.link2 / max,
-                gripper: self.gripper / max,
+                swivel: lim * self.swivel / max,
+                link1: lim * self.link1 / max,
+                link2: lim * self.link2 / max,
+                gripper: lim * self.gripper / max,
             }
         } else {
             self
         }
     }
 }
+
+pub const FINGERS_OPEN : FingerJointMap<f32> = FingerJointMap {
+    finger_0: 0.5,
+    finger_1: 0.5,
+    finger_2: 0.5,
+    finger_0_2: 0.5,
+    finger_1_2: 0.5,
+    finger_2_2: 0.5
+};
+
+pub const FINGERS_CLOSE : FingerJointMap<f32> = FingerJointMap {
+    finger_0: -0.5,
+    finger_1: -0.5,
+    finger_2: -0.5,
+    finger_0_2: -0.5,
+    finger_1_2: -0.5,
+    finger_2_2: -0.5
+};
 
 pub const ZERO_JOINT_VELOCITIES: JointVelocities = JointVelocities {
     swivel: 0.0,
@@ -289,6 +289,9 @@ pub const FINGER_MIDDLE_JOINT_MAX_ANGLE: f32 = -0.1;
 
 /// Generates a Multibody of the robot, without colliders.
 fn make_multibody(physics: &mut PhysicsWorld) -> RobotBodyPartIndex {
+
+    // FIXMe Can this be done better? This really, truly is an awful lot of code.
+
     let joint = FixedJoint::new(Isometry3::identity());
 
     let mut base = MultibodyDesc::new(joint).name("base".to_string()).mass(1.0);
@@ -311,6 +314,7 @@ fn make_multibody(physics: &mut PhysicsWorld) -> RobotBodyPartIndex {
         Vector3::x(),
         "link1".to_string(),
     );
+
     let mut link2 = make_link(
         &mut link1,
         Vector3::new(0.0, LINK_LENGTH, 0.0),
