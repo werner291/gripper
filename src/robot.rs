@@ -21,8 +21,11 @@ use crate::graphics::Graphics;
 use crate::physics::PhysicsWorld;
 use crate::{load_mesh, multibody_util};
 use std::prelude::v1::Vec;
+use nphysics3d::nalgebra::{RealField, Vector4};
+use std::convert::{From, Into};
+use crate::multibody_util::get_joint;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct ArmJointMap<T> {
     pub swivel: T,
     pub link1: T,
@@ -68,6 +71,40 @@ impl<T> JointMap<T> {
             finger_1_2: finger.finger_1_2,
             finger_2_2: finger.finger_2_2,
         }
+    }
+}
+
+impl<N:RealField> From<Vector4<N>> for ArmJointMap<N> {
+    //noinspection RsBorrowChecker (IntelliJ, please fix your borrowcheck inspection)
+    fn from(v: Vector4<N>) -> Self {
+        ArmJointMap {
+            swivel: v[0],
+            link1: v[1],
+            link2: v[2],
+            gripper: v[3],
+        }
+    }
+}
+
+impl<N:RealField+Clone> From<&Vector4<N>> for ArmJointMap<N> {
+    fn from(v: &Vector4<N>) -> Self {
+        ArmJointMap {
+            swivel: v[0].clone(),
+            link1: v[1].clone(),
+            link2: v[2].clone(),
+            gripper: v[3].clone(),
+        }
+    }
+}
+
+impl<N:RealField> Into<Vector4<N>> for ArmJointMap<N> {
+    fn into(self) -> Vector4<N> {
+        Vector4::new(
+            self.swivel,
+            self.link1,
+            self.link2,
+            self.gripper
+        )
     }
 }
 
@@ -125,6 +162,15 @@ pub const ZERO_JOINT_VELOCITIES: JointVelocities = JointVelocities {
     finger_1_2: 0.0,
     finger_2_2: 0.0,
 };
+
+pub fn arm_joint_angles(physics: &PhysicsWorld, robot: &RobotBodyPartIndex) -> ArmJointMap<f32> {
+    ArmJointMap {
+        swivel: get_joint::<RevoluteJoint<f32>>(physics, robot.swivel).unwrap().angle(),
+        link1: get_joint::<RevoluteJoint<f32>>(physics, robot.link1).unwrap().angle(),
+        link2: get_joint::<RevoluteJoint<f32>>(physics, robot.link2).unwrap().angle(),
+        gripper: get_joint::<RevoluteJoint<f32>>(physics, robot.gripper).unwrap().angle()
+    }
+}
 
 /// A struct that contains the body handle and body part handle of the various parts of a robot.
 /// Note that each body part also has a name, should that be more convenient.

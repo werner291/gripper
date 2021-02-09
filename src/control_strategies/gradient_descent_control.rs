@@ -6,10 +6,10 @@ use std::vec::Vec;
 use nalgebra::{Point3, Unit, Vector3};
 use nphysics3d::algebra::Velocity3;
 use nphysics3d::joint::RevoluteJoint;
-use nphysics3d::object::{BodyPart, DefaultBodyHandle};
+use nphysics3d::object::{DefaultBodyHandle};
 use rand::Rng;
 
-use crate::multibody_util::{get_multibody_link, get_joint};
+use crate::multibody_util::{get_joint};
 use crate::physics::PhysicsWorld;
 
 use crate::robot::{ArmJointVelocities, JointVelocities, RobotBodyPartIndex, FINGERS_OPEN, FINGERS_CLOSE};

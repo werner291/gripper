@@ -1,4 +1,6 @@
-//! A module containing some utilities with respect to kinematics.
+//! A module containing some utilities with respect to kinematics,
+//! as well as a simplified datatype that represents kinematic models,
+//! a simplified representation of a robot.
 
 
 
@@ -22,11 +24,11 @@ use std::convert::{From, Into};
 /// A link in a KinematicModel, assumed to consist of an axis of rotation,
 /// as well as a translation, and max/min angles (which may be infinite).
 #[derive(Debug)]
-struct KinematicLink {
-    offset: Vector3<f32>,
-    axis: Unit<Vector3<f32>>,
-    min: f32,
-    max: f32,
+pub struct KinematicLink {
+    pub offset: Vector3<f32>,
+    pub axis: Unit<Vector3<f32>>,
+    pub min: f32,
+    pub max: f32,
 }
 
 /// A simple kinematic chain model, consisting of a single origin and a set of revolute links.
@@ -41,7 +43,7 @@ struct KinematicLink {
 pub struct KinematicModel {
     // The position of the first link with 0 angle.
     origin: Isometry3<f32>,
-    links: Vec<KinematicLink>,
+    pub links: Vec<KinematicLink>,
 }
 
 pub struct PredictedPositions {

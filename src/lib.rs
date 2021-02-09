@@ -9,5 +9,6 @@ pub mod simulator_thread;
 pub mod spawn_utilities;
 pub mod sync_strategies;
 pub mod kinematics;
+pub mod inverse_kinematics;
 
 extern crate nalgebra as na;

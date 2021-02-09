@@ -706,6 +706,7 @@ dependencies = [
  "nalgebra",
  "nphysics3d",
  "rand 0.8.3",
+ "splines",
  "stl_io",
 ]
 
@@ -1750,6 +1751,17 @@ dependencies = [
  "wayland-client",
  "wayland-cursor",
  "wayland-protocols",
+]
+
+[[package]]
+name = "splines"
+version = "3.5.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "922ec2e51791609cdcbc0ab24f00ea8648d17e4ec2f391e256cab701c2783dfa"
+dependencies = [
+ "nalgebra",
+ "num-traits",
+ "simba",
 ]
 
 [[package]]
