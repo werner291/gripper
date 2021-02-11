@@ -6,17 +6,22 @@ use std::prelude::v1::Vec;
 use kiss3d::light::Light;
 use kiss3d::scene::SceneNode;
 use kiss3d::window::Window;
+use kiss3d::resource::Mesh;
 use nalgebra::{Isometry3, Point3};
-use nphysics3d::object::DefaultBodyPartHandle;
 
+use nphysics3d::object::{DefaultBodyPartHandle, DefaultBodyHandle};
 use generational_arena::{Arena, Index};
 use std::collections::HashMap;
+use std::rc::Rc;
+use std::cell::RefCell;
+use crate::simulator_thread::PhysicsUpdate;
 
 /// Struct containing data necessary for visualisation of the simulation.
 pub struct Graphics {
     pub window: Window,
     /// A table that associates body parts to scene nodes, used to update position information.
     pub bp_to_sn: Vec<(SceneNode, DefaultBodyPartHandle)>,
+    pub fem_bodies: Vec<(SceneNode, DefaultBodyHandle, Rc<RefCell<Mesh>>)>,
     frames_drawn: u64,
     traces: Arena<Trace>,
 }
@@ -33,6 +38,7 @@ impl Graphics {
         Graphics {
             window,
             bp_to_sn: vec![],
+            fem_bodies: vec![],
             frames_drawn: 0,
             traces: Arena::new(),
         }
@@ -65,15 +71,30 @@ impl Graphics {
     /// usually once every update of the physics world.
     pub fn synchronize_physics_to_graphics(
         &mut self,
-        physics: &HashMap<DefaultBodyPartHandle, Isometry3<f32>>,
+        physics: &PhysicsUpdate,
     ) {
         for (sn, bph) in self.bp_to_sn.iter_mut() {
-            sn.set_local_transformation(physics[bph]);
+            sn.set_local_transformation(physics.positions[bph]);
         }
 
         for (_,tr) in self.traces.iter_mut() {
-            tr.update(physics);
+            tr.update(&physics.positions);
         }
+
+        for (sn, bh, mesh) in self.fem_bodies.iter_mut() {
+            let points = &physics.fvm_points[bh];
+
+            (*mesh).borrow_mut()
+                .coords()
+                .write()
+                .expect("Mesh was poisoned.")
+                .data_mut()
+                .as_mut()
+                .unwrap()
+                .splice(.., points.iter().map(|pt| pt.clone()).collect::<Vec<_>>());
+        }
+
+
     }
 }
 

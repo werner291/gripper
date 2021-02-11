@@ -19,8 +19,11 @@ array-init = "1.0.0"
 float-ord = "0.2.0"
 splines = { version="3.5.3", features=["impl-nalgebra"] }
 
+[dev-dependencies]
+treegen = { git = "https://github.com/werner291/apple-tree-generation.git", branch = "main" }
+
 [profile.dev]
-opt-level = 0
+opt-level = 2
 
 #[target.x86_64-pc-windows-gnu]
 #linker = "/usr/bin/x86_64-w64-mingw32-gcc"

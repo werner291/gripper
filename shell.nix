@@ -15,7 +15,7 @@ in
     ];
 
     buildInputs = [
-        rust glib gtk3 libGL cmake
+	rust glib gtk3 libGL cmake
     ];
 
     LD_LIBRARY_PATH = with pkgs.xlibs; "${pkgs.libGL}/lib";

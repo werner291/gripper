@@ -40,6 +40,34 @@ pub fn make_pinned_ball(
     (ball_sn, ball)
 }
 
+/// Spawns a new ball with a radius of 0.3 at (4.0, 1.0, 0.0).
+///
+/// The ball is stuck to a vertical axis that it cannot leave:
+/// it can only be moved along the Y-axis.
+pub fn make_ball(
+    physics: &mut PhysicsWorld,
+    graphics: &mut Graphics,
+) -> (SceneNode, DefaultBodyHandle) {
+    const RADIUS: f32 = 0.35;
+
+    let rb = RigidBodyDesc::new()
+        .translation(Vector3::new(3.0, RADIUS, 0.0))
+        .build();
+
+    let ball = physics.bodies.insert(rb);
+    physics.colliders.insert(
+        ColliderDesc::new(ShapeHandle::new(Ball::new(RADIUS)))
+            .density(0.5)
+            .build(BodyPartHandle(ball, 0)),
+    );
+    let ball_sn = graphics.window.add_sphere(RADIUS);
+    graphics
+        .bp_to_sn
+        .push((ball_sn.clone(), BodyPartHandle(ball, 0)));
+
+    (ball_sn, ball)
+}
+
 /// Spawns a ground plane.
 ///
 /// Note that while the visible geometry is finite, the physical actual plane extends to infinity.

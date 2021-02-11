@@ -8,7 +8,8 @@ use std::thread::JoinHandle;
 use std::time::Duration;
 
 use nalgebra::geometry::Isometry3;
-use nphysics3d::object::{BodyPartHandle, DefaultBodyHandle, DefaultBodyPartHandle};
+use nalgebra::Point3;
+use nphysics3d::object::{BodyPartHandle, DefaultBodyHandle, DefaultBodyPartHandle, FEMVolume};
 use nphysics3d::object::Body;
 
 use crate::control_strategies::ControllerStrategy;
@@ -18,9 +19,14 @@ use crate::physics::PhysicsWorld;
 use crate::robot::{JointVelocities, RobotBodyPartIndex};
 use crate::sync_strategies;
 use crate::sync_strategies::WaitStrategy;
+use std::prelude::v1::Vec;
+use std::option::Option::Some;
 
 /// Message sent from physics thread about the state of the world.
-pub type PhysicsUpdate = HashMap<DefaultBodyPartHandle, Isometry3<f32>>;
+pub struct PhysicsUpdate {
+    pub positions: HashMap<DefaultBodyPartHandle, Isometry3<f32>>,
+    pub fvm_points: HashMap<DefaultBodyHandle, Vec<Point3<f32>>>,
+}
 
 /// Run the "simulation" part of the simulator app, independently of the graphics thread.
 /// Returns the JoinHandle of the thread, as well a Receiver, which provides the position
@@ -94,21 +100,33 @@ pub fn apply_motor_speeds(
 }
 
 /// Take a snapshot of the Physics engine that can be safely sent to the graphics thread.
-fn snapshot_physics(physics: &PhysicsWorld) -> PhysicsUpdate {
-    // For every body,
-    physics
-        .bodies
-        .iter()
-        .flat_map(|(bh, body): (DefaultBodyHandle, &dyn Body<f32>)| {
-            // for every body part,
-            (0..body.num_parts()).map(move |i| {
-                // register the BodyPartHandle and world position,
-                let bph = BodyPartHandle(bh, i);
-                let pos = body.part(i).unwrap().position();
-                (bph, pos)
-            })
-        })
-        .collect() // then put them all in a HashMap for easy lookup.
+pub fn snapshot_physics(physics: &PhysicsWorld) -> PhysicsUpdate {
+
+    let mut pu = PhysicsUpdate {
+        positions: HashMap::new(),
+        fvm_points: HashMap::new(),
+    };
+
+    for (bh,body) in physics.bodies.iter() {
+
+        if let Some(fem_body) = body.downcast_ref::<FEMVolume<f32>>() {
+            let bm = fem_body.boundary_mesh().0;
+            let points = bm.points().into_iter().cloned().collect::<Vec<_>>();
+            pu.fvm_points.insert(bh, points);
+        }
+
+        for i in 0..body.num_parts() {
+            // register the BodyPartHandle and world position,
+            let bph = BodyPartHandle(bh, i);
+            let pos = body.part(i).unwrap().position();
+            pu.positions.insert(bph, pos);
+        }
+
+
+    }
+
+    pu
+
 }
 
 pub fn run_synced_to_graphics(graphics: &mut Graphics, physics: PhysicsWorld, robot: RobotBodyPartIndex, tctrl: Box<dyn ControllerStrategy>) {
