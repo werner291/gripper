@@ -18,6 +18,7 @@ use std::option::Option;
 use nphysics3d::ncollide3d::shape::{ShapeHandle, Ball};
 use nphysics3d::algebra::Velocity3;
 use nphysics3d::joint::BallConstraint;
+use std::iter::IntoIterator;
 
 fn make_branch_mesh() {
     let branch_origin = Point3::new(-2.0, 2.0, 2.0);
@@ -106,10 +107,10 @@ fn main() {
 
     p.joint_constraints.insert(stem);
 
-    g.bp_to_sn.push((g.window.add_mesh(
+    g.window.add_mesh(
         mesh.clone(),
         Vector3::new(1.0, 1.0, 1.0)
-    ), BodyPartHandle(fem_body_handle,0)));
+    );
 
 
     while g.draw_frame() {
