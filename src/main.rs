@@ -12,6 +12,7 @@ use graphics::Graphics;
 
 use crate::control_strategies::gradient_descent_control::GradientDescentController;
 use crate::spawn_utilities::{make_ground, make_pinned_ball};
+use crate::simulator_thread::apply_motor_speeds;
 
 mod control_strategies;
 mod graphics;
@@ -64,7 +65,7 @@ fn main() {
         graphics.enable_trace(robot.gripper, Isometry3::translation(0.0, 0.5, 0.0));
     }
 
-    let tctrl: Box<dyn ControllerStrategy> = match opts.remote_control_port {
+    let mut tctrl: Box<dyn ControllerStrategy> = match opts.remote_control_port {
         Option::None => Box::new(GradientDescentController::new(
             ball_bh,
         )),
@@ -73,6 +74,9 @@ fn main() {
         }
     };
 
+    simulator_thread::run_synced_to_graphics(graphics, physics, move |physics| {
+        let speeds = tctrl.apply_controller(physics, &robot);
 
-    simulator_thread::run_synced_to_graphics(&mut graphics, physics, robot, tctrl)
+        apply_motor_speeds(&robot, physics, speeds);
+    })
 }

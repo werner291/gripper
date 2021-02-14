@@ -3,8 +3,8 @@ extern crate gripper_experiment;
 
 use gripper_experiment::physics::PhysicsWorld;
 use gripper_experiment::graphics::Graphics;
-use gripper_experiment::spawn_utilities;
-use gripper_experiment::simulator_thread::snapshot_physics;
+use gripper_experiment::{spawn_utilities, robot};
+use gripper_experiment::simulator_thread::{snapshot_physics, run_synced_to_graphics};
 use nphysics3d::object::{FEMVolumeDesc, FEMVolume, RigidBodyDesc, ColliderDesc, BodyPartHandle, RigidBody, Body};
 use nalgebra::{Point3, Vector3, Isometry3};
 use std::vec::Vec;
@@ -19,6 +19,7 @@ use nphysics3d::ncollide3d::shape::{ShapeHandle, Ball};
 use nphysics3d::algebra::Velocity3;
 use nphysics3d::joint::BallConstraint;
 use std::iter::IntoIterator;
+
 
 fn make_branch_mesh() {
     let branch_origin = Point3::new(-2.0, 2.0, 2.0);
@@ -40,8 +41,6 @@ fn make_branch_mesh() {
 fn main() {
     let mut p = PhysicsWorld::new();
     let mut g = Graphics::init();
-
-
 
     let mut fem_body = FEMVolumeDesc::cube(4, 1, 1)
         .scale(Vector3::new(10.0, 0.5, 0.5))
@@ -107,20 +106,27 @@ fn main() {
 
     p.joint_constraints.insert(stem);
 
-    g.window.add_mesh(
+    let sn = g.window.add_mesh(
         mesh.clone(),
         Vector3::new(1.0, 1.0, 1.0)
     );
 
+    g.fem_bodies.push((sn, fem_body_handle, mesh));
 
-    while g.draw_frame() {
-        g.synchronize_physics_to_graphics(&snapshot_physics(&p));
+    let robot = robot::make_robot(&mut p, &mut g);
 
-        p.step();
+    run_synced_to_graphics(g, p, move |p| {
 
-        let fem_body: &FEMVolume<f32> = p.bodies.get(fem_body_handle).unwrap().downcast_ref::<FEMVolume<f32>>().unwrap();
-        let bm = fem_body.boundary_mesh().0;
-        (*mesh).borrow_mut().coords().write().expect("Mesh was poisoned.").data_mut().as_mut().unwrap().splice(.., bm.points().into_iter().cloned().collect::<Vec<_>>());
-    }
+    });
+
+    // while g.draw_frame() {
+    //     g.synchronize_physics_to_graphics(&snapshot_physics(&p));
+    //
+    //     p.step();
+    //
+    //     let fem_body: &FEMVolume<f32> = p.bodies.get(fem_body_handle).unwrap().downcast_ref::<FEMVolume<f32>>().unwrap();
+    //     let bm = fem_body.boundary_mesh().0;
+    //     (*mesh).borrow_mut().coords().write().expect("Mesh was poisoned.").data_mut().as_mut().unwrap().splice(.., bm.points().into_iter().cloned().collect::<Vec<_>>());
+    // }
 
 }

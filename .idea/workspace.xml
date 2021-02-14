@@ -18,14 +18,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="99bfd17e-0b5a-4a4c-b788-1095db1046ef" name="Default Changelist" comment="Cleaned up the GradientDescentController code to use the KinematicModel more explicitly.">
-      <change afterPath="$PROJECT_DIR$/examples/flexible_tree.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Cargo.lock" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shell.nix" beforeDir="false" afterPath="$PROJECT_DIR$/shell.nix" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/graphics.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/graphics.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/flexible_tree.rs" beforeDir="false" afterPath="$PROJECT_DIR$/examples/flexible_tree.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/simulator_thread.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/simulator_thread.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/spawn_utilities.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/spawn_utilities.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -85,7 +81,7 @@
       <recent name="$PROJECT_DIR$/src/control_strategies" />
     </key>
   </component>
-  <component name="RunManager" selected="Cargo.Run flexible_tree">
+  <component name="RunManager" selected="Cargo.run">
     <configuration name="Run flexible_tree" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
       <option name="command" value="run --package gripper_experiment --example flexible_tree" />
       <option name="workingDirectory" value="file://$PROJECT_DIR$" />
@@ -165,10 +161,10 @@
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Cargo.run" />
         <item itemvalue="Cargo.Run flexible_tree" />
         <item itemvalue="Cargo.run [gripper_experiment]" />
         <item itemvalue="Cargo.Test inverse_kinematics::tests" />
-        <item itemvalue="Cargo.run" />
         <item itemvalue="Cargo.run [gripper_experiment]" />
       </list>
     </recent_temporary>
@@ -257,11 +253,11 @@
       <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state x="469" y="299" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1/0.0.1440.900@0.0.1440.900" timestamp="1612906332185" />
-    <state x="144" y="71" key="DiffContextDialog" timestamp="1612712786982">
+    <state x="144" y="71" width="1152" height="720" key="DiffContextDialog" timestamp="1613334144906">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state x="144" y="68" key="DiffContextDialog/0.0.1440.864@0.0.1440.864" timestamp="1612205159361" />
-    <state x="144" y="71" key="DiffContextDialog/0.0.1440.900@0.0.1440.900" timestamp="1612712786982" />
+    <state x="144" y="71" width="1152" height="720" key="DiffContextDialog/0.0.1440.900@0.0.1440.900" timestamp="1613334144906" />
     <state x="508" y="194" width="424" height="491" key="FileChooserDialogImpl" timestamp="1613065373256">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
@@ -271,26 +267,26 @@
       <screen x="0" y="0" width="1440" height="864" />
     </state>
     <state x="0" y="0" key="FileDocumentManager.FileCacheConflict/0.0.1440.864@0.0.1440.864" timestamp="1611932380535" />
-    <state width="1394" height="224" key="GridCell.Tab.0.bottom" timestamp="1613073258935">
+    <state width="1394" height="223" key="GridCell.Tab.0.bottom" timestamp="1613333971126">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state width="1394" height="213" key="GridCell.Tab.0.bottom/0.0.1440.864@0.0.1440.864" timestamp="1612297058044" />
-    <state width="1394" height="224" key="GridCell.Tab.0.bottom/0.0.1440.900@0.0.1440.900" timestamp="1613073258935" />
-    <state width="1394" height="224" key="GridCell.Tab.0.center" timestamp="1613073258935">
+    <state width="1394" height="223" key="GridCell.Tab.0.bottom/0.0.1440.900@0.0.1440.900" timestamp="1613333971126" />
+    <state width="1394" height="223" key="GridCell.Tab.0.center" timestamp="1613333971126">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state width="1394" height="213" key="GridCell.Tab.0.center/0.0.1440.864@0.0.1440.864" timestamp="1612297058043" />
-    <state width="1394" height="224" key="GridCell.Tab.0.center/0.0.1440.900@0.0.1440.900" timestamp="1613073258935" />
-    <state width="1394" height="224" key="GridCell.Tab.0.left" timestamp="1613073258935">
+    <state width="1394" height="223" key="GridCell.Tab.0.center/0.0.1440.900@0.0.1440.900" timestamp="1613333971126" />
+    <state width="1394" height="223" key="GridCell.Tab.0.left" timestamp="1613333971126">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state width="1394" height="213" key="GridCell.Tab.0.left/0.0.1440.864@0.0.1440.864" timestamp="1612297058042" />
-    <state width="1394" height="224" key="GridCell.Tab.0.left/0.0.1440.900@0.0.1440.900" timestamp="1613073258935" />
-    <state width="1394" height="224" key="GridCell.Tab.0.right" timestamp="1613073258935">
+    <state width="1394" height="223" key="GridCell.Tab.0.left/0.0.1440.900@0.0.1440.900" timestamp="1613333971126" />
+    <state width="1394" height="223" key="GridCell.Tab.0.right" timestamp="1613333971126">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state width="1394" height="213" key="GridCell.Tab.0.right/0.0.1440.864@0.0.1440.864" timestamp="1612297058044" />
-    <state width="1394" height="224" key="GridCell.Tab.0.right/0.0.1440.900@0.0.1440.900" timestamp="1613073258935" />
+    <state width="1394" height="223" key="GridCell.Tab.0.right/0.0.1440.900@0.0.1440.900" timestamp="1613333971126" />
     <state x="144" y="72" key="MergeDialog" timestamp="1612371589541">
       <screen x="0" y="0" width="1440" height="900" />
     </state>

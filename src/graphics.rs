@@ -81,7 +81,7 @@ impl Graphics {
             tr.update(&physics.positions);
         }
 
-        for (sn, bh, mesh) in self.fem_bodies.iter_mut() {
+        for (_sn, bh, mesh) in self.fem_bodies.iter_mut() {
             let points = &physics.fvm_points[bh];
 
             (*mesh).borrow_mut()
