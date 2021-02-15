@@ -5,7 +5,7 @@ use std::rc::Rc;
 
 use kiss3d::resource::Mesh;
 use kiss3d::scene::SceneNode;
-use nalgebra::{Point3, Translation3, Unit, Vector3};
+use nalgebra::{Point3, Unit, Vector3};
 use nphysics3d::ncollide3d::shape::{Ball, Plane, ShapeHandle};
 use nphysics3d::object::{Body, DefaultBodyHandle, FEMVolume, FEMVolumeDesc};
 use nphysics3d::{

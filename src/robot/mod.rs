@@ -6,24 +6,24 @@
 use std::clone::Clone;
 use std::iter::Iterator;
 use std::option::Option;
-use std::result::Result::{Err, Ok};
 
-use kiss3d::ncollide3d::procedural::TriMesh;
-use kiss3d::ncollide3d::shape::{ConvexHull, ShapeHandle};
-use kiss3d::resource::{MaterialManager, Mesh, TextureManager};
-use kiss3d::scene::{Object, SceneNode};
-use na::{Isometry3, Rotation3, Unit, Vector3};
-use nphysics3d::joint::{FixedJoint, RevoluteJoint};
-use nphysics3d::nalgebra::{RealField, Vector4};
+
+
+
+
+
+use na::{Vector3};
+use nphysics3d::joint::{RevoluteJoint};
+
 use nphysics3d::object::{
     BodyPartHandle, ColliderDesc, DefaultBodyHandle, DefaultBodyPartHandle, DefaultColliderHandle,
     MultibodyDesc,
 };
 
-use joint_map::{ArmJointMap, FingerJointMap, JointMap};
+use joint_map::{ArmJointMap, FingerJointMap};
 
-use crate::{load_mesh, multibody_util};
-use crate::graphics::Graphics;
+use crate::{multibody_util};
+
 use crate::kinematics::KinematicModel;
 use crate::multibody_util::get_joint;
 use crate::physics::PhysicsWorld;

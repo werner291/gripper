@@ -1,27 +1,27 @@
 extern crate gripper_experiment;
 
-use std::borrow::BorrowMut;
-use std::cell::RefCell;
+
+
 use std::clone::Clone;
 use std::convert::{Into, TryInto};
-use std::f32::consts::PI;
-use std::iter::IntoIterator;
-use std::marker::Sized;
-use std::option::Option;
-use std::option::Option::{None, Some};
-use std::rc::Rc;
-use std::vec::Vec;
+
+
+
+
+use std::option::Option::{Some};
+
+
 
 use float_ord::FloatOrd;
-use kiss3d::resource::Mesh;
+
 use kiss3d::scene::SceneNode;
 use nalgebra::{distance_squared, Isometry3, Point3, Translation3, Vector3};
-use nphysics3d::algebra::Velocity3;
-use nphysics3d::joint::{BallConstraint, RevoluteJoint};
+
+use nphysics3d::joint::{BallConstraint};
 use nphysics3d::ncollide3d::shape::{Ball, ShapeHandle};
 use nphysics3d::object::{
     Body, BodyPartHandle, BodySet, BodyStatus, ColliderDesc, DefaultBodyHandle,
-    DefaultColliderHandle, FEMVolume, FEMVolumeDesc, RigidBody, RigidBodyDesc,
+    DefaultColliderHandle, FEMVolume, RigidBodyDesc,
 };
 
 use gripper_experiment::control_strategies::gradient_descent_control::grabbed;
@@ -30,19 +30,19 @@ use gripper_experiment::graphics::Graphics;
 use gripper_experiment::inverse_kinematics;
 use gripper_experiment::inverse_kinematics::BestAttempt;
 use gripper_experiment::kinematics::KinematicModel;
-use gripper_experiment::multibody_util::*;
+
 use gripper_experiment::physics::PhysicsWorld;
 use gripper_experiment::robot::joint_map::{ArmJointMap, JointMap, JointVelocities};
-use gripper_experiment::robot::{joint_map, spawn, GripperDirection, RobotBodyPartIndex};
+use gripper_experiment::robot::{joint_map, spawn, RobotBodyPartIndex};
 use gripper_experiment::simulator_thread::{
-    apply_motor_speeds, run_synced_to_graphics, snapshot_physics,
+    apply_motor_speeds, run_synced_to_graphics,
 };
 use gripper_experiment::{robot, spawn_utilities};
 
 use crate::ControllerState::{BringingToTarget, Grabbing, Idle};
 
 fn make_branch_mesh() {
-    let branch_origin = Point3::new(-2.0, 2.0, 2.0);
+    let _branch_origin = Point3::new(-2.0, 2.0, 2.0);
 
     // let branch_direction = Vector3::new(1.0, 0.0, 0.0);
     //
@@ -71,7 +71,7 @@ fn main() {
 
     let robot = spawn::make_robot(&mut p, &mut g);
 
-    let (target_sn, target_bh, target_ch) =
+    let (_target_sn, target_bh, _target_ch) =
         add_apple_collection_target(&mut p, &mut g, Point3::new(-2.0, 0.0, -2.0));
     let receptacle_position =
         p.bodies.rigid_body(target_bh).unwrap().position() * Point3::new(0.0, 0.0, 0.0);

@@ -5,6 +5,7 @@ use std::boxed::Box;
 use nalgebra::{Point3, Vector3};
 
 use gripper_experiment::control_strategies::to_angles::ApproachAngles;
+use gripper_experiment::control_strategies::ControllerStrategy;
 use gripper_experiment::graphics::Graphics;
 use gripper_experiment::inverse_kinematics::gradient_guided_planner;
 use gripper_experiment::kinematics::KinematicModel;
@@ -14,6 +15,7 @@ use gripper_experiment::robot::joint_map::ArmJointMap;
 use gripper_experiment::robot::spawn;
 use gripper_experiment::simulator_thread;
 use gripper_experiment::spawn_utilities::{make_ground, make_pinned_ball};
+use std::option::Option::None;
 
 fn main() {
     let mut graphics = Graphics::init();
@@ -37,9 +39,9 @@ fn main() {
         Vector3::new(0.0, 1.0, 0.0),
     );
 
-    let inv_k = gradient_guided_planner(&km, &target_pos, &target_heading, 100, 1000).unwrap();
+    let inv_k = gradient_guided_planner(&km, &target_pos, &target_heading, 100, 1000, None).unwrap();
 
-    let ctrl = ApproachAngles {
+    let mut ctrl = ApproachAngles {
         angles: ArmJointMap {
             swivel: inv_k[0],
             link1: inv_k[1],
@@ -50,5 +52,7 @@ fn main() {
 
     dbg!(&ctrl.angles);
 
-    simulator_thread::run_synced_to_graphics(&mut graphics, physics, robot, Box::new(ctrl))
+    simulator_thread::run_synced_to_graphics(graphics, physics, move |physics| {
+        simulator_thread::apply_motor_speeds(&robot, physics, ctrl.apply_controller(physics, &robot));
+    });
 }
