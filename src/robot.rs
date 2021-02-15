@@ -112,6 +112,17 @@ impl<N:RealField> Into<Vector4<N>> for ArmJointMap<N> {
     }
 }
 
+impl<N:RealField> Into<[N; 4]> for ArmJointMap<N> {
+    fn into(self) -> [N; 4] {
+        [
+            self.swivel,
+            self.link1,
+            self.link2,
+            self.gripper
+        ]
+    }
+}
+
 #[derive(Debug)]
 pub struct WrongLengthError;
 impl<T:Clone> TryFrom<&[T]> for ArmJointMap<T> {
@@ -572,6 +583,6 @@ pub fn revolute_joint_angle(physics: &PhysicsWorld, part_handle: DefaultBodyPart
         .map(RevoluteJoint::angle)
 }
 
-pub fn kinematic_model_from_robot(p: &mut PhysicsWorld, robot: &RobotBodyPartIndex) -> KinematicModel {
-    KinematicModel::from_multibody(&p, robot.base, &[robot.swivel, robot.link1, robot.link2, robot.gripper], Vector3::new(0.0, 1.0, 0.0))
+pub fn kinematic_model_from_robot(p: &PhysicsWorld, robot: &RobotBodyPartIndex) -> KinematicModel {
+    KinematicModel::from_multibody(p, robot.base, &[robot.swivel, robot.link1, robot.link2, robot.gripper], Vector3::new(0.0, 1.0, 0.0))
 }

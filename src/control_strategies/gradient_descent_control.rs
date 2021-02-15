@@ -170,7 +170,7 @@ impl GradientDescentController {
     }
 }
 
-fn grabbed(physics: &PhysicsWorld, robot: &RobotBodyPartIndex, target: DefaultBodyHandle) -> bool {
+pub fn grabbed(physics: &PhysicsWorld, robot: &RobotBodyPartIndex, target: DefaultBodyHandle) -> bool {
     let mut normals = Vec::new();
 
     for fc in robot.gripper_colliders().iter() {
