@@ -4,14 +4,15 @@ use std::marker::Send;
 use std::prelude::v1::FnMut;
 
 use crate::physics::PhysicsWorld;
-use crate::robot::{JointVelocities, RobotBodyPartIndex};
+use crate::robot::joint_map::JointVelocities;
+use crate::robot::RobotBodyPartIndex;
 
 pub mod demo_flailing;
 pub mod gradient_descent_control;
 pub mod keyboard_control;
+pub mod path_controller;
 pub mod tcp_controller;
 pub mod to_angles;
-pub mod path_controller;
 
 /// A trait implemented by types that express a method for controlling the default robot arm.
 pub trait ControllerStrategy: Send + 'static {

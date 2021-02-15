@@ -1,10 +1,10 @@
 //! Amodule containing a dummy controller that simply makes the default robot arm
 //! flail around semi-randomly for testing and deomonstration purposes.
 
-use crate::physics::PhysicsWorld;
 use crate::control_strategies::ControllerStrategy;
-
-use crate::robot::{JointVelocities, RobotBodyPartIndex};
+use crate::physics::PhysicsWorld;
+use crate::robot::joint_map::JointVelocities;
+use crate::robot::RobotBodyPartIndex;
 
 /// A dummy controller that simply sends a sine wave into the motor speed controllers.
 pub struct FlailController {

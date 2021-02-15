@@ -1,7 +1,12 @@
 use std::collections::HashMap;
 use std::iter::Iterator;
+use std::marker::Send;
+use std::ops::FnMut;
+use std::option::Option::Some;
+use std::prelude::v1::Vec;
 use std::result::Result::{Err, Ok};
 use std::sync::mpsc::{channel, RecvTimeoutError};
+use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::Duration;
 
@@ -12,13 +17,9 @@ use nphysics3d::object::{BodyPartHandle, DefaultBodyHandle, DefaultBodyPartHandl
 use crate::graphics::Graphics;
 use crate::multibody_util::set_motor_speed;
 use crate::physics::PhysicsWorld;
-use crate::robot::{JointVelocities, RobotBodyPartIndex};
+use crate::robot::joint_map::JointVelocities;
+use crate::robot::RobotBodyPartIndex;
 use crate::sync_strategies;
-use std::prelude::v1::Vec;
-use std::option::Option::Some;
-use std::marker::Send;
-use std::ops::FnMut;
-use std::sync::{Mutex, Arc};
 
 /// Message sent from physics thread about the state of the world.
 pub struct PhysicsUpdate {
@@ -45,14 +46,12 @@ pub fn apply_motor_speeds(
 
 /// Take a snapshot of the Physics engine that can be safely sent to the graphics thread.
 pub fn snapshot_physics(physics: &PhysicsWorld) -> PhysicsUpdate {
-
     let mut pu = PhysicsUpdate {
         positions: HashMap::new(),
         fvm_points: HashMap::new(),
     };
 
-    for (bh,body) in physics.bodies.iter() {
-
+    for (bh, body) in physics.bodies.iter() {
         if let Some(fem_body) = body.downcast_ref::<FEMVolume<f32>>() {
             let bm = fem_body.boundary_mesh().0;
             let points = bm.points().into_iter().cloned().collect::<Vec<_>>();
@@ -65,26 +64,30 @@ pub fn snapshot_physics(physics: &PhysicsWorld) -> PhysicsUpdate {
             let pos = body.part(i).unwrap().position();
             pu.positions.insert(bph, pos);
         }
-
-
     }
 
     pu
-
 }
 
-pub fn run_synced_to_graphics<Cb>(mut graphics: Graphics, mut physics_world: PhysicsWorld, mut callback: Cb)
-    where Cb : FnMut(&mut PhysicsWorld) + Send + 'static {
-
+pub fn run_synced_to_graphics<Cb>(
+    mut graphics: Graphics,
+    mut physics_world: PhysicsWorld,
+    mut callback: Cb,
+) where
+    Cb: FnMut(&mut PhysicsWorld) + Send + 'static,
+{
     let (mut notifier, ws) = sync_strategies::continue_once_of_allowed();
 
     let should_stop = Arc::new(Mutex::new(false));
-    let should_stop_clone : Arc<Mutex<bool>> = should_stop.clone();
+    let should_stop_clone: Arc<Mutex<bool>> = should_stop.clone();
 
     let mut wait_strategy = ws;
     let (snd, pos_updates) = channel();
     let join = thread::spawn(move || {
-        while !(*(*should_stop_clone).lock().expect("Should-stop mutex poisoned.")) {
+        while !(*(*should_stop_clone)
+            .lock()
+            .expect("Should-stop mutex poisoned."))
+        {
             // Apply the waiting strategy, e.g. to synchronize with the graphics thread without blocking it.
             wait_strategy();
 
@@ -96,7 +99,6 @@ pub fn run_synced_to_graphics<Cb>(mut graphics: Graphics, mut physics_world: Phy
             // Update any interested parties in the positions of the various body parts.
             snd.send(snapshot_physics(&physics_world)).unwrap()
         }
-
     });
 
     while !(*(*should_stop).lock().expect("Should-stop mutex poisoned.")) {
@@ -116,5 +118,4 @@ pub fn run_synced_to_graphics<Cb>(mut graphics: Graphics, mut physics_world: Phy
 
     notifier(); // Wake up the physics thread so that it can be terminated.
     join.join().expect("Physics thread join failed.")
-
 }

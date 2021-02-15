@@ -1,285 +1,27 @@
+//! Utilities related to spawning the standard robotic arm.
+
 use std::cell::RefCell;
 use std::clone::Clone;
-use std::convert::{From, Into, TryFrom};
 use std::f32::consts::{FRAC_PI_2, PI};
-use std::iter::Iterator;
 use std::option::Option::{None, Some};
 use std::prelude::v1::Vec;
 use std::rc::Rc;
 use std::string::{String, ToString};
 
-use kiss3d::ncollide3d::na::{Isometry3, Rotation3, Unit, Vector3};
-use kiss3d::ncollide3d::procedural::TriMesh;
-use kiss3d::ncollide3d::shape::{ConvexHull, ShapeHandle};
 use kiss3d::resource::{MaterialManager, Mesh, TextureManager};
 use kiss3d::scene::{Object, SceneNode};
+use na::{Isometry3, Rotation3, Unit, Vector3};
+use ncollide3d::procedural::TriMesh;
+use ncollide3d::shape::{ConvexHull, ShapeHandle};
 use nphysics3d::joint::{FixedJoint, RevoluteJoint};
-use nphysics3d::nalgebra::{RealField, Vector4};
 use nphysics3d::object::{
-    BodyPartHandle, ColliderDesc, DefaultBodyHandle, DefaultBodyPartHandle, DefaultColliderHandle,
-    MultibodyDesc,
+    BodyPartHandle, ColliderDesc, DefaultBodyPartHandle, DefaultColliderHandle, MultibodyDesc,
 };
 
-use crate::{load_mesh, multibody_util};
 use crate::graphics::Graphics;
-use crate::kinematics::KinematicModel;
-use crate::multibody_util::get_joint;
+use crate::load_mesh;
 use crate::physics::PhysicsWorld;
-use std::option::Option;
-use std::result::Result;
-use std::result::Result::{Ok, Err};
-
-#[derive(Debug, Clone, Copy)]
-pub struct ArmJointMap<T> {
-    pub swivel: T,
-    pub link1: T,
-    pub link2: T,
-    pub gripper: T,
-}
-
-#[derive(Debug, Clone)]
-pub struct FingerJointMap<T> {
-    pub finger_0: T,
-    pub finger_1: T,
-    pub finger_2: T,
-    pub finger_0_2: T,
-    pub finger_1_2: T,
-    pub finger_2_2: T,
-}
-
-#[derive(Debug, Clone)]
-pub struct JointMap<T> {
-    pub swivel: T,
-    pub link1: T,
-    pub link2: T,
-    pub gripper: T,
-    pub finger_0: T,
-    pub finger_1: T,
-    pub finger_2: T,
-    pub finger_0_2: T,
-    pub finger_1_2: T,
-    pub finger_2_2: T,
-}
-
-impl<T> JointMap<T> {
-    pub fn from_arm_and_finger(arm: ArmJointMap<T>, finger: FingerJointMap<T>) -> JointMap<T> {
-        JointMap {
-            swivel: arm.swivel,
-            link1: arm.link1,
-            link2: arm.link2,
-            gripper: arm.gripper,
-            finger_0: finger.finger_0,
-            finger_1: finger.finger_1,
-            finger_2: finger.finger_2,
-            finger_0_2: finger.finger_0_2,
-            finger_1_2: finger.finger_1_2,
-            finger_2_2: finger.finger_2_2,
-        }
-    }
-}
-
-impl<N:RealField> From<Vector4<N>> for ArmJointMap<N> {
-    //noinspection RsBorrowChecker (IntelliJ, please fix your borrowcheck inspection)
-    fn from(v: Vector4<N>) -> Self {
-        ArmJointMap {
-            swivel: v[0],
-            link1: v[1],
-            link2: v[2],
-            gripper: v[3],
-        }
-    }
-}
-
-impl<N:RealField+Clone> From<&Vector4<N>> for ArmJointMap<N> {
-    fn from(v: &Vector4<N>) -> Self {
-        ArmJointMap {
-            swivel: v[0].clone(),
-            link1: v[1].clone(),
-            link2: v[2].clone(),
-            gripper: v[3].clone(),
-        }
-    }
-}
-
-impl<N:RealField> Into<Vector4<N>> for ArmJointMap<N> {
-    fn into(self) -> Vector4<N> {
-        Vector4::new(
-            self.swivel,
-            self.link1,
-            self.link2,
-            self.gripper
-        )
-    }
-}
-
-impl<N:RealField> Into<[N; 4]> for ArmJointMap<N> {
-    fn into(self) -> [N; 4] {
-        [
-            self.swivel,
-            self.link1,
-            self.link2,
-            self.gripper
-        ]
-    }
-}
-
-#[derive(Debug)]
-pub struct WrongLengthError;
-impl<T:Clone> TryFrom<&[T]> for ArmJointMap<T> {
-    type Error = WrongLengthError;
-
-    fn try_from(value: &[T]) -> Result<Self, WrongLengthError> {
-        if value.len() == 4 {
-            Ok(Self {
-                swivel: value[0].clone(),
-                link1: value[1].clone(),
-                link2: value[2].clone(),
-                gripper: value[3].clone()
-            })
-        } else {
-            Err(WrongLengthError)
-        }
-    }
-}
-
-pub type JointVelocities = JointMap<f32>;
-pub type ArmJointVelocities = ArmJointMap<f32>;
-
-impl ArmJointVelocities {
-    pub fn limit_to_safe(self, lim: f32) -> ArmJointVelocities {
-        let max = self
-            .swivel
-            .abs()
-            .max(self.link1.abs())
-            .max(self.link2.abs())
-            .max(self.gripper.abs());
-        if max > lim {
-            Self {
-                swivel: lim * self.swivel / max,
-                link1: lim * self.link1 / max,
-                link2: lim * self.link2 / max,
-                gripper: lim * self.gripper / max,
-            }
-        } else {
-            self
-        }
-    }
-}
-
-pub const FINGERS_OPEN : FingerJointMap<f32> = FingerJointMap {
-    finger_0: 0.5,
-    finger_1: 0.5,
-    finger_2: 0.5,
-    finger_0_2: 0.5,
-    finger_1_2: 0.5,
-    finger_2_2: 0.5
-};
-
-pub const FINGERS_CLOSE : FingerJointMap<f32> = FingerJointMap {
-    finger_0: -0.5,
-    finger_1: -0.5,
-    finger_2: -0.5,
-    finger_0_2: -0.5,
-    finger_1_2: -0.5,
-    finger_2_2: -0.5
-};
-
-pub const ZERO_JOINT_VELOCITIES: JointVelocities = JointVelocities {
-    swivel: 0.0,
-    link1: 0.0,
-    link2: 0.0,
-    gripper: 0.0,
-    finger_0: 0.0,
-    finger_1: 0.0,
-    finger_2: 0.0,
-    finger_0_2: 0.0,
-    finger_1_2: 0.0,
-    finger_2_2: 0.0,
-};
-
-pub fn arm_joint_angles(physics: &PhysicsWorld, robot: &RobotBodyPartIndex) -> ArmJointMap<f32> {
-    ArmJointMap {
-        swivel: get_joint::<RevoluteJoint<f32>>(physics, robot.swivel).unwrap().angle(),
-        link1: get_joint::<RevoluteJoint<f32>>(physics, robot.link1).unwrap().angle(),
-        link2: get_joint::<RevoluteJoint<f32>>(physics, robot.link2).unwrap().angle(),
-        gripper: get_joint::<RevoluteJoint<f32>>(physics, robot.gripper).unwrap().angle()
-    }
-}
-
-/// A struct that contains the body handle and body part handle of the various parts of a robot.
-/// Note that each body part also has a name, should that be more convenient.
-#[derive(Debug)]
-pub struct RobotBodyPartIndex {
-    pub body: DefaultBodyHandle,
-    pub base: DefaultBodyPartHandle,
-    pub swivel: DefaultBodyPartHandle,
-    pub link1: DefaultBodyPartHandle,
-    pub link2: DefaultBodyPartHandle,
-
-    pub gripper: DefaultBodyPartHandle,
-    pub gripper_collider: DefaultColliderHandle,
-
-    pub finger_0: DefaultBodyPartHandle,
-    pub finger_0_collider: DefaultColliderHandle,
-    pub finger_1: DefaultBodyPartHandle,
-    pub finger_1_collider: DefaultColliderHandle,
-    pub finger_2: DefaultBodyPartHandle,
-
-    pub finger_2_collider: DefaultColliderHandle,
-    pub finger_0_2: DefaultBodyPartHandle,
-    pub finger_0_2_collider: DefaultColliderHandle,
-    pub finger_1_2: DefaultBodyPartHandle,
-    pub finger_1_2_collider: DefaultColliderHandle,
-    pub finger_2_2: DefaultBodyPartHandle,
-    pub finger_2_2_collider: DefaultColliderHandle,
-}
-
-impl RobotBodyPartIndex {
-    /// Provides an array of body part handles that correspond to parts
-    /// that have a motorized revolute joint.
-    ///
-    /// Also provides a canonical mapping for motors to numerical channels.
-    pub fn motor_parts(&self) -> [DefaultBodyPartHandle; 10] {
-        [
-            self.swivel,
-            self.link1,
-            self.link2,
-            self.gripper,
-            self.finger_0,
-            self.finger_1,
-            self.finger_2,
-            self.finger_0_2,
-            self.finger_1_2,
-            self.finger_0_2,
-        ]
-    }
-
-    /// Array of motors that control the robot's fingers.
-    ///
-    /// Setting a positive speed on these opens the gripper, a negative speed closes them.
-    pub fn finger_parts(&self) -> [DefaultBodyPartHandle; 6] {
-        [
-            self.finger_0,
-            self.finger_1,
-            self.finger_2,
-            self.finger_0_2,
-            self.finger_1_2,
-            self.finger_2_2,
-        ]
-    }
-
-    pub fn gripper_colliders(&self) -> [DefaultColliderHandle; 7] {
-        [
-            self.gripper_collider,
-            self.finger_0_collider,
-            self.finger_1_collider,
-            self.finger_2_collider,
-            self.finger_0_2_collider,
-            self.finger_1_2_collider,
-            self.finger_2_2_collider,
-        ]
-    }
-}
+use crate::robot::RobotBodyPartIndex;
 
 /// Build a physical and visible robot.
 pub fn make_robot(physics: &mut PhysicsWorld, graphics: &mut Graphics) -> RobotBodyPartIndex {
@@ -369,7 +111,6 @@ pub const FINGER_MIDDLE_JOINT_MAX_ANGLE: f32 = -0.1;
 
 /// Generates a Multibody of the robot, without colliders.
 fn make_multibody(physics: &mut PhysicsWorld) -> RobotBodyPartIndex {
-
     // FIXMe Can this be done better? This really, truly is an awful lot of code.
 
     let joint = FixedJoint::new(Isometry3::identity());
@@ -538,51 +279,4 @@ fn wrap_transformed_trimesh(trimesh: TriMesh<f32>, transform: Isometry3<f32>) ->
     let mut sn = SceneNode::new(Vector3::new(1.0, 1.0, 1.0), Isometry3::identity(), None);
     sn.add_child(local_sn);
     sn
-}
-
-#[derive(Clone, Copy)]
-pub enum GripperDirection {
-    Open,
-    Closed,
-}
-
-pub fn set_gripper_direction(
-    physics: &mut PhysicsWorld,
-    bdi: &RobotBodyPartIndex,
-    dir: GripperDirection,
-) {
-    for bp in bdi.finger_parts().iter() {
-        multibody_util::set_motor_speed(
-            physics,
-            *bp,
-            match dir {
-                GripperDirection::Open => 1.0,
-                GripperDirection::Closed => -1.0,
-            },
-        );
-    }
-}
-
-/// Extract the joint angles of every finger part of the robot.
-pub fn gripper_finger_angles(
-    physics: &PhysicsWorld,
-    robot: &RobotBodyPartIndex,
-) -> FingerJointMap<f32> {
-    FingerJointMap {
-        finger_0: revolute_joint_angle(physics, robot.finger_0).unwrap(),
-        finger_1: revolute_joint_angle(physics, robot.finger_1).unwrap(),
-        finger_2: revolute_joint_angle(physics, robot.finger_2).unwrap(),
-        finger_0_2: revolute_joint_angle(physics, robot.finger_0_2).unwrap(),
-        finger_1_2: revolute_joint_angle(physics, robot.finger_1_2).unwrap(),
-        finger_2_2: revolute_joint_angle(physics, robot.finger_2_2).unwrap(),
-    }
-}
-
-pub fn revolute_joint_angle(physics: &PhysicsWorld, part_handle: DefaultBodyPartHandle) -> Option<f32> {
-    multibody_util::get_joint::<RevoluteJoint<f32>>(physics, part_handle)
-        .map(RevoluteJoint::angle)
-}
-
-pub fn kinematic_model_from_robot(p: &PhysicsWorld, robot: &RobotBodyPartIndex) -> KinematicModel {
-    KinematicModel::from_multibody(p, robot.base, &[robot.swivel, robot.link1, robot.link2, robot.gripper], Vector3::new(0.0, 1.0, 0.0))
 }

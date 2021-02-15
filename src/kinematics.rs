@@ -2,24 +2,21 @@
 //! as well as a simplified datatype that represents kinematic models,
 //! a simplified representation of a robot.
 
-
-
 use std::prelude::v1::{Iterator, Vec};
 
-use na::{Isometry3, Unit, Vector3, Vector6, Point3, Matrix3xX, Matrix6xX, Translation3};
+use na::{Isometry3, Matrix3xX, Matrix6xX, Point3, Translation3, Unit, Vector3, Vector6};
 use nphysics3d::joint::RevoluteJoint;
 use nphysics3d::object::{BodyPart, DefaultBodyPartHandle};
 use rand::prelude::ThreadRng;
 use rand::Rng;
 
-use crate::multibody_util::{get_multibody_link, get_joint};
+use crate::multibody_util::{get_joint, get_multibody_link};
 use crate::physics::PhysicsWorld;
 use nphysics3d::algebra::Velocity3;
-use std::iter::IntoIterator;
-use std::option::Option::Some;
-use std::option::Option;
 use std::convert::{From, Into};
-
+use std::iter::IntoIterator;
+use std::option::Option;
+use std::option::Option::Some;
 
 /// A link in a KinematicModel, assumed to consist of an axis of rotation,
 /// as well as a translation, and max/min angles (which may be infinite).
@@ -52,7 +49,6 @@ pub struct PredictedPositions {
 }
 
 impl KinematicModel {
-
     /// Predict global the tip position of every kinematic link.
     pub fn predict(&self, angles: &[f32]) -> PredictedPositions {
         let mut last_tip_position = self.origin.clone();
@@ -60,7 +56,8 @@ impl KinematicModel {
         let mut base_positions = Vec::new();
 
         for (a, l) in angles.iter().zip(self.links.iter()) {
-            let base_pos = last_tip_position * Isometry3::new(Vector3::new(0.0, 0.0, 0.0), l.axis.into_inner() * *a);
+            let base_pos = last_tip_position
+                * Isometry3::new(Vector3::new(0.0, 0.0, 0.0), l.axis.into_inner() * *a);
             last_tip_position = base_pos * Translation3::from(l.offset);
             base_positions.push(base_pos);
         }
@@ -95,75 +92,123 @@ impl KinematicModel {
     ///
     pub fn velocity_gradients(&self, angles: &[f32]) -> Vec<Velocity3<f32>> {
         let PredictedPositions {
-            link_base_positions, tip_position
+            link_base_positions,
+            tip_position,
         } = self.predict(angles);
 
         let end_position = tip_position.translation.vector.into();
 
-        angles.iter().enumerate().map(|(i, _a)| {
-            // Global point at the center of the joint.
-            let link_position = link_base_positions[i] * Point3::new(0.0, 0.0, 0.0);
+        angles
+            .iter()
+            .enumerate()
+            .map(|(i, _a)| {
+                // Global point at the center of the joint.
+                let link_position = link_base_positions[i] * Point3::new(0.0, 0.0, 0.0);
 
-            // A vector from the center of the joint to the point inside the gripper.
-            let toward_end = &end_position - &link_position;
+                // A vector from the center of the joint to the point inside the gripper.
+                let toward_end = &end_position - &link_position;
 
-            // Extract the global rotation axis of this joint.
-            let rot_axis: Unit<Vector3<f32>> = link_base_positions[i] * self.links[i].axis;
+                // Extract the global rotation axis of this joint.
+                let rot_axis: Unit<Vector3<f32>> = link_base_positions[i] * self.links[i].axis;
 
-            // Linear velocity of the gripper if the current joint was rotating at unit velocity, all others immobile.
-            let lv_g = -toward_end.cross(&rot_axis);
+                // Linear velocity of the gripper if the current joint was rotating at unit velocity, all others immobile.
+                let lv_g = -toward_end.cross(&rot_axis);
 
-            Velocity3 {
-                linear: lv_g,
-                angular: -rot_axis.into_inner(),
-            }
-        }).collect()
+                Velocity3 {
+                    linear: lv_g,
+                    angular: -rot_axis.into_inner(),
+                }
+            })
+            .collect()
     }
 
-    pub fn predict_tip_linear_velocity(&self, angles: &[f32], motor_speeds: &[f32]) -> Vector3<f32> {
-        self.velocity_gradients(angles).into_iter().zip(motor_speeds.iter())
+    pub fn predict_tip_linear_velocity(
+        &self,
+        angles: &[f32],
+        motor_speeds: &[f32],
+    ) -> Vector3<f32> {
+        self.velocity_gradients(angles)
+            .into_iter()
+            .zip(motor_speeds.iter())
             .map(|(v, ms)| v.linear * *ms)
             .sum()
     }
 
-    pub fn inverse_solve_velocity(&self, angles: &[f32], tip_velocity: &Velocity3<f32>) -> Option<Vec<f32>> {
-        let vg: Vec<Vector6<f32>> = self.velocity_gradients(angles).into_iter().map(|v| *v.as_vector()).collect();
+    pub fn inverse_solve_velocity(
+        &self,
+        angles: &[f32],
+        tip_velocity: &Velocity3<f32>,
+    ) -> Option<Vec<f32>> {
+        let vg: Vec<Vector6<f32>> = self
+            .velocity_gradients(angles)
+            .into_iter()
+            .map(|v| *v.as_vector())
+            .collect();
 
         let mtx = Matrix6xX::from_columns(vg.as_slice());
 
-        (mtx.transpose() * &mtx).lu().solve(&(mtx.transpose() * tip_velocity.as_vector())).map(|v| v.into_iter().cloned().collect())
+        (mtx.transpose() * &mtx)
+            .lu()
+            .solve(&(mtx.transpose() * tip_velocity.as_vector()))
+            .map(|v| v.into_iter().cloned().collect())
     }
 
-    pub fn inverse_solve_linear_velocity(&self, angles: &[f32], tip_linear_velocity: &Vector3<f32>) -> Option<Vec<f32>> {
-        let vg: Vec<Vector3<f32>> = self.velocity_gradients(angles).into_iter().map(|v| v.linear).collect();
+    pub fn inverse_solve_linear_velocity(
+        &self,
+        angles: &[f32],
+        tip_linear_velocity: &Vector3<f32>,
+    ) -> Option<Vec<f32>> {
+        let vg: Vec<Vector3<f32>> = self
+            .velocity_gradients(angles)
+            .into_iter()
+            .map(|v| v.linear)
+            .collect();
 
         let mtx = Matrix3xX::from_columns(vg.as_slice());
 
-        (mtx.transpose() * &mtx).lu().solve(&(mtx.transpose() * tip_linear_velocity)).map(|v| v.into_iter().cloned().collect())
+        (mtx.transpose() * &mtx)
+            .lu()
+            .solve(&(mtx.transpose() * tip_linear_velocity))
+            .map(|v| v.into_iter().cloned().collect())
     }
-
 
     //noinspection RsTypeCheck (Typechecking is apparently broken for cloning the parent shift...)
     /// Derive a KinematicModel from a Multibody, given a set of links that are assumed
     /// to form a kinematic chain
-    pub fn from_multibody(physics: &PhysicsWorld, base: DefaultBodyPartHandle, links: &[DefaultBodyPartHandle], last_tip: Vector3<f32>) -> Self {
+    pub fn from_multibody(
+        physics: &PhysicsWorld,
+        base: DefaultBodyPartHandle,
+        links: &[DefaultBodyPartHandle],
+        last_tip: Vector3<f32>,
+    ) -> Self {
         Self {
-            origin: get_multibody_link(physics, base).unwrap().position() * Translation3::from(*get_multibody_link(physics, *links.first().unwrap()).unwrap().parent_shift()),
-            links: links.iter().enumerate().map(|(i, bph)| {
-                let offset: Vector3<f32> = if let Some(next_bph) = links.get(i + 1) {
-                    *get_multibody_link(physics, *next_bph).unwrap().parent_shift()
-                } else {
-                    last_tip
-                };
+            origin: get_multibody_link(physics, base).unwrap().position()
+                * Translation3::from(
+                    *get_multibody_link(physics, *links.first().unwrap())
+                        .unwrap()
+                        .parent_shift(),
+                ),
+            links: links
+                .iter()
+                .enumerate()
+                .map(|(i, bph)| {
+                    let offset: Vector3<f32> = if let Some(next_bph) = links.get(i + 1) {
+                        *get_multibody_link(physics, *next_bph)
+                            .unwrap()
+                            .parent_shift()
+                    } else {
+                        last_tip
+                    };
 
-                let link_joint = get_joint::<RevoluteJoint<f32>>(physics, *bph).unwrap();
-                KinematicLink {
-                    offset,
-                    axis: link_joint.axis(),
-                    min: link_joint.min_angle().unwrap_or(std::f32::NEG_INFINITY),
-                    max: link_joint.max_angle().unwrap_or(std::f32::INFINITY),
-                }
-            }).collect(),
+                    let link_joint = get_joint::<RevoluteJoint<f32>>(physics, *bph).unwrap();
+                    KinematicLink {
+                        offset,
+                        axis: link_joint.axis(),
+                        min: link_joint.min_angle().unwrap_or(std::f32::NEG_INFINITY),
+                        max: link_joint.max_angle().unwrap_or(std::f32::INFINITY),
+                    }
+                })
+                .collect(),
         }
     }
 

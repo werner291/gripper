@@ -6,16 +6,18 @@ use std::option::Option;
 use clap::Clap;
 use na::Isometry3;
 
-use control_strategies::ControllerStrategy;
 use control_strategies::tcp_controller::TcpController;
+use control_strategies::ControllerStrategy;
 use graphics::Graphics;
+use robot::spawn;
 
 use crate::control_strategies::gradient_descent_control::GradientDescentController;
-use crate::spawn_utilities::{make_ground, make_pinned_ball};
 use crate::simulator_thread::apply_motor_speeds;
+use crate::spawn_utilities::{make_ground, make_pinned_ball};
 
 mod control_strategies;
 mod graphics;
+mod kinematics;
 mod load_mesh;
 mod multibody_util;
 mod physics;
@@ -23,7 +25,6 @@ mod robot;
 mod simulator_thread;
 mod spawn_utilities;
 mod sync_strategies;
-mod kinematics;
 
 extern crate array_init;
 extern crate kiss3d;
@@ -47,7 +48,6 @@ struct Opts {
     remote_control_port: Option<u16>,
 }
 
-
 fn main() {
     let opts: Opts = Opts::parse();
 
@@ -55,7 +55,7 @@ fn main() {
 
     let mut physics = physics::PhysicsWorld::new();
 
-    let robot = robot::make_robot(&mut physics, &mut graphics);
+    let robot = spawn::make_robot(&mut physics, &mut graphics);
 
     make_ground(&mut physics, &mut graphics);
     let (_, ball_bh) = make_pinned_ball(&mut physics, &mut graphics);
@@ -66,9 +66,7 @@ fn main() {
     }
 
     let mut tctrl: Box<dyn ControllerStrategy> = match opts.remote_control_port {
-        Option::None => Box::new(GradientDescentController::new(
-            ball_bh,
-        )),
+        Option::None => Box::new(GradientDescentController::new(ball_bh)),
         Option::Some(port) => {
             Box::new(TcpController::new_on_port(port).expect("Connection failed."))
         }

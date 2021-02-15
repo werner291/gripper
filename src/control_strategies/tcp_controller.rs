@@ -7,10 +7,11 @@ use std::result::Result::Ok;
 use byteorder::{BigEndian, ReadBytesExt, WriteBytesExt};
 use nphysics3d::joint::RevoluteJoint;
 
+use crate::control_strategies::ControllerStrategy;
 use crate::multibody_util::get_joint;
 use crate::physics::PhysicsWorld;
-use crate::robot::{JointVelocities, RobotBodyPartIndex};
-use crate::control_strategies::ControllerStrategy;
+use crate::robot::joint_map::JointVelocities;
+use crate::robot::RobotBodyPartIndex;
 
 pub struct TcpController {
     listener: TcpListener,

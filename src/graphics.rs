@@ -4,17 +4,17 @@ use std::option::Option::Some;
 use std::prelude::v1::Vec;
 
 use kiss3d::light::Light;
+use kiss3d::resource::Mesh;
 use kiss3d::scene::SceneNode;
 use kiss3d::window::Window;
-use kiss3d::resource::Mesh;
 use nalgebra::{Isometry3, Point3};
 
-use nphysics3d::object::{DefaultBodyPartHandle, DefaultBodyHandle};
+use crate::simulator_thread::PhysicsUpdate;
 use generational_arena::{Arena, Index};
+use nphysics3d::object::{DefaultBodyHandle, DefaultBodyPartHandle};
+use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
-use std::cell::RefCell;
-use crate::simulator_thread::PhysicsUpdate;
 
 /// Struct containing data necessary for visualisation of the simulation.
 pub struct Graphics {
@@ -27,7 +27,6 @@ pub struct Graphics {
 }
 
 impl Graphics {
-
     /// Initialize the visualisation and open a window with some default settings.
     /// FIXME: The default camera settings are pretty bad, but default arcball camera is inaccessible
     pub fn init() -> Graphics {
@@ -63,28 +62,26 @@ impl Graphics {
         self.frames_drawn += 1;
         for (_, trace) in self.traces.iter() {
             trace.draw(&mut self.window)
-        };
+        }
         self.window.render()
     }
 
     /// Graphics is mainly a view of a PhysicsWorld. Call this method to update that view,
     /// usually once every update of the physics world.
-    pub fn synchronize_physics_to_graphics(
-        &mut self,
-        physics: &PhysicsUpdate,
-    ) {
+    pub fn synchronize_physics_to_graphics(&mut self, physics: &PhysicsUpdate) {
         for (sn, bph) in self.bp_to_sn.iter_mut() {
             sn.set_local_transformation(physics.positions[bph]);
         }
 
-        for (_,tr) in self.traces.iter_mut() {
+        for (_, tr) in self.traces.iter_mut() {
             tr.update(&physics.positions);
         }
 
         for (_sn, bh, mesh) in self.fem_bodies.iter_mut() {
             let points = &physics.fvm_points[bh];
 
-            (*mesh).borrow_mut()
+            (*mesh)
+                .borrow_mut()
                 .coords()
                 .write()
                 .expect("Mesh was poisoned.")
@@ -93,11 +90,8 @@ impl Graphics {
                 .unwrap()
                 .splice(.., points.iter().map(|pt| pt.clone()).collect::<Vec<_>>());
         }
-
-
     }
 }
-
 
 struct Trace {
     target: DefaultBodyPartHandle,
@@ -106,7 +100,7 @@ struct Trace {
 }
 
 impl Trace {
-    fn update(&mut self, physics :&HashMap<DefaultBodyPartHandle, Isometry3<f32>>) {
+    fn update(&mut self, physics: &HashMap<DefaultBodyPartHandle, Isometry3<f32>>) {
         self.points
             .push(&physics[&self.target] * &self.offset * Point3::new(0.0, 0.0, 0.0));
     }

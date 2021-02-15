@@ -5,12 +5,12 @@ use std::rc::Rc;
 
 use kiss3d::resource::Mesh;
 use kiss3d::scene::SceneNode;
-use nalgebra::{Point3, Unit, Vector3, Translation3};
+use nalgebra::{Point3, Translation3, Unit, Vector3};
+use nphysics3d::ncollide3d::shape::{Ball, Plane, ShapeHandle};
+use nphysics3d::object::{Body, DefaultBodyHandle, FEMVolume, FEMVolumeDesc};
 use nphysics3d::{
     object::BodyPartHandle, object::BodyStatus, object::ColliderDesc, object::RigidBodyDesc,
 };
-use nphysics3d::ncollide3d::shape::{Ball, Plane, ShapeHandle};
-use nphysics3d::object::{Body, DefaultBodyHandle, FEMVolume, FEMVolumeDesc};
 
 use crate::graphics::Graphics;
 use crate::physics::PhysicsWorld;
@@ -98,8 +98,12 @@ pub fn make_ground(physics: &mut PhysicsWorld, graphics: &mut Graphics) {
         .push((ground_quad, BodyPartHandle(ground, 0)));
 }
 
-pub fn spawn_ball(p: &mut PhysicsWorld, g: &mut Graphics, radius: f32, middle_point: Point3<f32>) -> (SceneNode, DefaultBodyHandle) {
-
+pub fn spawn_ball(
+    p: &mut PhysicsWorld,
+    g: &mut Graphics,
+    radius: f32,
+    middle_point: Point3<f32>,
+) -> (SceneNode, DefaultBodyHandle) {
     let rb = RigidBodyDesc::new()
         .translation(middle_point.coords)
         .build();
@@ -111,19 +115,19 @@ pub fn spawn_ball(p: &mut PhysicsWorld, g: &mut Graphics, radius: f32, middle_po
             .build(BodyPartHandle(ball, 0)),
     );
     let ball_sn = g.window.add_sphere(radius);
-    g
-        .bp_to_sn
-        .push((ball_sn.clone(), BodyPartHandle(ball, 0)));
+    g.bp_to_sn.push((ball_sn.clone(), BodyPartHandle(ball, 0)));
 
     (ball_sn, ball)
 }
 
-pub fn spawn_flexible_rod(p: &mut PhysicsWorld, g: &mut Graphics,
-                          origin: Point3<f32>) -> (SceneNode, DefaultBodyHandle) {
-
+pub fn spawn_flexible_rod(
+    p: &mut PhysicsWorld,
+    g: &mut Graphics,
+    origin: Point3<f32>,
+) -> (SceneNode, DefaultBodyHandle) {
     let mut fem_body = FEMVolumeDesc::cube(4, 1, 1)
-        .scale(Vector3::new(10.0,0.5, 0.5))
-        .translation(origin.coords + Vector3::new(5.0,0.0,0.0))
+        .scale(Vector3::new(10.0, 0.5, 0.5))
+        .translation(origin.coords + Vector3::new(5.0, 0.0, 0.0))
         .young_modulus(1.0e5)
         .poisson_ratio(0.1)
         .mass_damping(0.5)
@@ -144,20 +148,26 @@ pub fn spawn_flexible_rod(p: &mut PhysicsWorld, g: &mut Graphics,
     let co = boundary_desc.build(fem_body_handle);
     p.colliders.insert(co);
 
-    let bm = p.bodies.get(fem_body_handle).unwrap().downcast_ref::<FEMVolume<f32>>().unwrap().boundary_mesh().0;
-    let mesh = Rc::new(RefCell::new(
-        Mesh::new(
-            bm.points().into_iter().cloned().collect(),
-            bm.faces().into_iter().map(|f| Point3::new(f.indices.x as u16, f.indices.y as u16, f.indices.z as u16)).collect(),
-            None,
-            None,
-            true)
-    ));
+    let bm = p
+        .bodies
+        .get(fem_body_handle)
+        .unwrap()
+        .downcast_ref::<FEMVolume<f32>>()
+        .unwrap()
+        .boundary_mesh()
+        .0;
+    let mesh = Rc::new(RefCell::new(Mesh::new(
+        bm.points().into_iter().cloned().collect(),
+        bm.faces()
+            .into_iter()
+            .map(|f| Point3::new(f.indices.x as u16, f.indices.y as u16, f.indices.z as u16))
+            .collect(),
+        None,
+        None,
+        true,
+    )));
 
-    let sn = g.window.add_mesh(
-        mesh.clone(),
-        Vector3::new(1.0, 1.0, 1.0)
-    );
+    let sn = g.window.add_mesh(mesh.clone(), Vector3::new(1.0, 1.0, 1.0));
 
     g.fem_bodies.push((sn.clone(), fem_body_handle, mesh));
 

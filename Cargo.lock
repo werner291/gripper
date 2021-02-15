@@ -704,6 +704,7 @@ dependencies = [
  "generational-arena",
  "kiss3d",
  "nalgebra",
+ "ncollide3d",
  "nphysics3d",
  "rand 0.8.3",
  "splines",

@@ -17,11 +17,28 @@
     <cargoProject FILE="$PROJECT_DIR$/src/simulator_thread/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="99bfd17e-0b5a-4a4c-b788-1095db1046ef" name="Default Changelist" comment="Set up the apple picking simulation to the point where there is an apple on a branch, and the picker accidentally knocks the apple off the branch.">
+    <list default="true" id="99bfd17e-0b5a-4a4c-b788-1095db1046ef" name="Default Changelist" comment="Picker occasionally manages to catch the apple.">
+      <change afterPath="$PROJECT_DIR$/src/robot/joint_map.rs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/robot/spawn.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Cargo.lock" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.toml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/examples/flexible_tree.rs" beforeDir="false" afterPath="$PROJECT_DIR$/examples/flexible_tree.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/random_planner_example.rs" beforeDir="false" afterPath="$PROJECT_DIR$/examples/random_planner_example.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/control_strategies/demo_flailing.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/control_strategies/demo_flailing.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/control_strategies/gradient_descent_control.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/control_strategies/gradient_descent_control.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/robot.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/robot.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/control_strategies/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/control_strategies/mod.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/control_strategies/path_controller.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/control_strategies/path_controller.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/control_strategies/tcp_controller.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/control_strategies/tcp_controller.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/control_strategies/to_angles.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/control_strategies/to_angles.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/graphics.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/graphics.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/inverse_kinematics.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/inverse_kinematics.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/kinematics.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/kinematics.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/robot.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/robot/mod.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/simulator_thread.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/simulator_thread.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/spawn_utilities.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/spawn_utilities.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -110,8 +127,8 @@
         <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
       </method>
     </configuration>
-    <configuration name="build" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
-      <option name="command" value="build" />
+    <configuration name="doc [gripper_experiment]" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
+      <option name="command" value="doc" />
       <option name="workingDirectory" value="file://$PROJECT_DIR$" />
       <option name="channel" value="DEFAULT" />
       <option name="allFeatures" value="false" />
@@ -153,19 +170,19 @@
       </method>
     </configuration>
     <list>
+      <item itemvalue="Cargo.doc [gripper_experiment]" />
       <item itemvalue="Cargo.Run flexible_tree" />
       <item itemvalue="Cargo.Test inverse_kinematics::tests" />
-      <item itemvalue="Cargo.build" />
       <item itemvalue="Cargo.run [gripper_experiment]" />
       <item itemvalue="Cargo.run" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Cargo.doc [gripper_experiment]" />
         <item itemvalue="Cargo.Run flexible_tree" />
         <item itemvalue="Cargo.run" />
         <item itemvalue="Cargo.run [gripper_experiment]" />
         <item itemvalue="Cargo.Test inverse_kinematics::tests" />
-        <item itemvalue="Cargo.run [gripper_experiment]" />
       </list>
     </recent_temporary>
   </component>
@@ -198,7 +215,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="GradientDescentController can now target a RigidBody instead of just a point.&#10;Refactored the terrifying use of numerical channels to a struct." />
     <MESSAGE value="Formatted and fixed." />
     <MESSAGE value="Minor refactoring, cleanup." />
     <MESSAGE value="Gradient descent controller can not handle a heading!" />
@@ -223,7 +239,8 @@
     <MESSAGE value="Cleaned up the GradientDescentController code to use the KinematicModel more explicitly." />
     <MESSAGE value="Refactored the interface for the simulator thread." />
     <MESSAGE value="Set up the apple picking simulation to the point where there is an apple on a branch, and the picker accidentally knocks the apple off the branch." />
-    <option name="LAST_COMMIT_MESSAGE" value="Set up the apple picking simulation to the point where there is an apple on a branch, and the picker accidentally knocks the apple off the branch." />
+    <MESSAGE value="Picker occasionally manages to catch the apple." />
+    <option name="LAST_COMMIT_MESSAGE" value="Picker occasionally manages to catch the apple." />
   </component>
   <component name="WindowStateProjectService">
     <state x="320" y="75" width="1017" height="719" key="#Plugins" timestamp="1612725403803">
@@ -239,11 +256,11 @@
       <screen x="0" y="0" width="1440" height="864" />
     </state>
     <state x="178" y="90" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1440.864@0.0.1440.864" timestamp="1612272593667" />
-    <state x="533" y="153" key="#com.intellij.ide.util.MemberChooser" timestamp="1613397735827">
+    <state x="533" y="153" key="#com.intellij.ide.util.MemberChooser" timestamp="1613419202992">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state x="533" y="147" key="#com.intellij.ide.util.MemberChooser/0.0.1440.864@0.0.1440.864" timestamp="1612292895037" />
-    <state x="533" y="153" key="#com.intellij.ide.util.MemberChooser/0.0.1440.900@0.0.1440.900" timestamp="1613397735827" />
+    <state x="533" y="153" key="#com.intellij.ide.util.MemberChooser/0.0.1440.900@0.0.1440.900" timestamp="1613419202992" />
     <state x="458" y="184" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1612735276281">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
@@ -258,35 +275,35 @@
     </state>
     <state x="144" y="68" key="DiffContextDialog/0.0.1440.864@0.0.1440.864" timestamp="1612205159361" />
     <state x="144" y="71" width="1152" height="720" key="DiffContextDialog/0.0.1440.900@0.0.1440.900" timestamp="1613334144906" />
-    <state x="508" y="194" width="424" height="491" key="FileChooserDialogImpl" timestamp="1613345222520">
+    <state x="508" y="194" width="424" height="491" key="FileChooserDialogImpl" timestamp="1613420677510">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state x="508" y="186" width="424" height="491" key="FileChooserDialogImpl/0.0.1440.864@0.0.1440.864" timestamp="1612186121559" />
-    <state x="508" y="194" width="424" height="491" key="FileChooserDialogImpl/0.0.1440.900@0.0.1440.900" timestamp="1613345222520" />
+    <state x="508" y="194" width="424" height="491" key="FileChooserDialogImpl/0.0.1440.900@0.0.1440.900" timestamp="1613420677510" />
     <state x="0" y="0" key="FileDocumentManager.FileCacheConflict" timestamp="1611932380535">
       <screen x="0" y="0" width="1440" height="864" />
     </state>
     <state x="0" y="0" key="FileDocumentManager.FileCacheConflict/0.0.1440.864@0.0.1440.864" timestamp="1611932380535" />
-    <state width="1394" height="223" key="GridCell.Tab.0.bottom" timestamp="1613403600625">
+    <state width="1394" height="223" key="GridCell.Tab.0.bottom" timestamp="1613416332227">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state width="1394" height="213" key="GridCell.Tab.0.bottom/0.0.1440.864@0.0.1440.864" timestamp="1612297058044" />
-    <state width="1394" height="223" key="GridCell.Tab.0.bottom/0.0.1440.900@0.0.1440.900" timestamp="1613403600625" />
-    <state width="1394" height="223" key="GridCell.Tab.0.center" timestamp="1613403600625">
+    <state width="1394" height="223" key="GridCell.Tab.0.bottom/0.0.1440.900@0.0.1440.900" timestamp="1613416332227" />
+    <state width="1394" height="223" key="GridCell.Tab.0.center" timestamp="1613416332226">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state width="1394" height="213" key="GridCell.Tab.0.center/0.0.1440.864@0.0.1440.864" timestamp="1612297058043" />
-    <state width="1394" height="223" key="GridCell.Tab.0.center/0.0.1440.900@0.0.1440.900" timestamp="1613403600625" />
-    <state width="1394" height="223" key="GridCell.Tab.0.left" timestamp="1613403600625">
+    <state width="1394" height="223" key="GridCell.Tab.0.center/0.0.1440.900@0.0.1440.900" timestamp="1613416332226" />
+    <state width="1394" height="223" key="GridCell.Tab.0.left" timestamp="1613416332226">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state width="1394" height="213" key="GridCell.Tab.0.left/0.0.1440.864@0.0.1440.864" timestamp="1612297058042" />
-    <state width="1394" height="223" key="GridCell.Tab.0.left/0.0.1440.900@0.0.1440.900" timestamp="1613403600625" />
-    <state width="1394" height="223" key="GridCell.Tab.0.right" timestamp="1613403600625">
+    <state width="1394" height="223" key="GridCell.Tab.0.left/0.0.1440.900@0.0.1440.900" timestamp="1613416332226" />
+    <state width="1394" height="223" key="GridCell.Tab.0.right" timestamp="1613416332226">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state width="1394" height="213" key="GridCell.Tab.0.right/0.0.1440.864@0.0.1440.864" timestamp="1612297058044" />
-    <state width="1394" height="223" key="GridCell.Tab.0.right/0.0.1440.900@0.0.1440.900" timestamp="1613403600625" />
+    <state width="1394" height="223" key="GridCell.Tab.0.right/0.0.1440.900@0.0.1440.900" timestamp="1613416332226" />
     <state x="144" y="72" key="MergeDialog" timestamp="1612371589541">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
@@ -305,11 +322,11 @@
     </state>
     <state x="221" y="63" key="SettingsEditor/0.0.1440.864@0.0.1440.864" timestamp="1611511223289" />
     <state x="221" y="66" width="1007" height="737" key="SettingsEditor/0.0.1440.900@0.0.1440.900" timestamp="1613065391162" />
-    <state x="320" y="171" width="800" height="563" key="Vcs.Push.Dialog.v2" timestamp="1613385272100">
+    <state x="320" y="171" width="800" height="563" key="Vcs.Push.Dialog.v2" timestamp="1613404201390">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state x="320" y="164" key="Vcs.Push.Dialog.v2/0.0.1440.864@0.0.1440.864" timestamp="1612295522291" />
-    <state x="320" y="171" width="800" height="563" key="Vcs.Push.Dialog.v2/0.0.1440.900@0.0.1440.900" timestamp="1613385272100" />
+    <state x="320" y="171" width="800" height="563" key="Vcs.Push.Dialog.v2/0.0.1440.900@0.0.1440.900" timestamp="1613404201390" />
     <state x="100" y="100" width="1240" height="664" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1612185023985">
       <screen x="0" y="0" width="1440" height="864" />
     </state>
@@ -337,10 +354,10 @@
     </state>
     <state x="384" y="191" key="run.anything.popup/0.0.1440.864@0.0.1440.864" timestamp="1611938939904" />
     <state x="384" y="199" key="run.anything.popup/0.0.1440.900@0.0.1440.900" timestamp="1612709276035" />
-    <state x="383" y="191" width="672" height="707" key="search.everywhere.popup" timestamp="1613396945718">
+    <state x="383" y="191" width="672" height="707" key="search.everywhere.popup" timestamp="1613422893845">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state x="383" y="184" width="672" height="678" key="search.everywhere.popup/0.0.1440.864@0.0.1440.864" timestamp="1612293271812" />
-    <state x="383" y="191" width="672" height="707" key="search.everywhere.popup/0.0.1440.900@0.0.1440.900" timestamp="1613396945718" />
+    <state x="383" y="191" width="672" height="707" key="search.everywhere.popup/0.0.1440.900@0.0.1440.900" timestamp="1613422893845" />
   </component>
 </project>
