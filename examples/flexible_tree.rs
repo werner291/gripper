@@ -52,9 +52,11 @@ fn main() {
     let mut p = PhysicsWorld::new();
     let mut g = Graphics::init();
 
-    let fem_body_handle = spawn_utilities::spawn_flexible_rod(&mut p, &mut g, Point3::new(-5.0, 8.0, 2.0));
+    let (mut fem_sn, branch_bh) = spawn_utilities::spawn_flexible_rod(&mut p, &mut g, Point3::new(-5.0, 8.0, 2.0));
 
-    let branch_body = p.bodies.get(fem_body_handle).unwrap().downcast_ref::<FEMVolume<f32>>().unwrap();
+    fem_sn.set_color(0.5,0.25,0.125);
+
+    let branch_body = p.bodies.get(branch_bh).unwrap().downcast_ref::<FEMVolume<f32>>().unwrap();
 
     let target_attachment_point = Point3::new(1.0,  1.0, 2.0);
 
@@ -62,12 +64,13 @@ fn main() {
     let attach_to_cell = bodypart_closest_to_point(branch_body, &target_attachment_point);
     let cell_middle = branch_body.world_point_at_material_point(branch_body.part(attach_to_cell).unwrap(), &Point3::new(0.0, 0.0, 0.0));
 
-    let apple_bh = spawn_utilities::spawn_ball(&mut p, &mut g, 0.35, cell_middle + Vector3::new(0.0, -1.0, 0.0));
+    let (mut apple_sn, apple_bh) = spawn_utilities::spawn_ball(&mut p, &mut g, 0.35, cell_middle + Vector3::new(0.0, -1.0, 0.0));
+    apple_sn.set_color(1.0,0.0,0.0);
 
     let mut stem = BallConstraint::new(BodyPartHandle(apple_bh, 0),
-                                         BodyPartHandle(fem_body_handle, attach_to_cell),
-                                         Point3::new(0.0, 1.0, 0.0),
-                                         Point3::new(0.0, 0.0, 0.0));
+                                       BodyPartHandle(branch_bh, attach_to_cell),
+                                       Point3::new(0.0, 1.0, 0.0),
+                                       Point3::new(0.0, 0.0, 0.0));
 
     stem.set_break_force(100.0);
 
