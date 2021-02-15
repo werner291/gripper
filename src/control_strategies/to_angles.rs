@@ -22,7 +22,7 @@ impl ControllerStrategy for ApproachAngles {
 ///
 /// The target velocity is the cube of the leftover signed angle, with motor speeds limited to a
 /// rotation speed of 1 (other joint speeds scaled down proportionally).
-fn joint_velocities_towards_angles(target_angles : &ArmJointMap<f32>, physics_world: &PhysicsWorld, robot: &RobotBodyPartIndex) -> ArmJointVelocities {
+pub fn joint_velocities_towards_angles(target_angles : &ArmJointMap<f32>, physics_world: &PhysicsWorld, robot: &RobotBodyPartIndex) -> ArmJointVelocities {
 
     let arm_joint_angles = ArmJointMap {
         swivel: get_joint::<RevoluteJoint<f32>>(physics_world, robot.swivel).unwrap().angle(),

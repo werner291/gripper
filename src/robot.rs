@@ -1,8 +1,10 @@
 use std::cell::RefCell;
 use std::clone::Clone;
+use std::convert::{From, Into, TryFrom};
 use std::f32::consts::{FRAC_PI_2, PI};
 use std::iter::Iterator;
 use std::option::Option::{None, Some};
+use std::prelude::v1::Vec;
 use std::rc::Rc;
 use std::string::{String, ToString};
 
@@ -12,18 +14,20 @@ use kiss3d::ncollide3d::shape::{ConvexHull, ShapeHandle};
 use kiss3d::resource::{MaterialManager, Mesh, TextureManager};
 use kiss3d::scene::{Object, SceneNode};
 use nphysics3d::joint::{FixedJoint, RevoluteJoint};
+use nphysics3d::nalgebra::{RealField, Vector4};
 use nphysics3d::object::{
     BodyPartHandle, ColliderDesc, DefaultBodyHandle, DefaultBodyPartHandle, DefaultColliderHandle,
     MultibodyDesc,
 };
 
-use crate::graphics::Graphics;
-use crate::physics::PhysicsWorld;
 use crate::{load_mesh, multibody_util};
-use std::prelude::v1::Vec;
-use nphysics3d::nalgebra::{RealField, Vector4};
-use std::convert::{From, Into};
+use crate::graphics::Graphics;
+use crate::kinematics::KinematicModel;
 use crate::multibody_util::get_joint;
+use crate::physics::PhysicsWorld;
+use std::option::Option;
+use std::result::Result;
+use std::result::Result::{Ok, Err};
 
 #[derive(Debug, Clone, Copy)]
 pub struct ArmJointMap<T> {
@@ -58,7 +62,7 @@ pub struct JointMap<T> {
 }
 
 impl<T> JointMap<T> {
-    pub(crate) fn from_arm_and_finger(arm: ArmJointMap<T>, finger: FingerJointMap<T>) -> JointMap<T> {
+    pub fn from_arm_and_finger(arm: ArmJointMap<T>, finger: FingerJointMap<T>) -> JointMap<T> {
         JointMap {
             swivel: arm.swivel,
             link1: arm.link1,
@@ -105,6 +109,25 @@ impl<N:RealField> Into<Vector4<N>> for ArmJointMap<N> {
             self.link2,
             self.gripper
         )
+    }
+}
+
+#[derive(Debug)]
+pub struct WrongLengthError;
+impl<T:Clone> TryFrom<&[T]> for ArmJointMap<T> {
+    type Error = WrongLengthError;
+
+    fn try_from(value: &[T]) -> Result<Self, WrongLengthError> {
+        if value.len() == 4 {
+            Ok(Self {
+                swivel: value[0].clone(),
+                link1: value[1].clone(),
+                link2: value[2].clone(),
+                gripper: value[3].clone()
+            })
+        } else {
+            Err(WrongLengthError)
+        }
     }
 }
 
@@ -535,23 +558,20 @@ pub fn gripper_finger_angles(
     robot: &RobotBodyPartIndex,
 ) -> FingerJointMap<f32> {
     FingerJointMap {
-        finger_0: multibody_util::get_joint::<RevoluteJoint<f32>>(physics, robot.finger_0)
-            .unwrap()
-            .angle(),
-        finger_1: multibody_util::get_joint::<RevoluteJoint<f32>>(physics, robot.finger_1)
-            .unwrap()
-            .angle(),
-        finger_2: multibody_util::get_joint::<RevoluteJoint<f32>>(physics, robot.finger_2)
-            .unwrap()
-            .angle(),
-        finger_0_2: multibody_util::get_joint::<RevoluteJoint<f32>>(physics, robot.finger_0_2)
-            .unwrap()
-            .angle(),
-        finger_1_2: multibody_util::get_joint::<RevoluteJoint<f32>>(physics, robot.finger_1_2)
-            .unwrap()
-            .angle(),
-        finger_2_2: multibody_util::get_joint::<RevoluteJoint<f32>>(physics, robot.finger_2_2)
-            .unwrap()
-            .angle(),
+        finger_0: revolute_joint_angle(physics, robot.finger_0).unwrap(),
+        finger_1: revolute_joint_angle(physics, robot.finger_1).unwrap(),
+        finger_2: revolute_joint_angle(physics, robot.finger_2).unwrap(),
+        finger_0_2: revolute_joint_angle(physics, robot.finger_0_2).unwrap(),
+        finger_1_2: revolute_joint_angle(physics, robot.finger_1_2).unwrap(),
+        finger_2_2: revolute_joint_angle(physics, robot.finger_2_2).unwrap(),
     }
+}
+
+pub fn revolute_joint_angle(physics: &PhysicsWorld, part_handle: DefaultBodyPartHandle) -> Option<f32> {
+    multibody_util::get_joint::<RevoluteJoint<f32>>(physics, part_handle)
+        .map(RevoluteJoint::angle)
+}
+
+pub fn kinematic_model_from_robot(p: &mut PhysicsWorld, robot: &RobotBodyPartIndex) -> KinematicModel {
+    KinematicModel::from_multibody(&p, robot.base, &[robot.swivel, robot.link1, robot.link2, robot.gripper], Vector3::new(0.0, 1.0, 0.0))
 }

@@ -1,15 +1,19 @@
-use crate::physics::PhysicsWorld;
-use kiss3d::scene::SceneNode;
+use std::cell::RefCell;
+use std::clone::Clone;
+use std::option::Option::None;
+use std::rc::Rc;
 
-use nalgebra::{Point3, Unit, Vector3};
-use nphysics3d::ncollide3d::shape::{Ball, Plane, ShapeHandle};
+use kiss3d::resource::Mesh;
+use kiss3d::scene::SceneNode;
+use nalgebra::{Point3, Unit, Vector3, Translation3};
 use nphysics3d::{
     object::BodyPartHandle, object::BodyStatus, object::ColliderDesc, object::RigidBodyDesc,
 };
-use std::clone::Clone;
+use nphysics3d::ncollide3d::shape::{Ball, Plane, ShapeHandle};
+use nphysics3d::object::{Body, DefaultBodyHandle, FEMVolume, FEMVolumeDesc};
 
 use crate::graphics::Graphics;
-use nphysics3d::object::DefaultBodyHandle;
+use crate::physics::PhysicsWorld;
 
 /// Spawns a new ball with a radius of 0.3 at (4.0, 1.0, 0.0).
 ///
@@ -92,4 +96,70 @@ pub fn make_ground(physics: &mut PhysicsWorld, graphics: &mut Graphics) {
     graphics
         .bp_to_sn
         .push((ground_quad, BodyPartHandle(ground, 0)));
+}
+
+pub fn spawn_ball(p: &mut PhysicsWorld, g: &mut Graphics, radius: f32, middle_point: Point3<f32>) -> DefaultBodyHandle {
+
+    let rb = RigidBodyDesc::new()
+        .translation(middle_point.coords)
+        .build();
+
+    let ball = p.bodies.insert(rb);
+    p.colliders.insert(
+        ColliderDesc::new(ShapeHandle::new(Ball::new(radius)))
+            .density(0.5)
+            .build(BodyPartHandle(ball, 0)),
+    );
+    let ball_sn = g.window.add_sphere(radius);
+    g
+        .bp_to_sn
+        .push((ball_sn, BodyPartHandle(ball, 0)));
+
+    ball
+}
+
+pub fn spawn_flexible_rod(p: &mut PhysicsWorld, g: &mut Graphics,
+                          origin: Point3<f32>) -> DefaultBodyHandle {
+
+    let mut fem_body = FEMVolumeDesc::cube(4, 1, 1)
+        .scale(Vector3::new(10.0,0.5, 0.5))
+        .translation(origin.coords + Vector3::new(5.0,0.0,0.0))
+        .young_modulus(1.0e5)
+        .poisson_ratio(0.1)
+        .mass_damping(0.5)
+        .build();
+
+    // Make sure to do this *BEFORE* setting the kinematic indices.
+    // See: https://github.com/dimforge/nphysics/issues/283
+    let boundary_desc = fem_body.boundary_collider_desc();
+
+    for i in 0..(fem_body.positions().len() / 3) {
+        if (fem_body.positions()[i * 3] - origin.x).abs() < 1.0e-5 {
+            fem_body.set_node_kinematic(i, true);
+        }
+    }
+
+    let fem_body_handle = p.bodies.insert(fem_body);
+
+    let co = boundary_desc.build(fem_body_handle);
+    p.colliders.insert(co);
+
+    let bm = p.bodies.get(fem_body_handle).unwrap().downcast_ref::<FEMVolume<f32>>().unwrap().boundary_mesh().0;
+    let mut mesh = Rc::new(RefCell::new(
+        Mesh::new(
+            bm.points().into_iter().cloned().collect(),
+            bm.faces().into_iter().map(|f| Point3::new(f.indices.x as u16, f.indices.y as u16, f.indices.z as u16)).collect(),
+            None,
+            None,
+            true)
+    ));
+
+    let sn = g.window.add_mesh(
+        mesh.clone(),
+        Vector3::new(1.0, 1.0, 1.0)
+    );
+
+    g.fem_bodies.push((sn, fem_body_handle, mesh));
+
+    fem_body_handle
 }

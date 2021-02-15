@@ -42,7 +42,7 @@ pub struct KinematicLink {
 #[derive(Debug)]
 pub struct KinematicModel {
     // The position of the first link with 0 angle.
-    origin: Isometry3<f32>,
+    pub origin: Isometry3<f32>,
     pub links: Vec<KinematicLink>,
 }
 
@@ -165,5 +165,11 @@ impl KinematicModel {
                 }
             }).collect(),
         }
+    }
+
+    /// Get the sum of the lengths of all links in the kinematic chain,
+    /// to get a rough estimate of maximum reach.
+    pub fn chain_length(&self) -> f32 {
+        self.links.iter().map(|link| link.offset.norm()).sum()
     }
 }
